@@ -766,3 +766,10 @@ html[data-theme="dark"] .site-footer .footer-icons a:hover { color: $cp-accent-d
    back to invisible on stripped Linux font sets. */
 .fa-adjust::before                { content: "\25D0"; margin-right: .25em; }  /* ◐ left half black */
 .fa-adjust.fa-rotate-180::before  { content: "\25D1"; margin-right: .25em; }  /* ◑ right half black */
+
+/* ============================================================
+   Landing page redesign — "typed-systems editorial" layer.
+   Lives in _sass/home.scss; scoped to .cp-home. Imported last so
+   its tokens win over the generic card/button rules above.
+   ============================================================ */
+@import 'home';
