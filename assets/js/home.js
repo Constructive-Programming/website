@@ -120,8 +120,8 @@
     }, '-=0.55')
     // the narrowing: each bar enters wide, then narrows to its type
     .from('.hp-bar-row', { autoAlpha: 0, y: 14, duration: 0.5, stagger: 0.28 }, '-=0.6')
-    .from('.hp-bar-2', { width: '100%', duration: 0.9, ease: 'power4.inOut' }, '-=0.7')
-    .from('.hp-bar-3', { width: '100%', duration: 0.9, ease: 'power4.inOut' }, '-=0.55')
+    .from('.hp-bar-2', { width: '100%', duration: 0.9, ease: 'power4.inOut', clearProps: 'width' }, '-=0.7')
+    .from('.hp-bar-3', { width: '100%', duration: 0.9, ease: 'power4.inOut', clearProps: 'width' }, '-=0.55')
     .from('.hp-bar-caption', { autoAlpha: 0, duration: 0.6 }, '-=0.3');
 
   if (typeof ScrollTrigger === 'undefined') return;
