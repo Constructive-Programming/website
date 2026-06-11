@@ -1,0 +1,798 @@
+/* ============================================================
+   Landing page — "typed-systems editorial" layer.
+
+   Scoped to .cp-home (plus a body background hook). Tokens are CSS
+   custom properties so the existing light/dark theme toggle
+   (html[data-theme]) keeps working. Fraunces (variable serif) is the
+   display face for the landing page only; body copy stays on the
+   system sans stack defined in main.scss.
+
+   Motion notes: everything here is visible by default. GSAP
+   (assets/js/home.js) only *adds* entrances — no content is hidden
+   in CSS, so no-JS and prefers-reduced-motion users get the full
+   page, static.
+   ============================================================ */
+
+$hp-serif: "Fraunces", "Iowan Old Style", Georgia, "Times New Roman", serif;
+
+.cp-home {
+  /* --- Tokens: light (warm paper) ------------------------------- */
+  --hp-bg:          #faf8f3;
+  --hp-ink:         #1b1b26;
+  --hp-muted:       rgba(27, 27, 38, 0.62);
+  --hp-faint:       rgba(27, 27, 38, 0.45);
+  --hp-line:        rgba(27, 27, 38, 0.14);
+  --hp-line-soft:   rgba(27, 27, 38, 0.07);
+  --hp-accent:      #3b3b8c;
+  --hp-accent-ink:  #32327a;
+  --hp-accent-soft: rgba(59, 59, 140, 0.08);
+  --hp-accent-mid:  rgba(59, 59, 140, 0.18);
+  --hp-card-bg:     #fffdf9;
+  --hp-stat-bg:     linear-gradient(135deg, rgba(59, 59, 140, 0.10), rgba(59, 59, 140, 0.03));
+
+  background: var(--hp-bg);
+  color: var(--hp-ink);
+  overflow-x: clip;
+  /* .site-header is a full-width left float the theme never clears.
+     Block children overlap it harmlessly, but flex sections (BFCs)
+     would be squeezed into the zero remaining space beside it. */
+  clear: both;
+}
+
+html[data-theme="dark"] .cp-home {
+  --hp-bg:          #1f242c;
+  --hp-ink:         #d9e0ea;
+  --hp-muted:       rgba(217, 224, 234, 0.66);
+  --hp-faint:       rgba(217, 224, 234, 0.45);
+  --hp-line:        rgba(217, 224, 234, 0.16);
+  --hp-line-soft:   rgba(217, 224, 234, 0.08);
+  --hp-accent:      #9b9bf2;
+  --hp-accent-ink:  #b3b3f7;
+  --hp-accent-soft: rgba(138, 138, 240, 0.10);
+  --hp-accent-mid:  rgba(138, 138, 240, 0.22);
+  --hp-card-bg:     #262c35;
+  --hp-stat-bg:     linear-gradient(135deg, rgba(138, 138, 240, 0.14), rgba(138, 138, 240, 0.04));
+}
+
+/* Page background must extend behind navbar + footer, not just the
+   .cp-home block, or the warm paper ends in a hard seam. */
+html body:has(.cp-home) { background: #faf8f3; }
+html[data-theme="dark"] body:has(.cp-home) { background: #1f242c; }
+
+/* The theme paints header/footer with --background (pure white /
+   #22272e), which seams against the warm paper. Let them inherit. */
+body:has(.cp-home) .site-header,
+body:has(.cp-home) .site-footer { background: transparent; }
+
+/* --- Shared primitives ------------------------------------------ */
+
+.cp-home .hp-wrap {
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
+}
+
+.cp-home .hp-section {
+  padding-block: clamp(4.5rem, 9vw, 8rem);
+  border-top: 1px solid var(--hp-line-soft);
+}
+
+.cp-home .hp-eyebrow {
+  font-family: $cp-mono;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--hp-accent);
+  margin: 0 0 1.25rem;
+}
+
+.cp-home .hp-h2 {
+  font-family: $hp-serif;
+  font-weight: 560;
+  font-variation-settings: "opsz" 90;
+  font-size: clamp(2.1rem, 4.5vw, 3.4rem);
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+  margin: 0;
+  max-width: 22ch;
+  text-wrap: balance;
+}
+
+.cp-home .hp-h2 em {
+  font-style: italic;
+  color: var(--hp-accent-ink);
+}
+
+.cp-home .hp-section-head { margin-bottom: clamp(2.5rem, 5vw, 4.5rem); }
+
+.cp-home .hp-section-lead {
+  font-size: 1.15rem;
+  color: var(--hp-muted);
+  max-width: 52ch;
+  margin: 1.25rem 0 0;
+  line-height: 1.6;
+}
+
+.cp-home .hp-large {
+  font-size: clamp(1.2rem, 1.8vw, 1.45rem);
+  line-height: 1.55;
+  letter-spacing: -0.008em;
+  margin: 0;
+}
+
+.cp-home .hp-aside {
+  font-size: 0.92rem;
+  color: var(--hp-muted);
+  margin: 0.85rem 0 0;
+}
+
+.cp-home h3 {
+  font-family: $hp-serif;
+  font-weight: 600;
+  font-size: 1.45rem;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  margin: 0 0 0.6rem;
+}
+
+.cp-home a:focus-visible,
+.cp-home .btn:focus-visible {
+  outline: 2px solid var(--hp-accent);
+  outline-offset: 3px;
+}
+
+/* Buttons inherit main.scss; re-derive colours from tokens so the
+   dark hero/dark section stay legible. */
+.cp-home .btn-primary {
+  background-color: var(--hp-accent);
+  border-color: var(--hp-accent);
+  color: var(--hp-bg);
+}
+.cp-home .btn-primary:hover { background-color: var(--hp-accent-ink); border-color: var(--hp-accent-ink); color: var(--hp-bg); }
+.cp-home .btn-outline-primary { color: var(--hp-accent); border-color: var(--hp-accent-mid); background: transparent; }
+.cp-home .btn-outline-primary:hover { background: var(--hp-accent-soft); color: var(--hp-accent-ink); border-color: var(--hp-accent); }
+
+/* The theme's html[data-theme="dark"] button rules (teal --link) outrank
+   the .cp-home overrides above; restate them at dark specificity. */
+html[data-theme="dark"] .cp-home .btn-primary {
+  background-color: var(--hp-accent);
+  border-color: var(--hp-accent);
+  color: #14141d;
+}
+html[data-theme="dark"] .cp-home .btn-primary:hover,
+html[data-theme="dark"] .cp-home .btn-primary:focus {
+  background-color: var(--hp-accent-ink);
+  border-color: var(--hp-accent-ink);
+  color: #14141d;
+}
+html[data-theme="dark"] .cp-home .btn-outline-primary {
+  color: var(--hp-accent);
+  border-color: var(--hp-accent-mid);
+}
+html[data-theme="dark"] .cp-home .btn-outline-primary:hover,
+html[data-theme="dark"] .cp-home .btn-outline-primary:focus {
+  background: var(--hp-accent-soft);
+  color: var(--hp-accent-ink);
+  border-color: var(--hp-accent);
+}
+
+/* ============================================================ Hero */
+
+.cp-home .hp-hero {
+  position: relative;
+  padding-block: clamp(4rem, 9vh, 7rem) clamp(4rem, 8vw, 6.5rem);
+  min-height: min(92vh, 60rem);
+  display: flex;
+  align-items: center;
+}
+
+.cp-home .hp-hero-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* fine blueprint grid, faded at the edges */
+  background-image:
+    linear-gradient(var(--hp-line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--hp-line-soft) 1px, transparent 1px);
+  background-size: 72px 72px;
+  -webkit-mask-image: radial-gradient(120% 90% at 50% 10%, black 30%, transparent 75%);
+          mask-image: radial-gradient(120% 90% at 50% 10%, black 30%, transparent 75%);
+}
+
+.cp-home .hp-hero-bg canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+}
+
+.cp-home .hp-hero .hp-wrap { position: relative; width: 100%; }
+
+.cp-home .hp-hero-eyebrow { margin-bottom: 2rem; color: var(--hp-faint); }
+.cp-home .hp-hero-eyebrow span { color: var(--hp-accent); }
+
+.cp-home .hp-hero-title {
+  font-family: $hp-serif;
+  font-weight: 540;
+  font-variation-settings: "opsz" 144;
+  font-size: clamp(2.9rem, 8.2vw, 6.4rem);
+  line-height: 1.0;
+  letter-spacing: -0.022em;
+  margin: 0 0 1.75rem;
+  max-width: 14ch;
+}
+
+.cp-home .hp-hero-title em {
+  font-style: italic;
+  color: var(--hp-accent-ink);
+}
+
+.cp-home .hp-line { display: block; overflow: hidden; padding-block: 0.06em; }
+.cp-home .hp-line-inner { display: inline-block; will-change: transform; }
+
+.cp-home .hp-hero-lead {
+  font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+  line-height: 1.6;
+  color: var(--hp-muted);
+  max-width: 46ch;
+  margin: 0 0 2.25rem;
+}
+
+.cp-home .hp-hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: center;
+}
+
+.cp-home .hp-magnetic { will-change: transform; }
+
+/* --- Narrowing diagram (HTML rebuild of hero-narrowing.svg) ------ */
+
+.cp-home .hp-narrowing {
+  margin: clamp(3rem, 6vw, 4.5rem) 0 0;
+  max-width: 64rem;
+}
+
+.cp-home .hp-bar-row { margin-bottom: 1.1rem; }
+.cp-home .hp-bar-row-2 { margin-left: 7%; }
+.cp-home .hp-bar-row-3 { margin-left: 14%; }
+
+.cp-home .hp-bar {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  height: clamp(2.6rem, 5vw, 3.3rem);
+  padding-inline: clamp(0.9rem, 2vw, 1.4rem);
+  border: 1px solid var(--hp-accent);
+  border-radius: 0.55rem;
+  background: var(--hp-accent-soft);
+  transform-origin: left center;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.cp-home .hp-bar-1 { width: 100%; }
+.cp-home .hp-bar-2 { width: 61.8%; background: var(--hp-accent-mid); }
+.cp-home .hp-bar-3 { width: 38.2%; background: var(--hp-accent-mid); border-width: 1.4px; }
+
+.cp-home .hp-bar code {
+  font-family: $cp-mono;
+  font-size: clamp(0.82rem, 1.5vw, 1.05rem);
+  font-weight: 500;
+  background: none;
+  color: var(--hp-ink);
+}
+.cp-home .hp-key { color: var(--hp-accent-ink); font-weight: 600; }
+.cp-home .hp-dim { color: var(--hp-faint); }
+
+.cp-home .hp-bar-sub {
+  font-size: 0.88rem;
+  color: var(--hp-muted);
+  margin: 0.45rem 0 0 0.15rem;
+}
+
+.cp-home .hp-bar-caption {
+  font-family: $cp-mono;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--hp-faint);
+  margin-top: 1.75rem;
+}
+
+@media (max-width: 640px) {
+  .cp-home .hp-bar-row-2 { margin-left: 3%; }
+  .cp-home .hp-bar-row-3 { margin-left: 6%; }
+  .cp-home .hp-bar-2 { width: 82%; }
+  .cp-home .hp-bar-3 { width: 70%; }
+  .cp-home .hp-bar-3 code { font-size: 0.7rem; }
+}
+
+/* ==================================================== Positioning */
+
+.cp-home .hp-positioning-grid {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 5rem);
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .cp-home .hp-positioning-grid { grid-template-columns: 5fr 6fr; }
+}
+
+.cp-home .hp-capabilities {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+@media (min-width: 560px) {
+  .cp-home .hp-capabilities { grid-template-columns: 1fr 1fr; column-gap: 2.5rem; }
+}
+
+.cp-home .hp-capabilities li {
+  border-top: 1px solid var(--hp-line);
+  padding: 1.1rem 0 1.3rem;
+  font-size: 0.97rem;
+  line-height: 1.5;
+  color: var(--hp-muted);
+}
+
+.cp-home .hp-capabilities strong {
+  display: block;
+  color: var(--hp-ink);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.3rem;
+  font-size: 1.05rem;
+}
+
+.cp-home .hp-cap-index {
+  float: right;
+  font-family: $cp-mono;
+  font-size: 0.72rem;
+  color: var(--hp-faint);
+  padding-top: 0.25rem;
+}
+
+/* ======================================================= Services */
+
+.cp-home .hp-services-intro {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  max-width: 100%;
+}
+@media (min-width: 900px) {
+  .cp-home .hp-services-intro { grid-template-columns: 1fr 1fr; }
+}
+.cp-home .hp-services-intro p {
+  margin: 0;
+  font-size: 1.04rem;
+  line-height: 1.65;
+  color: var(--hp-muted);
+}
+.cp-home .hp-services-intro strong,
+.cp-home .hp-services-intro em { color: var(--hp-ink); }
+
+.cp-home .hp-services-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.1rem;
+}
+@media (min-width: 760px) {
+  .cp-home .hp-services-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.cp-home .hp-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--hp-line);
+  border-radius: 0.9rem;
+  background: var(--hp-card-bg);
+  padding: clamp(1.4rem, 2.5vw, 2rem);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.35s ease,
+              box-shadow 0.35s ease;
+}
+
+.cp-home .hp-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--hp-accent-mid);
+  box-shadow: 0 18px 40px -22px rgba(27, 27, 60, 0.35);
+}
+
+.cp-home .hp-card-tag {
+  font-family: $cp-mono;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hp-faint);
+  margin: 0 0 1.4rem;
+}
+
+.cp-home .hp-card-body {
+  font-size: 0.99rem;
+  line-height: 1.6;
+  color: var(--hp-muted);
+  margin: 0 0 1.4rem;
+}
+
+.cp-home .hp-card-outcome {
+  font-size: 1.02rem;
+  line-height: 1.5;
+  color: var(--hp-ink);
+  font-weight: 550;
+  letter-spacing: -0.006em;
+  border-top: 1px solid var(--hp-line-soft);
+  padding-top: 1.1rem;
+  margin: auto 0 1.4rem;
+}
+
+.cp-home .hp-card-link {
+  font-family: $cp-mono;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--hp-accent);
+  text-decoration: none;
+  align-self: flex-start;
+  position: relative;
+}
+.cp-home .hp-card-link::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -3px;
+  width: 100%;
+  height: 1px;
+  background: var(--hp-accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cp-home .hp-card-link:hover::after { transform: scaleX(1); }
+
+.cp-home .hp-services-cta {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  text-align: center;
+}
+
+/* ======================================================== Process */
+
+.cp-home .hp-process {
+  position: relative;
+  max-width: 46rem;
+}
+
+.cp-home .hp-process-rail {
+  position: absolute;
+  top: 0.4rem;
+  bottom: 0.4rem;
+  left: 0.45rem;
+  width: 1px;
+  background: var(--hp-line);
+}
+.cp-home .hp-process-line {
+  position: absolute;
+  inset: 0;
+  background: var(--hp-accent);
+  transform-origin: top center;
+  /* JS scrubs scaleY 0→1; without JS the line is simply full. */
+}
+
+.cp-home .hp-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cp-home .hp-step {
+  position: relative;
+  padding: 0 0 clamp(2.2rem, 4vw, 3.2rem) clamp(2.4rem, 5vw, 3.5rem);
+}
+.cp-home .hp-step:last-child { padding-bottom: 0; }
+
+.cp-home .hp-step::before {
+  content: "";
+  position: absolute;
+  left: 0.18rem;
+  top: 0.42rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--hp-bg);
+  border: 1.5px solid var(--hp-accent);
+}
+
+.cp-home .hp-step-num {
+  font-family: $cp-mono;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--hp-accent);
+  margin: 0 0 0.35rem;
+}
+
+.cp-home .hp-step p:last-child {
+  margin: 0;
+  font-size: 0.99rem;
+  line-height: 1.6;
+  color: var(--hp-muted);
+  max-width: 52ch;
+}
+
+.cp-home .hp-pullquote {
+  margin: clamp(3rem, 6vw, 5rem) 0 0 auto;
+  max-width: 38rem;
+  border: 0;
+  border-left: 2px solid var(--hp-accent);
+  padding: 0.4rem 0 0.4rem 1.75rem;
+}
+.cp-home .hp-pullquote p {
+  font-family: $hp-serif;
+  font-style: italic;
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  line-height: 1.4;
+  margin: 0 0 0.85rem;
+}
+.cp-home .hp-pullquote footer {
+  font-family: $cp-mono;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--hp-faint);
+}
+
+/* =================================================== Case studies */
+
+.cp-home .hp-cases {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.cp-home .hp-case {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  align-items: center;
+}
+@media (min-width: 860px) {
+  .cp-home .hp-case { grid-template-columns: 7fr 5fr; }
+  .cp-home .hp-case:nth-child(even) .hp-case-visual { order: 2; }
+}
+
+.cp-home .hp-case-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--hp-line);
+  border-radius: 1.1rem;
+  background:
+    linear-gradient(var(--hp-line-soft) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(90deg, var(--hp-line-soft) 1px, transparent 1px) 0 0 / 48px 48px,
+    var(--hp-stat-bg);
+  overflow: hidden;
+}
+
+.cp-home .hp-case-stat {
+  font-family: $hp-serif;
+  font-weight: 540;
+  font-variation-settings: "opsz" 144;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  letter-spacing: -0.03em;
+  color: var(--hp-accent-ink);
+  line-height: 1;
+}
+
+.cp-home .hp-case-statsub {
+  font-family: $cp-mono;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hp-muted);
+}
+
+.cp-home .hp-case-copy .hp-eyebrow { margin-bottom: 0.85rem; }
+.cp-home .hp-case-copy h3 { max-width: 18ch; }
+.cp-home .hp-case-copy p {
+  font-size: 0.99rem;
+  line-height: 1.6;
+  color: var(--hp-muted);
+  max-width: 44ch;
+  margin: 0 0 1rem;
+}
+
+.cp-home .hp-case-result {
+  font-weight: 650;
+  color: var(--hp-ink) !important;
+  letter-spacing: -0.008em;
+}
+
+/* =========================================== Technical excellence */
+
+.cp-home .hp-dark {
+  --hp-bg:          #14141d;
+  --hp-ink:         #e8e8f2;
+  --hp-muted:       rgba(232, 232, 242, 0.64);
+  --hp-faint:       rgba(232, 232, 242, 0.42);
+  --hp-line:        rgba(232, 232, 242, 0.16);
+  --hp-line-soft:   rgba(232, 232, 242, 0.08);
+  --hp-accent:      #a3a3f5;
+  --hp-accent-ink:  #bcbcf8;
+  --hp-accent-soft: rgba(163, 163, 245, 0.10);
+  --hp-accent-mid:  rgba(163, 163, 245, 0.26);
+
+  background: #14141d;
+  color: var(--hp-ink);
+  border-top: 0;
+}
+
+.cp-home .hp-excellence {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 5rem);
+  align-items: center;
+}
+@media (min-width: 900px) {
+  .cp-home .hp-excellence { grid-template-columns: 6fr 5fr; }
+}
+
+.cp-home .hp-layers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.cp-home .hp-layer {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  border: 1px solid var(--hp-accent-mid);
+  border-radius: 0.6rem;
+  background: var(--hp-accent-soft);
+  padding: 0.85rem 1.25rem;
+  margin-inline: auto;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+/* each layer narrows the one above it — the hero motif, restated */
+.cp-home .hp-layer:nth-child(2) { width: 86%; }
+.cp-home .hp-layer:nth-child(3) { width: 72%; }
+.cp-home .hp-layer:nth-child(4) { width: 58%; }
+.cp-home .hp-layer:nth-child(5) { width: 44%; background: var(--hp-accent-mid); }
+
+.cp-home .hp-layer code {
+  font-family: $cp-mono;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--hp-accent-ink);
+  background: none;
+}
+.cp-home .hp-layer span {
+  font-size: 0.85rem;
+  color: var(--hp-muted);
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+@media (max-width: 560px) {
+  .cp-home .hp-layer span { display: none; }
+  .cp-home .hp-layer:nth-child(4) { width: 66%; }
+  .cp-home .hp-layer:nth-child(5) { width: 54%; }
+}
+
+.cp-home .hp-depth {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cp-home .hp-depth li {
+  border-top: 1px solid var(--hp-line-soft);
+  padding: 0.95rem 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--hp-muted);
+}
+.cp-home .hp-depth li:last-child { border-bottom: 1px solid var(--hp-line-soft); }
+.cp-home .hp-depth strong {
+  color: var(--hp-ink);
+  font-weight: 650;
+  margin-right: 0.5rem;
+}
+
+/* ===================================== Research & open source */
+
+.cp-home .hp-fixed {
+  margin-top: clamp(3rem, 6vw, 5rem);
+  border-top: 1px solid var(--hp-line);
+  padding-top: clamp(2rem, 4vw, 3rem);
+  max-width: 56rem;
+}
+.cp-home .hp-fixed .hp-large { color: var(--hp-muted); }
+.cp-home .hp-fixed .hp-large strong,
+.cp-home .hp-fixed .hp-large code { color: var(--hp-ink); }
+.cp-home .hp-fixed-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.75rem 0 0;
+}
+
+/* Cards from the shared includes, re-skinned to the landing tokens. */
+.cp-home .card {
+  background: var(--hp-card-bg);
+  border: 1px solid var(--hp-line);
+  border-radius: 0.9rem;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease;
+}
+.cp-home .card:hover { transform: translateY(-4px); border-color: var(--hp-accent-mid); }
+html[data-theme="dark"] .cp-home .card { background: var(--hp-card-bg); border-color: var(--hp-line); }
+
+.cp-home .hp-writing-more {
+  margin: 2rem 0 0;
+  font-family: $cp-mono;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+}
+
+/* ====================================================== Final CTA */
+
+.cp-home .hp-final {
+  text-align: center;
+  padding-block: clamp(6rem, 12vw, 10rem);
+}
+
+.cp-home .hp-final .hp-eyebrow { margin-bottom: 1.75rem; }
+
+.cp-home .hp-availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid var(--hp-line);
+  border-radius: 99px;
+  padding: 0.45rem 1rem;
+  color: var(--hp-muted);
+}
+.cp-home .hp-availability-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #3e9c5f;
+  animation: hp-pulse 2.4s ease-in-out infinite;
+}
+@keyframes hp-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(62, 156, 95, 0.45); }
+  50%      { box-shadow: 0 0 0 6px rgba(62, 156, 95, 0); }
+}
+
+.cp-home .hp-final-title {
+  margin-inline: auto;
+  max-width: 18ch;
+  font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+}
+
+.cp-home .hp-final-lead {
+  font-size: 1.08rem;
+  line-height: 1.65;
+  color: var(--hp-muted);
+  max-width: 52ch;
+  margin: 1.75rem auto 2.5rem;
+}
+
+.cp-home .hp-final .hp-hero-cta { justify-content: center; }
+
+/* ====================================== Reduced motion / no-JS */
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-home .hp-availability-dot { animation: none; }
+  .cp-home .hp-card,
+  .cp-home .card,
+  .cp-home .hp-card-link::after { transition: none; }
+}
