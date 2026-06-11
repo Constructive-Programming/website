@@ -1,5 +1,8 @@
 name: Constructive Programming
-description: Type-driven and LLM-augmented engineering consultancy
+description: >-
+  Software consultancy for platform teams: AI-accelerated delivery inside
+  type-driven guardrails. Architecture reviews, embedded senior engineers
+  (Scala, Rust, TypeScript), and agent-native development workflows.
 url: https://www.constructive.dev
 
 title: Constructive Programming
@@ -8,7 +11,7 @@ favicon: assets/img/favicon.svg
 # Hero
 header_feature_image: ""
 header_text: Constructive Programming
-header_subtitle: Types as guardrails for AI agents. We ship production code paired with LLMs, narrowed by construction.
+header_subtitle: Ship at AI speed. Skip the gamble. Production code with AI, inside engineering guardrails that make most wrong versions impossible to build.
 
 # Footer
 footer_text: "Copyright Constructive Programming,"
