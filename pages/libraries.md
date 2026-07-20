@@ -32,7 +32,19 @@ algebra and droste recursion schemes; it is the proving ground for
 the recursion-scheme techniques that show up later in production
 pipelines.
 
-The home page introduces a fourth, longer-running output:
+[**rivoli**](https://github.com/Constructive-Programming/rivoli) is
+the systems end of the same discipline: a Rust and HIP/ROCm inference
+engine that decodes a 744B-parameter mixture-of-experts model on one
+128 GB AMD APU. It is here because of *how* it was built, not just
+what it does — every milestone is gated on a measured number rather
+than an intuition, and the engine's central result came from
+disproving the obvious hypothesis. The decode looked bandwidth-bound;
+instrumentation showed the memory bus sitting ~96% idle while the cost
+went to roughly 920,000 synchronisation points per run. That is the
+same evidence-before-architecture habit we bring to a client's
+performance work, applied where the feedback is brutally honest.
+
+The home page introduces one more, longer-running output:
 [**Fixed**]({{ '/#fixed' | relative_url }}) — a new functional
 language being designed around the same constructive principles. Phase 0
 of that design is in flight; the implementation will follow.

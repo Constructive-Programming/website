@@ -26,6 +26,21 @@
   status: "Experimental"
   repo: "https://github.com/Constructive-Programming/surreals"
 
+- slug: rivoli
+  name: "rivoli"
+  featured: true
+  tagline: "A 744B mixture-of-experts decode engine on one 128 GB APU."
+  description: >
+    Rust + tokio streaming inference for GLM-5.2 (744B int4, 78 layers,
+    256 experts) on a single AMD Strix Halo APU, with hand-written
+    HIP/ROCm kernels. Every milestone is gated on a measured number,
+    not a vibe: 1.31 tok/s sustained over 512 tokens at 90.9% expert-cache
+    hit, 0% run-to-run variance. The design law is to win by removing
+    bottlenecks — the decode proved dispatch-bound, not bandwidth-bound.
+  stack: "Rust + tokio + HIP/ROCm (gfx1151)"
+  status: "Active — ≥1 tok/s goal met (2026)"
+  repo: "https://github.com/Constructive-Programming/rivoli"
+
 - slug: cardinality
   name: "scala-cardinality"
   featured: true
