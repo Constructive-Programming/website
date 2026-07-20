@@ -33,6 +33,7 @@
             strategy: {
                 type: 'hybrid',
             },
+            sortMiddleware: window.RelevanceSort,
             exclude: [],
             templateMiddleware: window.createHighlightTemplateMiddleware({
                 className: 'search-highlight',

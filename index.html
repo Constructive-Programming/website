@@ -366,6 +366,22 @@
       </article>
     
       <article class="card lib-card">
+        <h3 class="card-title">rivoli</h3>
+        <p class="card-subtitle">A 744B mixture-of-experts decode engine on one 128 GB APU.</p>
+        <p class="card-text">Rust + tokio streaming inference for GLM-5.2 (744B int4, 78 layers, 256 experts) on a single AMD Strix Halo APU, with hand-written HIP/ROCm kernels. Every milestone is gated on a measured number, not a vibe: 1.31 tok/s sustained over 512 tokens at 90.9% expert-cache hit, 0% run-to-run variance. The design law is to win by removing bottlenecks — the decode proved dispatch-bound, not bandwidth-bound.</p>
+        <ul class="card-meta">
+          <li><span class="card-meta-key">Stack</span> Rust + tokio + HIP/ROCm (gfx1151)</li>
+          <li><span class="card-meta-key">Status</span> Active — ≥1 tok/s goal met (2026)</li>
+        </ul>
+        <div class="card-actions">
+          
+          
+            <a href="https://github.com/Constructive-Programming/rivoli" class="btn btn-outline-primary btn-sm" target="_blank" rel="noopener">Source</a>
+          
+        </div>
+      </article>
+    
+      <article class="card lib-card">
         <h3 class="card-title">scala-cardinality</h3>
         <p class="card-subtitle">Counting type inhabitants — keep your types small.</p>
         <p class="card-text">A type-cardinality calculator for Scala ADTs (|T| over +, *, ^), plus a scalafix rule that flags sum types used as function arguments. Backs the "Keep Your Types Small" argument with code.</p>

@@ -59,6 +59,22 @@ independently versioned at
       </article>
     
       <article class="card lib-card">
+        <h3 class="card-title">rivoli</h3>
+        <p class="card-subtitle">A 744B mixture-of-experts decode engine on one 128 GB APU.</p>
+        <p class="card-text">Rust + tokio streaming inference for GLM-5.2 (744B int4, 78 layers, 256 experts) on a single AMD Strix Halo APU, with hand-written HIP/ROCm kernels. Every milestone is gated on a measured number, not a vibe: 1.31 tok/s sustained over 512 tokens at 90.9% expert-cache hit, 0% run-to-run variance. The design law is to win by removing bottlenecks — the decode proved dispatch-bound, not bandwidth-bound.</p>
+        <ul class="card-meta">
+          <li><span class="card-meta-key">Stack</span> Rust + tokio + HIP/ROCm (gfx1151)</li>
+          <li><span class="card-meta-key">Status</span> Active — ≥1 tok/s goal met (2026)</li>
+        </ul>
+        <div class="card-actions">
+          
+          
+            <a href="https://github.com/Constructive-Programming/rivoli" class="btn btn-outline-primary btn-sm" target="_blank" rel="noopener">Source</a>
+          
+        </div>
+      </article>
+    
+      <article class="card lib-card">
         <h3 class="card-title">scala-cardinality</h3>
         <p class="card-subtitle">Counting type inhabitants — keep your types small.</p>
         <p class="card-text">A type-cardinality calculator for Scala ADTs (|T| over +, *, ^), plus a scalafix rule that flags sum types used as function arguments. Backs the "Keep Your Types Small" argument with code.</p>
@@ -94,7 +110,19 @@ algebra and droste recursion schemes; it is the proving ground for
 the recursion-scheme techniques that show up later in production
 pipelines.</p>
 
-<p>The home page introduces a fourth, longer-running output:
+<p><a href="https://github.com/Constructive-Programming/rivoli"><strong>rivoli</strong></a> is
+the systems end of the same discipline: a Rust and HIP/ROCm inference
+engine that decodes a 744B-parameter mixture-of-experts model on one
+128 GB AMD APU. It is here because of <em>how</em> it was built, not just
+what it does — every milestone is gated on a measured number rather
+than an intuition, and the engine’s central result came from
+disproving the obvious hypothesis. The decode looked bandwidth-bound;
+instrumentation showed the memory bus sitting ~96% idle while the cost
+went to roughly 920,000 synchronisation points per run. That is the
+same evidence-before-architecture habit we bring to a client’s
+performance work, applied where the feedback is brutally honest.</p>
+
+<p>The home page introduces one more, longer-running output:
 <a href="/#fixed"><strong>Fixed</strong></a> — a new functional
 language being designed around the same constructive principles. Phase 0
 of that design is in flight; the implementation will follow.</p>
