@@ -13,6 +13,9 @@
 {% assign libs = site.data.libraries %}
 {% if include.featured %}
   {% assign libs = libs | where: "featured", true %}
+{% else %}
+  {% comment %} home_only entries are research artefacts, not libraries. {% endcomment %}
+  {% assign libs = libs | where_exp: "lib", "lib.home_only != true" %}
 {% endif %}
 
 <div class="libraries">

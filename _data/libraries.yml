@@ -29,6 +29,8 @@
 - slug: rivoli
   name: "rivoli"
   featured: true
+  # Research artefact, not a library — shown on the home page only.
+  home_only: true
   tagline: "A 744B mixture-of-experts decode engine on one 128 GB APU."
   description: >
     Rust + tokio streaming inference for GLM-5.2 (744B int4, 78 layers,
