@@ -221,13 +221,14 @@ the entry point.</p>
 <h2 id="three-examples">Three examples</h2>
 
 <p>Each example is the same program twice, <code class="language-plaintext highlighter-rouge">Before</code> and <code class="language-plaintext highlighter-rouge">After</code>, in Scala 3
-and in Haskell, using a tiny self-contained optic encoding — a lens, a
-prism, a traversal, and the compositions between them — so the sources
-run with no dependencies. The entry point keeps its name and its type,
-the optic is the only difference, and a hedgehog property generates
-inputs and demands that both versions agree on every one of them. The
-three are eo’s “navigate structures” recipes, in increasing depth of
-nesting.</p>
+and in Haskell. The optic building blocks — a lens, a prism, a
+traversal, and the compositions between them — and the hedgehog spec
+runner live in the entry’s <code class="language-plaintext highlighter-rouge">shared/</code> directory: compiled by <code class="language-plaintext highlighter-rouge">run.sh</code>,
+never shown on the page, so each example is the move itself. The entry
+point keeps its name and its type, the optic is the only difference,
+and a hedgehog property verifies that both versions agree on every
+generated input. The three are eo’s “navigate structures” recipes, in
+increasing depth of nesting.</p>
 
 <h3 id="1--a-single-node-prism-and-lens-composed">1 · A single node: prism and lens composed</h3>
 
@@ -330,6 +331,8 @@ passes through.</p>
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Same, as one composed optic: the prism matches the Var branch,</span>
 <span class="c1">// the lens edits its name, every other shape passes through.</span>
 <span class="k">object</span> <span class="nc">After</span><span class="k">:</span>
+  <span class="kt">import</span> <span class="kt">Optics.*</span>
+
   <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Var</span><span class="o">(</span><span class="kt">name:</span> <span class="kt">String</span><span class="o">,</span> <span class="kt">ref:</span> <span class="kt">Int</span><span class="o">)</span>
   <span class="n">enum</span> <span class="nc">Expr</span><span class="k">:</span>
     <span class="kt">case</span> <span class="kt">EVar</span><span class="o">(</span><span class="kt">v:</span> <span class="kt">Var</span><span class="o">)</span>
@@ -338,29 +341,6 @@ passes through.</p>
 
   <span class="k">import</span> <span class="nn">Expr.</span><span class="o">*</span>
 
-  <span class="k">case</span> <span class="k">class</span> <span class="nc">Lens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">view</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">,</span> <span class="n">set</span><span class="k">:</span> <span class="o">(</span><span class="kt">S</span><span class="o">,</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">S</span><span class="o">)</span><span class="k">:</span>
-    <span class="kt">def</span> <span class="kt">modify</span><span class="o">(</span><span class="kt">f:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=</span> <span class="n">s</span> <span class="k">=&gt;</span> <span class="nf">set</span><span class="o">(</span><span class="n">s</span><span class="o">,</span> <span class="nf">f</span><span class="o">(</span><span class="nf">view</span><span class="o">(</span><span class="n">s</span><span class="o">)))</span>
-
-  <span class="k">case</span> <span class="k">class</span> <span class="nc">Prism</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">preview</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">review</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">S</span><span class="o">)</span><span class="k">:</span>
-    <span class="kt">def</span> <span class="kt">modify</span><span class="o">(</span><span class="kt">f:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=</span>
-      <span class="n">s</span> <span class="k">=&gt;</span> <span class="nf">preview</span><span class="o">(</span><span class="n">s</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="n">a</span> <span class="k">=&gt;</span> <span class="nf">review</span><span class="o">(</span><span class="nf">f</span><span class="o">(</span><span class="n">a</span><span class="o">))).</span><span class="py">getOrElse</span><span class="o">(</span><span class="n">s</span><span class="o">)</span>
-  <span class="c1">// A prism followed by a lens: hit → edit the field;</span>
-  <span class="c1">// miss → pass through.</span>
-  <span class="k">case</span> <span class="k">class</span> <span class="nc">PartialLens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">preview</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span>
-                               <span class="n">modify</span><span class="k">:</span> <span class="o">(</span><span class="kt">A</span> <span class="o">=&gt;</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">S</span> <span class="k">=&gt;</span> <span class="n">S</span><span class="o">)</span>
-
-  <span class="k">def</span> <span class="nf">compose</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">M</span>, <span class="kt">A</span><span class="o">](</span><span class="n">p</span><span class="k">:</span> <span class="kt">Prism</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">M</span><span class="o">],</span>
-                     <span class="n">l</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">M</span>, <span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">]</span> <span class="k">=</span>
-    <span class="nc">PartialLens</span><span class="o">(</span>
-      <span class="n">preview</span> <span class="k">=</span> <span class="n">s</span> <span class="k">=&gt;</span> <span class="nv">p</span><span class="o">.</span><span class="py">preview</span><span class="o">(</span><span class="n">s</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="nv">l</span><span class="o">.</span><span class="py">view</span><span class="o">),</span>
-      <span class="n">modify</span>  <span class="k">=</span> <span class="n">f</span> <span class="k">=&gt;</span> <span class="n">s</span> <span class="k">=&gt;</span> <span class="nv">p</span><span class="o">.</span><span class="py">preview</span><span class="o">(</span><span class="n">s</span><span class="o">)</span> <span class="k">match</span>
-        <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">m</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">p</span><span class="o">.</span><span class="py">review</span><span class="o">(</span><span class="nv">l</span><span class="o">.</span><span class="py">modify</span><span class="o">(</span><span class="n">f</span><span class="o">)(</span><span class="n">m</span><span class="o">))</span>
-        <span class="k">case</span> <span class="nc">None</span>    <span class="k">=&gt;</span> <span class="n">s</span><span class="o">,</span>
-    <span class="o">)</span>
-
-  <span class="k">def</span> <span class="nf">over</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">pl</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">],</span> <span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=</span>
-    <span class="nv">pl</span><span class="o">.</span><span class="py">modify</span><span class="o">(</span><span class="n">f</span><span class="o">)</span>
-
   <span class="k">val</span> <span class="nv">varP</span><span class="k">:</span> <span class="kt">Prism</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">Var</span><span class="o">]</span> <span class="k">=</span>
     <span class="nc">Prism</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">Var</span><span class="o">](</span>
       <span class="o">{</span> <span class="k">case</span> <span class="nc">EVar</span><span class="o">(</span><span class="n">v</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">(</span><span class="n">v</span><span class="o">);</span> <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="nc">None</span> <span class="o">},</span>
@@ -368,7 +348,6 @@ passes through.</p>
     <span class="o">)</span>
   <span class="k">val</span> <span class="nv">nameL</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Var</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span>
     <span class="nc">Lens</span><span class="o">[</span><span class="kt">Var</span>, <span class="kt">String</span><span class="o">](</span><span class="nv">_</span><span class="o">.</span><span class="py">name</span><span class="o">,</span> <span class="o">(</span><span class="n">v</span><span class="o">,</span> <span class="n">n</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">v</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">name</span> <span class="k">=</span> <span class="n">n</span><span class="o">))</span>
-
   <span class="k">val</span> <span class="nv">varName</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nf">compose</span><span class="o">(</span><span class="n">varP</span><span class="o">,</span> <span class="n">nameL</span><span class="o">)</span>
 
   <span class="k">def</span> <span class="nf">upperVarName</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="nf">over</span><span class="o">(</span><span class="n">varName</span><span class="o">,</span> <span class="nv">_</span><span class="o">.</span><span class="py">toUpperCase</span><span class="o">)(</span><span class="n">e</span><span class="o">)</span></code></pre></figure>
@@ -381,44 +360,12 @@ passes through.</p>
 <span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
 
 <span class="kr">import</span> <span class="nn">Data.Char</span> <span class="p">(</span><span class="nf">toUpper</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Optics</span> <span class="p">(</span><span class="kt">Lens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Prism</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">PartialLens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="nf">composeO</span><span class="p">,</span> <span class="nf">over</span><span class="p">)</span>
 
 <span class="kr">data</span> <span class="kt">Var</span>   <span class="o">=</span> <span class="kt">Var</span>   <span class="p">{</span> <span class="n">vName</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">vRef</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
   <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
 <span class="kr">data</span> <span class="kt">Expr</span>  <span class="o">=</span> <span class="kt">EVar</span> <span class="kt">Var</span> <span class="o">|</span> <span class="kt">EApp</span> <span class="kt">Expr</span> <span class="kt">Expr</span> <span class="o">|</span> <span class="kt">ELam</span> <span class="kt">String</span> <span class="kt">Expr</span>
   <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
-
-<span class="kr">data</span> <span class="kt">Lens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">view</span> <span class="o">::</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">,</span> <span class="n">set</span> <span class="o">::</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="p">}</span>
-
-<span class="n">modifyL</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span>
-<span class="n">modifyL</span> <span class="n">l</span> <span class="n">f</span> <span class="n">s</span> <span class="o">=</span> <span class="n">set</span> <span class="n">l</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">f</span> <span class="p">(</span><span class="n">view</span> <span class="n">l</span> <span class="n">s</span><span class="p">))</span>
-
-<span class="kr">data</span> <span class="kt">Prism</span> <span class="n">s</span> <span class="n">a</span> <span class="o">=</span> <span class="kt">Prism</span>
-  <span class="p">{</span> <span class="n">preview</span> <span class="o">::</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="n">a</span>
-  <span class="p">,</span> <span class="n">review</span>  <span class="o">::</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">s</span>
-  <span class="p">}</span>
-
-<span class="n">modifyP</span> <span class="o">::</span> <span class="kt">Prism</span> <span class="n">s</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span>
-<span class="n">modifyP</span> <span class="n">p</span> <span class="n">f</span> <span class="n">s</span> <span class="o">=</span> <span class="kr">case</span> <span class="n">preview</span> <span class="n">p</span> <span class="n">s</span> <span class="kr">of</span>
-  <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="n">s</span>
-  <span class="kt">Just</span> <span class="n">a</span>  <span class="o">-&gt;</span> <span class="n">review</span> <span class="n">p</span> <span class="p">(</span><span class="n">f</span> <span class="n">a</span><span class="p">)</span>
-
-<span class="c1">-- A prism followed by a lens: hit -&gt; edit the field;</span>
-<span class="c1">-- miss -&gt; pass through.</span>
-<span class="kr">data</span> <span class="kt">PartialLens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">=</span> <span class="kt">PartialLens</span>
-  <span class="p">{</span> <span class="n">plPreview</span> <span class="o">::</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="n">a</span>
-  <span class="p">,</span> <span class="n">plModify</span>  <span class="o">::</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span>
-  <span class="p">}</span>
-
-<span class="n">composeO</span> <span class="o">::</span> <span class="kt">Prism</span> <span class="n">s</span> <span class="n">m</span> <span class="o">-&gt;</span> <span class="kt">Lens</span> <span class="n">m</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="kt">PartialLens</span> <span class="n">s</span> <span class="n">a</span>
-<span class="n">composeO</span> <span class="n">p</span> <span class="n">l</span> <span class="o">=</span> <span class="kt">PartialLens</span>
-  <span class="p">{</span> <span class="n">plPreview</span> <span class="o">=</span> <span class="nf">\</span><span class="n">s</span> <span class="o">-&gt;</span> <span class="n">view</span> <span class="n">l</span> <span class="o">&lt;$&gt;</span> <span class="n">preview</span> <span class="n">p</span> <span class="n">s</span>
-  <span class="p">,</span> <span class="n">plModify</span>  <span class="o">=</span> <span class="nf">\</span><span class="n">f</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="kr">case</span> <span class="n">preview</span> <span class="n">p</span> <span class="n">s</span> <span class="kr">of</span>
-      <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="n">s</span>
-      <span class="kt">Just</span> <span class="n">m</span>  <span class="o">-&gt;</span> <span class="n">review</span> <span class="n">p</span> <span class="p">(</span><span class="n">modifyL</span> <span class="n">l</span> <span class="n">f</span> <span class="n">m</span><span class="p">)</span>
-  <span class="p">}</span>
-
-<span class="n">over</span> <span class="o">::</span> <span class="kt">PartialLens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span>
-<span class="n">over</span> <span class="n">pl</span> <span class="o">=</span> <span class="n">plModify</span> <span class="n">pl</span>
 
 <span class="n">varP</span> <span class="o">::</span> <span class="kt">Prism</span> <span class="kt">Expr</span> <span class="kt">Var</span>
 <span class="n">varP</span> <span class="o">=</span> <span class="kt">Prism</span>
@@ -518,16 +465,7 @@ passes through.</p>
     <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="k">_</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="kc">false</span>
     <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">x</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="nf">tNoVars</span><span class="o">(</span><span class="n">f</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nf">tNoVars</span><span class="o">(</span><span class="n">x</span><span class="o">)</span>
     <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="nf">tNoVars</span><span class="o">(</span><span class="n">b</span><span class="o">)</span>
-
-<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span>
-  <span class="k">val</span> <span class="nv">results</span> <span class="k">=</span> <span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">.</span><span class="py">map</span> <span class="o">{</span> <span class="n">t</span> <span class="k">=&gt;</span>
-    <span class="k">val</span> <span class="nv">r</span> <span class="k">=</span> <span class="nv">Property</span><span class="o">.</span><span class="py">check</span><span class="o">(</span><span class="nv">t</span><span class="o">.</span><span class="py">withConfig</span><span class="o">(</span><span class="nv">PropertyConfig</span><span class="o">.</span><span class="py">default</span><span class="o">),</span>
-      <span class="nv">t</span><span class="o">.</span><span class="py">result</span><span class="o">,</span> <span class="nv">Seed</span><span class="o">.</span><span class="py">fromTime</span><span class="o">())</span>
-    <span class="nf">println</span><span class="o">(</span><span class="nv">Test</span><span class="o">.</span><span class="py">renderReport</span><span class="o">(</span>
-      <span class="s">"Props"</span><span class="o">,</span> <span class="n">t</span><span class="o">,</span> <span class="n">r</span><span class="o">,</span> <span class="n">ansiCodesSupported</span> <span class="k">=</span> <span class="kc">false</span><span class="o">))</span>
-    <span class="nv">r</span><span class="o">.</span><span class="py">status</span>
-  <span class="o">}</span>
-  <span class="k">if</span> <span class="o">!</span><span class="nv">results</span><span class="o">.</span><span class="py">forall</span><span class="o">(</span><span class="k">_</span> <span class="o">==</span> <span class="nv">Status</span><span class="o">.</span><span class="py">ok</span><span class="o">)</span> <span class="n">then</span> <span class="nv">sys</span><span class="o">.</span><span class="py">exit</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span></code></pre></figure>
+<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nv">SpecRunner</span><span class="o">.</span><span class="py">run</span><span class="o">(</span><span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">)</span></code></pre></figure>
 
 </div>
 <div><h4>Spec · Haskell</h4>
@@ -722,6 +660,8 @@ eo’s “visit across whole trees” recipe — one derivation and one
 <span class="c1">// tree: how to reach the name is defined once, and the walk only</span>
 <span class="c1">// decides where it applies.</span>
 <span class="k">object</span> <span class="nc">After</span><span class="k">:</span>
+  <span class="kt">import</span> <span class="kt">Optics.*</span>
+
   <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Var</span><span class="o">(</span><span class="kt">name:</span> <span class="kt">String</span><span class="o">,</span> <span class="kt">ref:</span> <span class="kt">Int</span><span class="o">)</span>
   <span class="n">enum</span> <span class="nc">Expr</span><span class="k">:</span>
     <span class="kt">case</span> <span class="kt">EVar</span><span class="o">(</span><span class="kt">v:</span> <span class="kt">Var</span><span class="o">)</span>
@@ -729,26 +669,6 @@ eo’s “visit across whole trees” recipe — one derivation and one
     <span class="k">case</span> <span class="nc">ELam</span><span class="o">(</span><span class="n">bind</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">body</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span>
 
   <span class="k">import</span> <span class="nn">Expr.</span><span class="o">*</span>
-
-  <span class="k">case</span> <span class="k">class</span> <span class="nc">Lens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">view</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">,</span> <span class="n">set</span><span class="k">:</span> <span class="o">(</span><span class="kt">S</span><span class="o">,</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">S</span><span class="o">)</span><span class="k">:</span>
-    <span class="kt">def</span> <span class="kt">modify</span><span class="o">(</span><span class="kt">f:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=</span> <span class="n">s</span> <span class="k">=&gt;</span> <span class="nf">set</span><span class="o">(</span><span class="n">s</span><span class="o">,</span> <span class="nf">f</span><span class="o">(</span><span class="nf">view</span><span class="o">(</span><span class="n">s</span><span class="o">)))</span>
-  <span class="k">case</span> <span class="k">class</span> <span class="nc">Prism</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">preview</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">review</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">S</span><span class="o">)</span><span class="k">:</span>
-    <span class="kt">def</span> <span class="kt">modify</span><span class="o">(</span><span class="kt">f:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=</span>
-      <span class="n">s</span> <span class="k">=&gt;</span> <span class="nf">preview</span><span class="o">(</span><span class="n">s</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="n">a</span> <span class="k">=&gt;</span> <span class="nf">review</span><span class="o">(</span><span class="nf">f</span><span class="o">(</span><span class="n">a</span><span class="o">))).</span><span class="py">getOrElse</span><span class="o">(</span><span class="n">s</span><span class="o">)</span>
-  <span class="k">case</span> <span class="k">class</span> <span class="nc">PartialLens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">preview</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span>
-                               <span class="n">modify</span><span class="k">:</span> <span class="o">(</span><span class="kt">A</span> <span class="o">=&gt;</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">S</span> <span class="k">=&gt;</span> <span class="n">S</span><span class="o">)</span>
-
-  <span class="k">def</span> <span class="nf">compose</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">M</span>, <span class="kt">A</span><span class="o">](</span><span class="n">p</span><span class="k">:</span> <span class="kt">Prism</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">M</span><span class="o">],</span>
-                       <span class="n">l</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">M</span>, <span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">]</span> <span class="k">=</span>
-    <span class="nc">PartialLens</span><span class="o">(</span>
-      <span class="n">preview</span> <span class="k">=</span> <span class="n">s</span> <span class="k">=&gt;</span> <span class="nv">p</span><span class="o">.</span><span class="py">preview</span><span class="o">(</span><span class="n">s</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="nv">l</span><span class="o">.</span><span class="py">view</span><span class="o">),</span>
-      <span class="n">modify</span>  <span class="k">=</span> <span class="n">f</span> <span class="k">=&gt;</span> <span class="n">s</span> <span class="k">=&gt;</span> <span class="nv">p</span><span class="o">.</span><span class="py">preview</span><span class="o">(</span><span class="n">s</span><span class="o">)</span> <span class="k">match</span>
-        <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">m</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">p</span><span class="o">.</span><span class="py">review</span><span class="o">(</span><span class="nv">l</span><span class="o">.</span><span class="py">modify</span><span class="o">(</span><span class="n">f</span><span class="o">)(</span><span class="n">m</span><span class="o">))</span>
-        <span class="k">case</span> <span class="nc">None</span>    <span class="k">=&gt;</span> <span class="n">s</span><span class="o">,</span>
-    <span class="o">)</span>
-
-  <span class="k">def</span> <span class="nf">over</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">pl</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">],</span> <span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=</span>
-    <span class="nv">pl</span><span class="o">.</span><span class="py">modify</span><span class="o">(</span><span class="n">f</span><span class="o">)</span>
 
   <span class="k">val</span> <span class="nv">varP</span><span class="k">:</span> <span class="kt">Prism</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">Var</span><span class="o">]</span> <span class="k">=</span>
     <span class="nc">Prism</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">Var</span><span class="o">](</span>
@@ -771,43 +691,18 @@ eo’s “visit across whole trees” recipe — one derivation and one
 </div>
 <div><h4>After · Haskell</h4>
 
-<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Same, with the single varName optic applied at every node of the</span>
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Same, with the same varName optic applied at every node of the</span>
 <span class="c1">-- tree: how to reach the name is defined once, and the walk only</span>
 <span class="c1">-- decides where it applies.</span>
 <span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
 
 <span class="kr">import</span> <span class="nn">Data.Char</span> <span class="p">(</span><span class="nf">toUpper</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Optics</span> <span class="p">(</span><span class="kt">Lens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Prism</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">PartialLens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="nf">composeO</span><span class="p">,</span> <span class="nf">over</span><span class="p">)</span>
 
-<span class="kr">data</span> <span class="kt">Var</span>  <span class="o">=</span> <span class="kt">Var</span>  <span class="p">{</span> <span class="n">vName</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">vRef</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
+<span class="kr">data</span> <span class="kt">Var</span> <span class="o">=</span> <span class="kt">Var</span> <span class="p">{</span> <span class="n">vName</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">vRef</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
   <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
 <span class="kr">data</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="kt">EVar</span> <span class="kt">Var</span> <span class="o">|</span> <span class="kt">EApp</span> <span class="kt">Expr</span> <span class="kt">Expr</span> <span class="o">|</span> <span class="kt">ELam</span> <span class="kt">String</span> <span class="kt">Expr</span>
   <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
-
-<span class="kr">data</span> <span class="kt">Lens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">view</span> <span class="o">::</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">,</span> <span class="n">set</span> <span class="o">::</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="p">}</span>
-
-<span class="n">modifyL</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span>
-<span class="n">modifyL</span> <span class="n">l</span> <span class="n">f</span> <span class="n">s</span> <span class="o">=</span> <span class="n">set</span> <span class="n">l</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">f</span> <span class="p">(</span><span class="n">view</span> <span class="n">l</span> <span class="n">s</span><span class="p">))</span>
-
-<span class="kr">data</span> <span class="kt">Prism</span> <span class="n">s</span> <span class="n">a</span> <span class="o">=</span> <span class="kt">Prism</span>
-  <span class="p">{</span> <span class="n">preview</span> <span class="o">::</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="n">a</span>
-  <span class="p">,</span> <span class="n">review</span>  <span class="o">::</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">s</span>
-  <span class="p">}</span>
-
-<span class="kr">data</span> <span class="kt">PartialLens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">=</span> <span class="kt">PartialLens</span>
-  <span class="p">{</span> <span class="n">plPreview</span> <span class="o">::</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="n">a</span>
-  <span class="p">,</span> <span class="n">plModify</span>  <span class="o">::</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span>
-  <span class="p">}</span>
-
-<span class="n">composeO</span> <span class="o">::</span> <span class="kt">Prism</span> <span class="n">s</span> <span class="n">m</span> <span class="o">-&gt;</span> <span class="kt">Lens</span> <span class="n">m</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="kt">PartialLens</span> <span class="n">s</span> <span class="n">a</span>
-<span class="n">composeO</span> <span class="n">p</span> <span class="n">l</span> <span class="o">=</span> <span class="kt">PartialLens</span>
-  <span class="p">{</span> <span class="n">plPreview</span> <span class="o">=</span> <span class="nf">\</span><span class="n">s</span> <span class="o">-&gt;</span> <span class="n">view</span> <span class="n">l</span> <span class="o">&lt;$&gt;</span> <span class="n">preview</span> <span class="n">p</span> <span class="n">s</span>
-  <span class="p">,</span> <span class="n">plModify</span>  <span class="o">=</span> <span class="nf">\</span><span class="n">f</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="kr">case</span> <span class="n">preview</span> <span class="n">p</span> <span class="n">s</span> <span class="kr">of</span>
-      <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="n">s</span>
-      <span class="kt">Just</span> <span class="n">m</span>  <span class="o">-&gt;</span> <span class="n">review</span> <span class="n">p</span> <span class="p">(</span><span class="n">modifyL</span> <span class="n">l</span> <span class="n">f</span> <span class="n">m</span><span class="p">)</span>
-  <span class="p">}</span>
-
-<span class="n">over</span> <span class="o">::</span> <span class="kt">PartialLens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span>
-<span class="n">over</span> <span class="n">pl</span> <span class="o">=</span> <span class="n">plModify</span> <span class="n">pl</span>
 
 <span class="n">varP</span> <span class="o">::</span> <span class="kt">Prism</span> <span class="kt">Expr</span> <span class="kt">Var</span>
 <span class="n">varP</span> <span class="o">=</span> <span class="kt">Prism</span>
@@ -823,9 +718,9 @@ eo’s “visit across whole trees” recipe — one derivation and one
 
 <span class="c1">-- Bottom-up: apply the rewrite at every node, descending first.</span>
 <span class="n">everywhere</span> <span class="o">::</span> <span class="p">(</span><span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">Expr</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">Expr</span>
-<span class="n">everywhere</span> <span class="n">f</span> <span class="n">e</span><span class="o">@</span><span class="p">(</span><span class="kt">EVar</span> <span class="kr">_</span><span class="p">)</span>   <span class="o">=</span> <span class="n">f</span> <span class="n">e</span>
-<span class="n">everywhere</span> <span class="n">f</span> <span class="p">(</span><span class="kt">EApp</span> <span class="n">a</span> <span class="n">b</span><span class="p">)</span>   <span class="o">=</span> <span class="n">f</span> <span class="p">(</span><span class="kt">EApp</span> <span class="p">(</span><span class="n">everywhere</span> <span class="n">f</span> <span class="n">a</span><span class="p">)</span> <span class="p">(</span><span class="n">everywhere</span> <span class="n">f</span> <span class="n">b</span><span class="p">))</span>
-<span class="n">everywhere</span> <span class="n">f</span> <span class="p">(</span><span class="kt">ELam</span> <span class="n">b</span> <span class="n">bd</span><span class="p">)</span>  <span class="o">=</span> <span class="n">f</span> <span class="p">(</span><span class="kt">ELam</span> <span class="n">b</span> <span class="p">(</span><span class="n">everywhere</span> <span class="n">f</span> <span class="n">bd</span><span class="p">))</span>
+<span class="n">everywhere</span> <span class="n">f</span> <span class="n">e</span><span class="o">@</span><span class="p">(</span><span class="kt">EVar</span> <span class="kr">_</span><span class="p">)</span>    <span class="o">=</span> <span class="n">f</span> <span class="n">e</span>
+<span class="n">everywhere</span> <span class="n">f</span> <span class="p">(</span><span class="kt">EApp</span> <span class="n">a</span> <span class="n">b</span><span class="p">)</span>    <span class="o">=</span> <span class="n">f</span> <span class="p">(</span><span class="kt">EApp</span> <span class="p">(</span><span class="n">everywhere</span> <span class="n">f</span> <span class="n">a</span><span class="p">)</span> <span class="p">(</span><span class="n">everywhere</span> <span class="n">f</span> <span class="n">b</span><span class="p">))</span>
+<span class="n">everywhere</span> <span class="n">f</span> <span class="p">(</span><span class="kt">ELam</span> <span class="n">b</span> <span class="n">bd</span><span class="p">)</span>   <span class="o">=</span> <span class="n">f</span> <span class="p">(</span><span class="kt">ELam</span> <span class="n">b</span> <span class="p">(</span><span class="n">everywhere</span> <span class="n">f</span> <span class="n">bd</span><span class="p">))</span>
 
 <span class="n">renameAll</span> <span class="o">::</span> <span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">Expr</span>
 <span class="n">renameAll</span> <span class="o">=</span> <span class="n">everywhere</span> <span class="p">(</span><span class="n">over</span> <span class="n">varName</span> <span class="p">(</span><span class="n">map</span> <span class="n">toUpper</span><span class="p">))</span></code></pre></figure>
@@ -911,16 +806,7 @@ eo’s “visit across whole trees” recipe — one derivation and one
       <span class="nf">refsUnchanged</span><span class="o">(</span><span class="n">f1</span><span class="o">,</span> <span class="n">f2</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nf">refsUnchanged</span><span class="o">(</span><span class="n">x1</span><span class="o">,</span> <span class="n">x2</span><span class="o">)</span>
     <span class="nf">case</span> <span class="o">(</span><span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">b1</span><span class="o">),</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">b2</span><span class="o">))</span> <span class="k">=&gt;</span> <span class="nf">refsUnchanged</span><span class="o">(</span><span class="n">b1</span><span class="o">,</span> <span class="n">b2</span><span class="o">)</span>
     <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="kc">false</span>
-
-<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span>
-  <span class="k">val</span> <span class="nv">results</span> <span class="k">=</span> <span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">.</span><span class="py">map</span> <span class="o">{</span> <span class="n">t</span> <span class="k">=&gt;</span>
-    <span class="k">val</span> <span class="nv">r</span> <span class="k">=</span> <span class="nv">Property</span><span class="o">.</span><span class="py">check</span><span class="o">(</span><span class="nv">t</span><span class="o">.</span><span class="py">withConfig</span><span class="o">(</span><span class="nv">PropertyConfig</span><span class="o">.</span><span class="py">default</span><span class="o">),</span>
-      <span class="nv">t</span><span class="o">.</span><span class="py">result</span><span class="o">,</span> <span class="nv">Seed</span><span class="o">.</span><span class="py">fromTime</span><span class="o">())</span>
-    <span class="nf">println</span><span class="o">(</span><span class="nv">Test</span><span class="o">.</span><span class="py">renderReport</span><span class="o">(</span>
-      <span class="s">"Props"</span><span class="o">,</span> <span class="n">t</span><span class="o">,</span> <span class="n">r</span><span class="o">,</span> <span class="n">ansiCodesSupported</span> <span class="k">=</span> <span class="kc">false</span><span class="o">))</span>
-    <span class="nv">r</span><span class="o">.</span><span class="py">status</span>
-  <span class="o">}</span>
-  <span class="k">if</span> <span class="o">!</span><span class="nv">results</span><span class="o">.</span><span class="py">forall</span><span class="o">(</span><span class="k">_</span> <span class="o">==</span> <span class="nv">Status</span><span class="o">.</span><span class="py">ok</span><span class="o">)</span> <span class="n">then</span> <span class="nv">sys</span><span class="o">.</span><span class="py">exit</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span></code></pre></figure>
+<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nv">SpecRunner</span><span class="o">.</span><span class="py">run</span><span class="o">(</span><span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">)</span></code></pre></figure>
 
 </div>
 <div><h4>Spec · Haskell</h4>
@@ -1106,6 +992,8 @@ loop; composed optics keep the two apart.</p>
 <figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Same, with a small traversal composed with a prism and a lens:</span>
 <span class="c1">// reach every element, match the succeeded branch, edit its value.</span>
 <span class="k">object</span> <span class="nc">After</span><span class="k">:</span>
+  <span class="kt">import</span> <span class="kt">Optics.*</span>
+
   <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Ok</span><span class="o">(</span><span class="kt">value:</span> <span class="kt">Int</span><span class="o">)</span>
   <span class="kt">enum</span> <span class="kt">Result:</span>
     <span class="kt">case</span> <span class="kt">Succeeded</span><span class="o">(</span><span class="kt">v:</span> <span class="kt">Ok</span><span class="o">)</span>
@@ -1113,44 +1001,16 @@ loop; composed optics keep the two apart.</p>
 
   <span class="kt">import</span> <span class="kt">Result.*</span>
 
-  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">view</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">,</span> <span class="n">set</span><span class="k">:</span> <span class="o">(</span><span class="kt">S</span><span class="o">,</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">S</span><span class="o">)</span><span class="k">:</span>
-    <span class="kt">def</span> <span class="kt">modify</span><span class="o">(</span><span class="kt">f:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=</span> <span class="n">s</span> <span class="k">=&gt;</span> <span class="nf">set</span><span class="o">(</span><span class="n">s</span><span class="o">,</span> <span class="nf">f</span><span class="o">(</span><span class="nf">view</span><span class="o">(</span><span class="n">s</span><span class="o">)))</span>
-  <span class="k">case</span> <span class="k">class</span> <span class="nc">Prism</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">preview</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">review</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">S</span><span class="o">)</span><span class="k">:</span>
-    <span class="kt">def</span> <span class="kt">modify</span><span class="o">(</span><span class="kt">f:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=</span>
-      <span class="n">s</span> <span class="k">=&gt;</span> <span class="nf">preview</span><span class="o">(</span><span class="n">s</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="n">a</span> <span class="k">=&gt;</span> <span class="nf">review</span><span class="o">(</span><span class="nf">f</span><span class="o">(</span><span class="n">a</span><span class="o">))).</span><span class="py">getOrElse</span><span class="o">(</span><span class="n">s</span><span class="o">)</span>
-  <span class="k">case</span> <span class="k">class</span> <span class="nc">PartialLens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">preview</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span>
-                               <span class="n">modify</span><span class="k">:</span> <span class="o">(</span><span class="kt">A</span> <span class="o">=&gt;</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">S</span> <span class="k">=&gt;</span> <span class="n">S</span><span class="o">)</span>
-
-  <span class="k">def</span> <span class="nf">compose</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">M</span>, <span class="kt">A</span><span class="o">](</span><span class="n">p</span><span class="k">:</span> <span class="kt">Prism</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">M</span><span class="o">],</span>
-                       <span class="n">l</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">M</span>, <span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">]</span> <span class="k">=</span>
-    <span class="nc">PartialLens</span><span class="o">(</span>
-      <span class="n">preview</span> <span class="k">=</span> <span class="n">s</span> <span class="k">=&gt;</span> <span class="nv">p</span><span class="o">.</span><span class="py">preview</span><span class="o">(</span><span class="n">s</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="nv">l</span><span class="o">.</span><span class="py">view</span><span class="o">),</span>
-      <span class="n">modify</span>  <span class="k">=</span> <span class="n">f</span> <span class="k">=&gt;</span> <span class="n">s</span> <span class="k">=&gt;</span> <span class="nv">p</span><span class="o">.</span><span class="py">preview</span><span class="o">(</span><span class="n">s</span><span class="o">)</span> <span class="k">match</span>
-        <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">m</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">p</span><span class="o">.</span><span class="py">review</span><span class="o">(</span><span class="nv">l</span><span class="o">.</span><span class="py">modify</span><span class="o">(</span><span class="n">f</span><span class="o">)(</span><span class="n">m</span><span class="o">))</span>
-        <span class="k">case</span> <span class="nc">None</span>    <span class="k">=&gt;</span> <span class="n">s</span><span class="o">,</span>
-    <span class="o">)</span>
-  <span class="c1">// Traversal: reach every element, and within it apply the</span>
-  <span class="c1">// partial lens (hits edit, misses pass through).</span>
-  <span class="k">def</span> <span class="nf">each</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">pl</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">S</span><span class="o">]</span>, <span class="kt">A</span><span class="o">]</span> <span class="k">=</span>
-    <span class="nc">PartialLens</span><span class="o">(</span>
-      <span class="n">preview</span> <span class="k">=</span> <span class="nv">_</span><span class="o">.</span><span class="py">headOption</span><span class="o">.</span><span class="py">flatMap</span><span class="o">(</span><span class="nv">pl</span><span class="o">.</span><span class="py">preview</span><span class="o">),</span>
-      <span class="n">modify</span>  <span class="k">=</span> <span class="n">f</span> <span class="k">=&gt;</span> <span class="nv">_</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="nv">pl</span><span class="o">.</span><span class="py">modify</span><span class="o">(</span><span class="n">f</span><span class="o">)),</span>
-    <span class="o">)</span>
-
-  <span class="k">def</span> <span class="nf">over</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">pl</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">],</span> <span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=</span>
-    <span class="nv">pl</span><span class="o">.</span><span class="py">modify</span><span class="o">(</span><span class="n">f</span><span class="o">)</span>
-
-  <span class="k">val</span> <span class="nv">succeededP</span><span class="k">:</span> <span class="kt">Prism</span><span class="o">[</span><span class="kt">Result</span>, <span class="kt">Ok</span><span class="o">]</span> <span class="k">=</span>
+  <span class="kt">val</span> <span class="kt">succeededP:</span> <span class="kt">Prism</span><span class="o">[</span><span class="kt">Result</span>, <span class="kt">Ok</span><span class="o">]</span> <span class="k">=</span>
     <span class="nc">Prism</span><span class="o">[</span><span class="kt">Result</span>, <span class="kt">Ok</span><span class="o">](</span>
       <span class="o">{</span> <span class="k">case</span> <span class="nc">Succeeded</span><span class="o">(</span><span class="n">v</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">(</span><span class="n">v</span><span class="o">);</span> <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="nc">None</span> <span class="o">},</span>
       <span class="nc">Succeeded</span><span class="o">(</span><span class="k">_</span><span class="o">),</span>
     <span class="o">)</span>
   <span class="k">val</span> <span class="nv">valueL</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Ok</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span>
     <span class="nc">Lens</span><span class="o">[</span><span class="kt">Ok</span>, <span class="kt">Int</span><span class="o">](</span><span class="nv">_</span><span class="o">.</span><span class="py">value</span><span class="o">,</span> <span class="o">(</span><span class="n">ok</span><span class="o">,</span> <span class="n">v</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">ok</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">value</span> <span class="k">=</span> <span class="n">v</span><span class="o">))</span>
-  <span class="k">val</span> <span class="nv">okValue</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">Result</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="nf">compose</span><span class="o">(</span><span class="n">succeededP</span><span class="o">,</span> <span class="n">valueL</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">okVal</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">Result</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="nf">compose</span><span class="o">(</span><span class="n">succeededP</span><span class="o">,</span> <span class="n">valueL</span><span class="o">)</span>
 
-  <span class="k">val</span> <span class="nv">eachSucceeded</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Result</span><span class="o">]</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span>
-    <span class="nf">each</span><span class="o">(</span><span class="n">okValue</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">eachSucceeded</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Result</span><span class="o">]</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="nf">each</span><span class="o">(</span><span class="n">okVal</span><span class="o">)</span>
 
   <span class="k">def</span> <span class="nf">bumpSucceeded</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Result</span><span class="o">])</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Result</span><span class="o">]</span> <span class="k">=</span>
     <span class="nf">over</span><span class="o">(</span><span class="n">eachSucceeded</span><span class="o">,</span> <span class="k">_</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)(</span><span class="n">xs</span><span class="o">)</span></code></pre></figure>
@@ -1162,45 +1022,12 @@ loop; composed optics keep the two apart.</p>
 <span class="c1">-- reach every element, match the succeeded branch, edit its value.</span>
 <span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
 
-<span class="kr">import</span> <span class="nn">Data.Maybe</span> <span class="p">(</span><span class="nf">listToMaybe</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Optics</span> <span class="p">(</span><span class="kt">Lens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Prism</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">PartialLens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="nf">composeO</span><span class="p">,</span> <span class="nf">each</span><span class="p">,</span> <span class="nf">over</span><span class="p">)</span>
 
 <span class="kr">data</span> <span class="kt">Ok</span>     <span class="o">=</span> <span class="kt">Ok</span>     <span class="p">{</span> <span class="n">okValue</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
   <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
 <span class="kr">data</span> <span class="kt">Result</span> <span class="o">=</span> <span class="kt">Succeeded</span> <span class="kt">Ok</span> <span class="o">|</span> <span class="kt">Failed</span> <span class="kt">String</span>
   <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
-
-<span class="kr">data</span> <span class="kt">Lens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">view</span> <span class="o">::</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">,</span> <span class="n">set</span> <span class="o">::</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="p">}</span>
-
-<span class="n">modifyL</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span>
-<span class="n">modifyL</span> <span class="n">l</span> <span class="n">f</span> <span class="n">s</span> <span class="o">=</span> <span class="n">set</span> <span class="n">l</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">f</span> <span class="p">(</span><span class="n">view</span> <span class="n">l</span> <span class="n">s</span><span class="p">))</span>
-
-<span class="kr">data</span> <span class="kt">Prism</span> <span class="n">s</span> <span class="n">a</span> <span class="o">=</span> <span class="kt">Prism</span>
-  <span class="p">{</span> <span class="n">preview</span> <span class="o">::</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="n">a</span>
-  <span class="p">,</span> <span class="n">review</span>  <span class="o">::</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">s</span>
-  <span class="p">}</span>
-
-<span class="kr">data</span> <span class="kt">PartialLens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">=</span> <span class="kt">PartialLens</span>
-  <span class="p">{</span> <span class="n">plPreview</span> <span class="o">::</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="n">a</span>
-  <span class="p">,</span> <span class="n">plModify</span>  <span class="o">::</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span>
-  <span class="p">}</span>
-
-<span class="n">composeO</span> <span class="o">::</span> <span class="kt">Prism</span> <span class="n">s</span> <span class="n">m</span> <span class="o">-&gt;</span> <span class="kt">Lens</span> <span class="n">m</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="kt">PartialLens</span> <span class="n">s</span> <span class="n">a</span>
-<span class="n">composeO</span> <span class="n">p</span> <span class="n">l</span> <span class="o">=</span> <span class="kt">PartialLens</span>
-  <span class="p">{</span> <span class="n">plPreview</span> <span class="o">=</span> <span class="nf">\</span><span class="n">s</span> <span class="o">-&gt;</span> <span class="n">view</span> <span class="n">l</span> <span class="o">&lt;$&gt;</span> <span class="n">preview</span> <span class="n">p</span> <span class="n">s</span>
-  <span class="p">,</span> <span class="n">plModify</span>  <span class="o">=</span> <span class="nf">\</span><span class="n">f</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="kr">case</span> <span class="n">preview</span> <span class="n">p</span> <span class="n">s</span> <span class="kr">of</span>
-      <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="n">s</span>
-      <span class="kt">Just</span> <span class="n">m</span>  <span class="o">-&gt;</span> <span class="n">review</span> <span class="n">p</span> <span class="p">(</span><span class="n">modifyL</span> <span class="n">l</span> <span class="n">f</span> <span class="n">m</span><span class="p">)</span>
-  <span class="p">}</span>
-
-<span class="c1">-- Traversal: reach every element, and within it apply the</span>
-<span class="c1">-- partial lens (hits edit, misses pass through).</span>
-<span class="n">each</span> <span class="o">::</span> <span class="kt">PartialLens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="kt">PartialLens</span> <span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="n">a</span>
-<span class="n">each</span> <span class="n">pl</span> <span class="o">=</span> <span class="kt">PartialLens</span>
-  <span class="p">(</span><span class="nf">\</span><span class="n">xs</span> <span class="o">-&gt;</span> <span class="n">listToMaybe</span> <span class="n">xs</span> <span class="o">&gt;&gt;=</span> <span class="n">plPreview</span> <span class="n">pl</span><span class="p">)</span>
-  <span class="p">(</span><span class="nf">\</span><span class="n">g</span> <span class="n">xs</span> <span class="o">-&gt;</span> <span class="n">map</span> <span class="p">(</span><span class="n">plModify</span> <span class="n">pl</span> <span class="n">g</span><span class="p">)</span> <span class="n">xs</span><span class="p">)</span>
-
-<span class="n">over</span> <span class="o">::</span> <span class="kt">PartialLens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span>
-<span class="n">over</span> <span class="n">pl</span> <span class="o">=</span> <span class="n">plModify</span> <span class="n">pl</span>
 
 <span class="n">succeededP</span> <span class="o">::</span> <span class="kt">Prism</span> <span class="kt">Result</span> <span class="kt">Ok</span>
 <span class="n">succeededP</span> <span class="o">=</span> <span class="kt">Prism</span>
@@ -1283,16 +1110,7 @@ loop; composed optics keep the two apart.</p>
         <span class="nf">case</span> <span class="o">(</span><span class="nv">R</span><span class="o">.</span><span class="py">Failed</span><span class="o">(</span><span class="n">m1</span><span class="o">),</span> <span class="nv">R</span><span class="o">.</span><span class="py">Failed</span><span class="o">(</span><span class="n">m0</span><span class="o">))</span>       <span class="k">=&gt;</span> <span class="n">m1</span> <span class="o">==</span> <span class="n">m0</span>
         <span class="k">case</span> <span class="k">_</span>                                  <span class="k">=&gt;</span> <span class="kc">false</span>
       <span class="o">}</span> <span class="o">====</span> <span class="kc">true</span>
-
-<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span>
-  <span class="k">val</span> <span class="nv">results</span> <span class="k">=</span> <span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">.</span><span class="py">map</span> <span class="o">{</span> <span class="n">t</span> <span class="k">=&gt;</span>
-    <span class="k">val</span> <span class="nv">r</span> <span class="k">=</span> <span class="nv">Property</span><span class="o">.</span><span class="py">check</span><span class="o">(</span><span class="nv">t</span><span class="o">.</span><span class="py">withConfig</span><span class="o">(</span><span class="nv">PropertyConfig</span><span class="o">.</span><span class="py">default</span><span class="o">),</span>
-      <span class="nv">t</span><span class="o">.</span><span class="py">result</span><span class="o">,</span> <span class="nv">Seed</span><span class="o">.</span><span class="py">fromTime</span><span class="o">())</span>
-    <span class="nf">println</span><span class="o">(</span><span class="nv">Test</span><span class="o">.</span><span class="py">renderReport</span><span class="o">(</span>
-      <span class="s">"Props"</span><span class="o">,</span> <span class="n">t</span><span class="o">,</span> <span class="n">r</span><span class="o">,</span> <span class="n">ansiCodesSupported</span> <span class="k">=</span> <span class="kc">false</span><span class="o">))</span>
-    <span class="nv">r</span><span class="o">.</span><span class="py">status</span>
-  <span class="o">}</span>
-  <span class="k">if</span> <span class="o">!</span><span class="nv">results</span><span class="o">.</span><span class="py">forall</span><span class="o">(</span><span class="k">_</span> <span class="o">==</span> <span class="nv">Status</span><span class="o">.</span><span class="py">ok</span><span class="o">)</span> <span class="n">then</span> <span class="nv">sys</span><span class="o">.</span><span class="py">exit</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span></code></pre></figure>
+<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nv">SpecRunner</span><span class="o">.</span><span class="py">run</span><span class="o">(</span><span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">)</span></code></pre></figure>
 
 </div>
 <div><h4>Spec · Haskell</h4>
