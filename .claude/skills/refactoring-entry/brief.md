@@ -9,12 +9,16 @@
   referential transparency, totality, termination; Curry–Howard–Lambek. Refactorings are read as *equivalences between
   programs* that you can state and CHECK — hence property-based tests proving before == after.
 - Audience: senior engineers and CTOs who know OO refactoring (Fowler) and want the typed-FP reading of it.
-- Every entry is presented "to & from": the move AND its inverse (<Name> <-> <inverse name>).
+- Every entry is presented "to & from": the move AND its inverse (<Name> <-> <inverse name>). The catalogue name
+  carries both sides ("Extract / Inline method"), so does the page title and subtitle; the two directions are
+  one equation.
 
 ## This refactoring
 - OO reading: <one paragraph: what the OO/imperative world calls it, where it is catalogued>
 - FP reading: <one paragraph: what it is in a referentially transparent language; which papers/transformations>
 - Inverse: <name of the reverse move and when it is used>
+- Motivation (page section 1, before any mechanics): <why go in each direction — the smell that drives the move,
+  the smell that drives its inverse (e.g. duplication / long methods vs speculative generality / coupling)>
 - Known anchors to verify and cite (find more; verify all): <list>
 - Example ideas (adjust if you find better, keep the progression simple → free variables/effects → recursion/laziness):
   1. <...>

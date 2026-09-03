@@ -49,3 +49,17 @@ brief.md or workflow.js and deleted here. Keep the calibration table current.
 - **Browser contention.** The diagram agent and the main agent share one Chrome; resize/reload calls on
   the main agent's tab hang for minutes while the other is screenshotting. Do layout screenshots before
   the Diagrams phase starts, or after it ends.
+
+## 2026-09-03 — 01 Extract method renamed to "Extract / Inline method" (post-PR-12 review round 3)
+
+- **Reviewer (kryptt).** Rename the entry to "Extract / Inline Method" and add a first **Motivation** section
+  stating why you would go in either direction: duplication and long methods drive Extract; speculative
+  generality and coupling drive Inline. Also (skill-wide): Motivation is always the first section of an entry,
+  and every entry shows up with its dual. → folded into SKILL.md §3 (page section order + the always-first
+  Motivation section with the two-direction motivators), brief.md, and the workflow.js research prompt
+  (Motivation heading, first, with the same motivator guidance). Reference page updated: title, subtitle, intro,
+  new Motivation section.
+
+- **Rule.** Prompt-forced page structure in workflow.js: the research prompt now enumerates the exact H2
+  headings in order with Motivation first — check that list whenever a section is added or renamed, or the
+  assemble-the-page step and the research step will disagree on shape.

@@ -4,7 +4,7 @@
 
 - group: "Refactorings"
   items:
-    - { name: "Extract method", slug: extract-method }
+    - { name: "Extract / Inline method", slug: extract-method }
     - { name: "Replace mutable fields with lenses" }
     - { name: "Replace global state with parameter" }
     - { name: "Introduce ReaderT (Kleisli)" }

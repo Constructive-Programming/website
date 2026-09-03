@@ -10,6 +10,10 @@ and *checked* with property-based tests. The reference implementation is `/refac
 (page `pages/refactorings/extract-method.md`, sources `pages/refactorings/extract-method/`).
 Copy its shape; do not redesign it.
 
+Each entry is written **with its dual**: the refactoring and its inverse are one equation, and the
+page presents both directions ("Extract / Inline", "Replace X with Y / Replace Y with X"). The list name
+in `_data/refactorings.yml` carries both sides, e.g. `Extract / Inline method`.
+
 ## 0. Read the lessons first
 
 Read `LESSONS.md` in this directory, top to bottom. It is the memory of every previous entry: what
@@ -54,12 +58,21 @@ Workflow({
 ## 3. Assemble the page
 
 Start from `pages/refactorings/extract-method.md`. Keep: front matter shape (`layout: page`,
-`subtitle` carries the koan, `permalink: /refactorings/<slug>/`, `tags`), the crumb line, the
-section order (intro · The move · The functional reading · To and from + koan figure ·
-Three examples · When it is not an equivalence · Checking it · References), the `rf-pair` /
+`subtitle` carries the koan and names both directions, `permalink: /refactorings/<slug>/`, `tags`,
+`hide: true` so entry pages stay out of the top-right nav), the crumb line, the
+section order (Motivation · The move · The functional reading · To and from + koan figure ·
+Three examples · When it is not an equivalence · Checking it · References) — **Motivation is always
+the first section, before The move** — the `rf-pair` /
 `rf-figure` / `rf-spec` markup, and the `run.sh` instructions. Replace the prose with
 `<scratch>/research.md` (after its citation fix-up) and write one paragraph per example from
 the examples agent's `what_changes` notes.
+
+Motivation states why you would move in either direction: what smell drives the move, and
+what smell drives its inverse. Extract-style motivators include duplication and methods that
+have grown too long; inline-style motivators include speculative generality and coupling
+through a seam's implementation rather than its contract. Two short paragraphs, one per
+direction, before any mechanics — the reader should know when to reach for the move before
+how to perform it.
 
 Rules that came from review, keep them:
 - Source lines ≤ 72 characters or the pane scrolls horizontally on a 1280px screen.

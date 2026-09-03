@@ -62,8 +62,11 @@ const common = `Read ${BRIEF} first; it has the repo layout, toolchain commands,
 const trackA = async () => {
   const research = await agent(`${common}
 
-You are the RESEARCH agent for catalogue entry ${A.number} of ${A.total}: "${A.name}", read as a Constructive/functional-programming refactoring.
-Write ${SCRATCH}/research.md — the prose for the web page at /refactorings/${A.slug}/ — with these exact H2 headings, matching the reference page ${REPO}/pages/refactorings/extract-method.md in tone and depth (read it first):
+You are the RESEARCH agent for catalogue entry ${A.number} of ${A.total}: "${A.name}", read as a Constructive/functional-programming refactoring, always presented WITH ITS DUAL (the inverse move: the two directions are one equation).
+Write ${SCRATCH}/research.md — the prose for the web page at /refactorings/${A.slug}/ — with these exact H2 headings, in this exact order; the first section is always Motivation. Match the reference page ${REPO}/pages/refactorings/extract-method.md in tone and depth (read it first):
+
+## Motivation
+The FIRST section, before any mechanics. Why reach for either direction, two short paragraphs: the smells that drive the move (duplication, long methods, ...) and the smells that drive its inverse (speculative generality, coupling through a seam's implementation rather than its contract, ...). The reader should know when to use the move before how to perform it.
 
 ## The move
 The refactoring as the OO / imperative world catalogues it (Fowler, Kerievsky, Opdyke, the IDE menu, GoF where relevant): mechanics, preconditions, why they are needed there.

@@ -1,7 +1,7 @@
 ---
 layout: page
-title: Extract method
-subtitle: "Extract method: name a sub-expression, and its free variables become the parameters"
+title: Extract / Inline Method
+subtitle: "Extract / Inline method: name a sub-expression, and its free variables become the parameters — inline a call, and its arguments flow back into the body"
 permalink: /refactorings/extract-method/
 tags: [refactorings, extract-method]
 hide: true   # entry pages are reached from the catalogue, not the top-right nav
@@ -9,18 +9,39 @@ hide: true   # entry pages are reached from the catalogue, not the top-right nav
 
 <p class="rf-crumb"><a href="{{ '/refactorings/' | relative_url }}">← The refactoring catalogue</a> · 1 of 35</p>
 
-Extract Method is the refactoring everyone learns first: find a region of
-a method body that does one nameable thing, move it into a new method,
-and replace the region with a call. Fowler's 1999 catalogue gave it that
-name [1]; the second edition renamed it Extract Function, lists Inline
-Function as its inverse, and rewrote the mechanics for a language without
-classes [2]. The lineage is older. Griswold's 1991 thesis treated
+Extract / Inline Method is the pair everyone learns first. Extract: find
+a region of a method body that does one nameable thing, move it into a
+new method, and replace the region with a call. Inline: take a call and
+replace it with the body of the method it names. Fowler's 1999 catalogue
+gave Extract that name [1]; the second edition renamed it Extract
+Function, lists Inline Function as its inverse, and rewrote the mechanics
+for a language without classes [2]. The lineage is older. Griswold's 1991
+thesis treated
 restructuring as meaning-preserving manipulation of a program dependence
 graph, with a tool holding the semantics fixed while the programmer moved
 code about [4]. Opdyke's 1992 thesis gave the first full treatment of
 "refactoring" for the object-oriented setting, and stated each operation
 as a transformation with explicit preconditions under which behaviour is
 preserved [3].
+
+## Motivation
+
+The two directions answer different smells, and the direction you choose
+records a judgement about the code. Extract when the same shape of work
+recurs in more than one place and the duplication would otherwise drift
+out of sync, each copy fixed separately; or when a method has grown so
+long that its single responsibility is no longer visible. Naming the
+region gives the recurring or the long shape a signature and a boundary
+of its own — it can be reused, tested and varied, and the reader no
+longer holds the whole method in their head.
+
+Inline when the indirection costs more than it names. A method that
+exists only because some future boundary might need it is speculative
+generality: abstraction tax paid today for flexibility nobody uses. And
+a seam whose callers are coupled through its implementation rather than
+its contract hides nothing — the name adds a hop, not meaning. Inlining
+removes the hop and lets the body breathe into the caller, where the
+constants and structure the name kept apart become visible again.
 
 ## The move
 
