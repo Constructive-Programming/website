@@ -56,6 +56,16 @@
   
   
   
+  {
+      "title"    : "Replace Mutable Fields with Lenses",
+      "subtitle"    : "Replace mutable fields with lenses: package how to reach a field and what to do with it as one optic value — read becomes get, write becomes set or modify; inline the lens, and a projection no one composes becomes a field again",
+      "category" : "",
+      "tags"     : "refactorings, replace-mutable-fields-with-lenses",
+      "url"      : "/refactorings/replace-mutable-fields-with-lenses/"
+  },
+  
+  
+  
   
   
   {
