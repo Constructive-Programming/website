@@ -66,14 +66,15 @@ effects — each recipe runnable against the library.</p>
 <h2 id="motivation">Motivation</h2>
 
 <p>Reach for the lens when access to a field needs to be <em>decoupled from
-its manipulation</em>. The smell is repetition of field handling: an
-object-with-accessors whose setters are one-liners nothing intercepts,
-a copy-update chain that grows a level for every record you descend,
-or an update that must be re-derived by hand each time a field moves.
-The optics version of the corridor is a <em>value</em>, so it can be passed
+its manipulation</em>. The smell is multiple long methods that do too
+much — the complexity of reaching the values is mixed up with the
+code for the changes you want to make, and each operation re-derives
+its own path. A lens separates the two: how you get to a value and
+what you do once you have it stop being one entangled method. The
+optics version of the corridor is a <em>value</em>, so it can be passed
 around, stored, and composed into paths that reach several levels
 down without ever repeating the intermediate records; and a function
-that needs “every <code class="language-plaintext highlighter-rouge">Instant</code> in whatever you hand me” can ask for the
+that needs “every <code class="language-plaintext highlighter-rouge">Instant</code> in whatever you hand me” can call the
 optic instead of the type. When the invariant itself matters — a
 balance that must never go negative, a size that must bracket its
 children — the pure writer makes the transition a value the type
@@ -556,11 +557,14 @@ passes through.</p>
 is what makes the hand-written version hurt. The Before version is a
 recursive walk that rebuilds a hit by hand at each level of the
 recursion; add a level to the tree and the rebuild appears again. The
-After version reuses the <em>same</em> <code class="language-plaintext highlighter-rouge">varName</code> optic from example 1 inside
-a bottom-up <code class="language-plaintext highlighter-rouge">everywhere</code> walk: “how to reach a variable name” is
-written once, and the walk only decides <em>where</em> it applies. This is
-eo’s “visit across whole trees” recipe — one derivation and one
-<code class="language-plaintext highlighter-rouge">.andThen</code>, rather than a rewrite.</p>
+The After version reuses the <em>same</em> <code class="language-plaintext highlighter-rouge">varName</code> optic from example 1,
+and the walk comes from <code class="language-plaintext highlighter-rouge">Plated</code> — the recursion of the type as a
+value, declared once (which fields are the sub-terms) and reused
+<code class="language-plaintext highlighter-rouge">everywhere</code>. The lens says “how to reach a variable name”; the
+<code class="language-plaintext highlighter-rouge">Plated</code> instance says “where the tree recurses”; and the walk applies
+the optic at every node. This is eo’s “visit across whole trees”
+recipe — one <code class="language-plaintext highlighter-rouge">Plated</code> instance and one <code class="language-plaintext highlighter-rouge">everywhere</code>, rather than a
+hand-written recursive rebuild.</p>
 
 <figure class="rf-figure">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 216" role="img" aria-labelledby="d2-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
@@ -656,9 +660,8 @@ eo’s “visit across whole trees” recipe — one derivation and one
 <div class="rf-pair">
 <div><h4>After · Scala</h4>
 
-<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Same, with the single varName optic applied at every node of the</span>
-<span class="c1">// tree: how to reach the name is defined once, and the walk only</span>
-<span class="c1">// decides where it applies.</span>
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Same, with the single varName optic applied at every node: the walk</span>
+<span class="c1">// comes from Plated (which fields recurse), not from the example.</span>
 <span class="k">object</span> <span class="nc">After</span><span class="k">:</span>
   <span class="kt">import</span> <span class="kt">Optics.*</span>
 
@@ -670,6 +673,12 @@ eo’s “visit across whole trees” recipe — one derivation and one
 
   <span class="k">import</span> <span class="nn">Expr.</span><span class="o">*</span>
 
+  <span class="n">given</span> <span class="nc">Plated</span><span class="o">[</span><span class="kt">Expr</span><span class="o">]</span> <span class="k">with</span>
+    <span class="k">def</span> <span class="nf">descend</span><span class="o">(</span><span class="n">f</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=&gt;</span> <span class="nc">Expr</span><span class="o">)(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="n">e</span> <span class="k">match</span>
+      <span class="k">case</span> <span class="nc">EApp</span><span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span>  <span class="k">=&gt;</span> <span class="nc">EApp</span><span class="o">(</span><span class="nf">f</span><span class="o">(</span><span class="n">a</span><span class="o">),</span> <span class="nf">f</span><span class="o">(</span><span class="n">b</span><span class="o">))</span>
+      <span class="k">case</span> <span class="nc">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">bd</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="nf">f</span><span class="o">(</span><span class="n">bd</span><span class="o">))</span>
+      <span class="k">case</span> <span class="n">e</span>           <span class="k">=&gt;</span> <span class="n">e</span>
+
   <span class="k">val</span> <span class="nv">varP</span><span class="k">:</span> <span class="kt">Prism</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">Var</span><span class="o">]</span> <span class="k">=</span>
     <span class="nc">Prism</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">Var</span><span class="o">](</span>
       <span class="o">{</span> <span class="k">case</span> <span class="nc">EVar</span><span class="o">(</span><span class="n">v</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">(</span><span class="n">v</span><span class="o">);</span> <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="nc">None</span> <span class="o">},</span>
@@ -679,30 +688,31 @@ eo’s “visit across whole trees” recipe — one derivation and one
     <span class="nc">Lens</span><span class="o">[</span><span class="kt">Var</span>, <span class="kt">String</span><span class="o">](</span><span class="nv">_</span><span class="o">.</span><span class="py">name</span><span class="o">,</span> <span class="o">(</span><span class="n">v</span><span class="o">,</span> <span class="n">n</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">v</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">name</span> <span class="k">=</span> <span class="n">n</span><span class="o">))</span>
   <span class="k">val</span> <span class="nv">varName</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nf">compose</span><span class="o">(</span><span class="n">varP</span><span class="o">,</span> <span class="n">nameL</span><span class="o">)</span>
 
-  <span class="c1">// Bottom-up: apply the rewrite at every node, descending first.</span>
-  <span class="k">def</span> <span class="nf">everywhere</span><span class="o">(</span><span class="n">f</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=&gt;</span> <span class="nc">Expr</span><span class="o">)(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="n">e</span> <span class="k">match</span>
-    <span class="k">case</span> <span class="nc">EVar</span><span class="o">(</span><span class="k">_</span><span class="o">)</span>     <span class="k">=&gt;</span> <span class="nf">f</span><span class="o">(</span><span class="n">e</span><span class="o">)</span>
-    <span class="k">case</span> <span class="nc">EApp</span><span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span>  <span class="k">=&gt;</span> <span class="nf">f</span><span class="o">(</span><span class="nc">EApp</span><span class="o">(</span><span class="nf">everywhere</span><span class="o">(</span><span class="n">f</span><span class="o">)(</span><span class="n">a</span><span class="o">),</span> <span class="nf">everywhere</span><span class="o">(</span><span class="n">f</span><span class="o">)(</span><span class="n">b</span><span class="o">)))</span>
-    <span class="k">case</span> <span class="nc">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">bd</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nf">f</span><span class="o">(</span><span class="nc">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="nf">everywhere</span><span class="o">(</span><span class="n">f</span><span class="o">)(</span><span class="n">bd</span><span class="o">)))</span>
-
   <span class="k">def</span> <span class="nf">renameAll</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=</span>
-    <span class="nf">everywhere</span><span class="o">(</span><span class="nf">over</span><span class="o">(</span><span class="n">varName</span><span class="o">,</span> <span class="nv">_</span><span class="o">.</span><span class="py">toUpperCase</span><span class="o">))(</span><span class="n">e</span><span class="o">)</span></code></pre></figure>
+    <span class="n">summon</span><span class="o">[</span><span class="kt">Plated</span><span class="o">[</span><span class="kt">Expr</span><span class="o">]].</span><span class="py">everywhere</span><span class="o">(</span><span class="nf">over</span><span class="o">(</span><span class="n">varName</span><span class="o">,</span> <span class="nv">_</span><span class="o">.</span><span class="py">toUpperCase</span><span class="o">))(</span><span class="n">e</span><span class="o">)</span></code></pre></figure>
 
 </div>
 <div><h4>After · Haskell</h4>
 
-<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Same, with the same varName optic applied at every node of the</span>
-<span class="c1">-- tree: how to reach the name is defined once, and the walk only</span>
-<span class="c1">-- decides where it applies.</span>
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Same, with the same varName optic applied at every node: the walk</span>
+<span class="c1">-- comes from Plated (which fields recurse), not from the example.</span>
 <span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
 
 <span class="kr">import</span> <span class="nn">Data.Char</span> <span class="p">(</span><span class="nf">toUpper</span><span class="p">)</span>
-<span class="kr">import</span> <span class="nn">Optics</span> <span class="p">(</span><span class="kt">Lens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Prism</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">PartialLens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="nf">composeO</span><span class="p">,</span> <span class="nf">over</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Optics</span>
+  <span class="p">(</span> <span class="kt">Lens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Prism</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">PartialLens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Plated</span><span class="p">(</span><span class="o">..</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nf">composeO</span><span class="p">,</span> <span class="nf">over</span><span class="p">,</span> <span class="nf">everywhere</span>
+  <span class="p">)</span>
 
 <span class="kr">data</span> <span class="kt">Var</span> <span class="o">=</span> <span class="kt">Var</span> <span class="p">{</span> <span class="n">vName</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">vRef</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
   <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
 <span class="kr">data</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="kt">EVar</span> <span class="kt">Var</span> <span class="o">|</span> <span class="kt">EApp</span> <span class="kt">Expr</span> <span class="kt">Expr</span> <span class="o">|</span> <span class="kt">ELam</span> <span class="kt">String</span> <span class="kt">Expr</span>
   <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="kr">instance</span> <span class="kt">Plated</span> <span class="kt">Expr</span> <span class="kr">where</span>
+  <span class="n">descend</span> <span class="n">f</span> <span class="p">(</span><span class="kt">EApp</span> <span class="n">a</span> <span class="n">b</span><span class="p">)</span>   <span class="o">=</span> <span class="kt">EApp</span> <span class="p">(</span><span class="n">f</span> <span class="n">a</span><span class="p">)</span> <span class="p">(</span><span class="n">f</span> <span class="n">b</span><span class="p">)</span>
+  <span class="n">descend</span> <span class="n">f</span> <span class="p">(</span><span class="kt">ELam</span> <span class="n">b</span> <span class="n">bd</span><span class="p">)</span>  <span class="o">=</span> <span class="kt">ELam</span> <span class="n">b</span> <span class="p">(</span><span class="n">f</span> <span class="n">bd</span><span class="p">)</span>
+  <span class="n">descend</span> <span class="kr">_</span> <span class="n">e</span>            <span class="o">=</span> <span class="n">e</span>
 
 <span class="n">varP</span> <span class="o">::</span> <span class="kt">Prism</span> <span class="kt">Expr</span> <span class="kt">Var</span>
 <span class="n">varP</span> <span class="o">=</span> <span class="kt">Prism</span>
@@ -715,12 +725,6 @@ eo’s “visit across whole trees” recipe — one derivation and one
 
 <span class="n">varName</span> <span class="o">::</span> <span class="kt">PartialLens</span> <span class="kt">Expr</span> <span class="kt">String</span>
 <span class="n">varName</span> <span class="o">=</span> <span class="n">composeO</span> <span class="n">varP</span> <span class="n">nameL</span>
-
-<span class="c1">-- Bottom-up: apply the rewrite at every node, descending first.</span>
-<span class="n">everywhere</span> <span class="o">::</span> <span class="p">(</span><span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">Expr</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">Expr</span>
-<span class="n">everywhere</span> <span class="n">f</span> <span class="n">e</span><span class="o">@</span><span class="p">(</span><span class="kt">EVar</span> <span class="kr">_</span><span class="p">)</span>    <span class="o">=</span> <span class="n">f</span> <span class="n">e</span>
-<span class="n">everywhere</span> <span class="n">f</span> <span class="p">(</span><span class="kt">EApp</span> <span class="n">a</span> <span class="n">b</span><span class="p">)</span>    <span class="o">=</span> <span class="n">f</span> <span class="p">(</span><span class="kt">EApp</span> <span class="p">(</span><span class="n">everywhere</span> <span class="n">f</span> <span class="n">a</span><span class="p">)</span> <span class="p">(</span><span class="n">everywhere</span> <span class="n">f</span> <span class="n">b</span><span class="p">))</span>
-<span class="n">everywhere</span> <span class="n">f</span> <span class="p">(</span><span class="kt">ELam</span> <span class="n">b</span> <span class="n">bd</span><span class="p">)</span>   <span class="o">=</span> <span class="n">f</span> <span class="p">(</span><span class="kt">ELam</span> <span class="n">b</span> <span class="p">(</span><span class="n">everywhere</span> <span class="n">f</span> <span class="n">bd</span><span class="p">))</span>
 
 <span class="n">renameAll</span> <span class="o">::</span> <span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">Expr</span>
 <span class="n">renameAll</span> <span class="o">=</span> <span class="n">everywhere</span> <span class="p">(</span><span class="n">over</span> <span class="n">varName</span> <span class="p">(</span><span class="n">map</span> <span class="n">toUpper</span><span class="p">))</span></code></pre></figure>
