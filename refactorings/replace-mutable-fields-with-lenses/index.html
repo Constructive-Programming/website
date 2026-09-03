@@ -161,43 +161,37 @@ and “arbitrary structure” recipes.</p>
 <h2 id="to-and-from">To and from</h2>
 
 <figure class="rf-figure">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 196" role="img" aria-labelledby="koan-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
-  <title id="koan-title">Replace mutable fields with lenses / replace lenses with mutable fields. Left: a record field read and written directly, spelled out at every call site. Right: the same field as a lens value packaging get :: s -&gt; a and set :: a -&gt; s -&gt; s, so every read is get, every write is set or modify. The arrow to the right is replace (package get and set as one composable value); the arrow to the left is inline (drop the lens and access the field directly). The three lens laws — get (set v s) = v, set (get s) s = s, set v2 (set v1 s) = set v2 s — are the equation the move is checked against.</title>
-  <g fill="currentColor" font-size="12" opacity=".6">
-    <text x="16" y="28">before</text>
-    <text x="424" y="28">after</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 174" role="img" aria-labelledby="koan-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none">
+  <title id="koan-title">One equation read in two directions. Before, navigation to a field and the edit are repeated together. After, the path is a composed optic and the edit is a separate function. Replace packages the path; inline writes the access directly.</title>
+  <defs>
+    <marker id="koan-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="currentColor" />
+    </marker>
+  </defs>
+  <g fill="currentColor" font-size="12" opacity=".65">
+    <text x="16" y="22">before</text>
+    <text x="434" y="22">after</text>
   </g>
   <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
-    <rect x="16" y="40" width="200" height="104" rx="4" />
-    <rect x="424" y="40" width="200" height="104" rx="4" />
+    <rect x="16" y="30" width="190" height="120" rx="4" />
+    <rect x="434" y="30" width="190" height="120" rx="4" />
   </g>
-  <g fill="currentColor" font-size="14" text-anchor="middle">
-    <text x="116" y="66">field <tspan font-style="italic" font-weight="700">balance</tspan></text>
-    <text x="524" y="62">balanceLens =</text>
-    <text x="524" y="84">Lens { get, set }</text>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="56">reach the field</text>
+    <text x="28" y="76">match / copy / recurse</text>
+    <text x="28" y="104">then change it</text>
+    <text x="28" y="124">business rule mixed</text>
+    <text x="28" y="140">with navigation</text>
+    <text x="446" y="56">path = prism</text>
+    <text x="458" y="76">.andThen(lens).each</text>
+    <text x="446" y="104">over(path, change)</text>
+    <text x="446" y="124">navigation and rule</text>
+    <text x="446" y="140">are separate values</text>
   </g>
-  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".9">
-    <text x="116" y="92">read: <tspan font-style="italic">a.balance</tspan></text>
-    <text x="116" y="110">write: <tspan font-style="italic">copy</tspan> with balance</text>
-    <text x="116" y="132">every call site spells the</text>
-    <text x="116" y="146">field out again</text>
-    <text x="524" y="108">read: <tspan font-weight="700">get</tspan> balanceLens</text>
-    <text x="524" y="128">write: <tspan font-weight="700">set</tspan> / <tspan font-weight="700">modify</tspan></text>
-    <text x="524" y="148">lens composes along paths</text>
-  </g>
-  <g fill="none" stroke="currentColor" stroke-width="1.2">
-    <path d="M232 76 H398" />
-    <path d="M408 116 H242" />
-  </g>
-  <g fill="currentColor">
-    <path d="M398 72.5 L406 76 L398 79.5 Z" />
-    <path d="M242 112.5 L234 116 L242 119.5 Z" />
-  </g>
-  <g fill="currentColor" font-size="12" text-anchor="middle">
-    <text x="320" y="62">replace (package get + set into a lens)</text>
-    <text x="320" y="132">inline (drop the lens, access the field)</text>
-  </g>
-  <text x="320" y="176" fill="currentColor" font-size="12" text-anchor="middle" opacity=".75"><tspan font-style="italic">get</tspan> (<tspan font-style="italic">set v s</tspan>) = <tspan font-style="italic">v</tspan> &#183; <tspan font-style="italic">set</tspan> (<tspan font-style="italic">get s</tspan>) <tspan font-style="italic">s</tspan> = <tspan font-style="italic">s</tspan> &#183; <tspan font-style="italic">set v&#8322;</tspan> (<tspan font-style="italic">set v&#8321; s</tspan>) = <tspan font-style="italic">set v&#8322; s</tspan></text>
+  <path d="M224 72 H416" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#koan-arrow)" />
+  <text x="320" y="58" fill="currentColor" font-size="12" text-anchor="middle">replace: package the path</text>
+  <path d="M416 116 H224" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#koan-arrow)" />
+  <text x="320" y="138" fill="currentColor" font-size="12" text-anchor="middle">inline: write the access directly</text>
 </svg>
 
 <figcaption>The koan. One equation, read in two directions: replace
@@ -243,46 +237,39 @@ second property checks that the hit is uppercased and every miss
 passes through.</p>
 
 <figure class="rf-figure">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 200" role="img" aria-labelledby="d1-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
-  <title id="d1-title">Replacing a hand-written match with a composed prism and lens. Before: upperVarName(e) matches Var(n, r), rebuilds it, and passes every other shape through; the dotted region is the match and rebuild. After: varName = prism(varP).andThen(lens(nameL)) — the prism decides whether the value is a Var, the lens edits its name, and one over(varName, upper) applies the rewrite; the miss passes through untouched.</title>
-  <g fill="currentColor" font-size="12" opacity=".6">
-    <text x="16" y="26">before</text>
-    <text x="428" y="26">after</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 176" role="img" aria-labelledby="d1-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none">
+  <title id="d1-title">Before, upperVarName matches EVar and rebuilds its name. After, varP is composed with nameL, then over applies uppercase; misses pass through.</title>
+  <defs>
+    <marker id="d1-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="currentColor" />
+    </marker>
+  </defs>
+  <g fill="currentColor" font-size="12" opacity=".65">
+    <text x="16" y="22">before</text>
+    <text x="464" y="22">after</text>
   </g>
   <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
-    <rect x="16" y="36" width="388" height="128" rx="4" />
-    <rect x="428" y="36" width="336" height="128" rx="4" />
+    <rect x="16" y="30" width="300" height="126" rx="4" />
+    <rect x="464" y="30" width="300" height="126" rx="4" />
   </g>
-  <g fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3">
-    <rect x="44" y="62" width="332" height="34" rx="3" />
-    <rect x="44" y="112" width="332" height="26" rx="3" />
+  <g fill="rgba(128,128,128,.12)">
+    <rect x="30" y="58" width="272" height="42" rx="3" />
+    <rect x="478" y="58" width="272" height="42" rx="3" />
   </g>
   <g fill="currentColor" font-size="12">
     <text x="28" y="50">upperVarName(e) = e match</text>
-    <text x="40" y="70">case Var(n, r) =&gt; Var(n.toUpper, r)</text>
-    <text x="40" y="88">case other =&gt; other</text>
-    <text x="52" y="108">match + rebuild</text>
-    <text x="52" y="126">pass-through</text>
-    <text x="440" y="50">varName = varP .andThen nameL</text>
-    <text x="452" y="70">over(varName, _.toUpperCase):</text>
-    <text x="464" y="88">prism decides the hit (Var)</text>
-    <text x="464" y="106">lens edits the name</text>
-    <text x="464" y="124">miss passes through</text>
+    <text x="40" y="76">EVar(v) → EVar(v.copy(name = upper))</text>
+    <text x="40" y="94">other → other</text>
+    <text x="28" y="122">navigation and edit are one match</text>
+    <text x="28" y="140">each use repeats the path</text>
+    <text x="476" y="50">varName = varP.andThen(nameL)</text>
+    <text x="488" y="76">varP: choose the EVar branch</text>
+    <text x="488" y="94">nameL: focus the name field</text>
+    <text x="476" y="122">over(varName, upper)</text>
+    <text x="476" y="140">misses pass through unchanged</text>
   </g>
-  <g fill="none" stroke="currentColor" stroke-width="1">
-    <circle cx="386" cy="132" r="7.5" />
-    <circle cx="428" cy="132" r="7.5" />
-  </g>
-  <g fill="currentColor" font-size="12" text-anchor="middle">
-    <text x="386" y="136">1</text>
-    <text x="428" y="136">1</text>
-  </g>
-  <g fill="none" stroke="currentColor" stroke-width="1.2">
-    <path d="M406 132 H414" />
-  </g>
-  <g fill="currentColor">
-    <path d="M414 128.5 L422 132 L414 135.5 Z" />
-  </g>
+  <path d="M332 92 H448" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#d1-arrow)" />
+  <text x="390" y="80" fill="currentColor" font-size="12" text-anchor="middle">compose the path</text>
 </svg>
 
 </figure>
@@ -349,7 +336,7 @@ passes through.</p>
     <span class="o">)</span>
   <span class="k">val</span> <span class="nv">nameL</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Var</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span>
     <span class="nc">Lens</span><span class="o">[</span><span class="kt">Var</span>, <span class="kt">String</span><span class="o">](</span><span class="nv">_</span><span class="o">.</span><span class="py">name</span><span class="o">,</span> <span class="o">(</span><span class="n">v</span><span class="o">,</span> <span class="n">n</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">v</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">name</span> <span class="k">=</span> <span class="n">n</span><span class="o">))</span>
-  <span class="k">val</span> <span class="nv">varName</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nf">compose</span><span class="o">(</span><span class="n">varP</span><span class="o">,</span> <span class="n">nameL</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">varName</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nv">varP</span><span class="o">.</span><span class="py">andThen</span><span class="o">(</span><span class="n">nameL</span><span class="o">)</span>
 
   <span class="k">def</span> <span class="nf">upperVarName</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="nf">over</span><span class="o">(</span><span class="n">varName</span><span class="o">,</span> <span class="nv">_</span><span class="o">.</span><span class="py">toUpperCase</span><span class="o">)(</span><span class="n">e</span><span class="o">)</span></code></pre></figure>
 
@@ -361,7 +348,7 @@ passes through.</p>
 <span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
 
 <span class="kr">import</span> <span class="nn">Data.Char</span> <span class="p">(</span><span class="nf">toUpper</span><span class="p">)</span>
-<span class="kr">import</span> <span class="nn">Optics</span> <span class="p">(</span><span class="kt">Lens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Prism</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">PartialLens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="nf">composeO</span><span class="p">,</span> <span class="nf">over</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Optics</span> <span class="p">(</span><span class="kt">Lens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Prism</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">PartialLens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="nf">andThen</span><span class="p">,</span> <span class="nf">over</span><span class="p">)</span>
 
 <span class="kr">data</span> <span class="kt">Var</span>   <span class="o">=</span> <span class="kt">Var</span>   <span class="p">{</span> <span class="n">vName</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">vRef</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
   <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
@@ -378,7 +365,7 @@ passes through.</p>
 <span class="n">nameL</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">view</span> <span class="o">=</span> <span class="n">vName</span><span class="p">,</span> <span class="n">set</span> <span class="o">=</span> <span class="nf">\</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">v</span> <span class="p">{</span> <span class="n">vName</span> <span class="o">=</span> <span class="n">n</span> <span class="p">}</span> <span class="p">}</span>
 
 <span class="n">varName</span> <span class="o">::</span> <span class="kt">PartialLens</span> <span class="kt">Expr</span> <span class="kt">String</span>
-<span class="n">varName</span> <span class="o">=</span> <span class="n">composeO</span> <span class="n">varP</span> <span class="n">nameL</span>
+<span class="n">varName</span> <span class="o">=</span> <span class="n">varP</span> <span class="p">`</span><span class="n">andThen</span><span class="p">`</span> <span class="n">nameL</span>
 
 <span class="n">upperVarName</span> <span class="o">::</span> <span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">Expr</span>
 <span class="n">upperVarName</span> <span class="o">=</span> <span class="n">over</span> <span class="n">varName</span> <span class="p">(</span><span class="n">map</span> <span class="n">toUpper</span><span class="p">)</span></code></pre></figure>
@@ -567,51 +554,41 @@ recipe — one <code class="language-plaintext highlighter-rouge">Plated</code> 
 hand-written recursive rebuild.</p>
 
 <figure class="rf-figure">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 216" role="img" aria-labelledby="d2-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
-  <title id="d2-title">Replacing a recursive match with one optic reused at every node. Before: renameAll recurses over the tree and matches+rebuilds Var at each node by hand. After: everywhere(over(varName, upper)) — the same varName optic from example 1 applied at every node, bottom-up; the walk decides where, the optic decides how.</title>
-  <g fill="currentColor" font-size="12" opacity=".6">
-    <text x="16" y="26">before</text>
-    <text x="428" y="26">after</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 192" role="img" aria-labelledby="d2-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none">
+  <title id="d2-title">Before, renameAll owns both the recursive walk and the name edit. After, a Plated instance defines which fields recurse, Plated.everywhere supplies the walk, and varName supplies the edit.</title>
+  <defs>
+    <marker id="d2-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="currentColor" />
+    </marker>
+  </defs>
+  <g fill="currentColor" font-size="12" opacity=".65">
+    <text x="16" y="22">before</text>
+    <text x="464" y="22">after</text>
   </g>
   <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
-    <rect x="16" y="36" width="388" height="136" rx="4" />
-    <rect x="428" y="36" width="336" height="136" rx="4" />
+    <rect x="16" y="30" width="300" height="146" rx="4" />
+    <rect x="464" y="30" width="300" height="146" rx="4" />
   </g>
-  <g fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3">
-    <rect x="44" y="104" width="176" height="24" rx="3" />
-    <rect x="210" y="128" width="176" height="24" rx="3" />
+  <g fill="rgba(128,128,128,.12)">
+    <rect x="30" y="58" width="272" height="64" rx="3" />
+    <rect x="478" y="58" width="272" height="64" rx="3" />
   </g>
   <g fill="currentColor" font-size="12">
-    <text x="28" y="56">renameAll(e) =</text>
-    <text x="40" y="72">e match</text>
-    <text x="52" y="88">EVar(v) =&gt; EVar(v.copy(name = upper))</text>
-    <text x="52" y="104">EApp(f, x) =&gt; EApp(renameAll(f),</text>
-    <text x="64" y="120">renameAll(x))</text>
-    <text x="52" y="134">ELam(b, bd) =&gt; ELam(b, renameAll(bd))</text>
-    <text x="52" y="156">the rebuild appears at</text>
-    <text x="52" y="170">every depth</text>
-    <text x="440" y="56">everywhere(over(varName, upper))</text>
-    <text x="452" y="72">walk decides where:</text>
-    <text x="464" y="88">every node, bottom-up</text>
-    <text x="452" y="108">varName decides how:</text>
-    <text x="464" y="124">prism then lens, from ex. 1</text>
-    <text x="452" y="148">one optic, reused</text>
-    <text x="452" y="164">at every depth</text>
+    <text x="28" y="50">renameAll(e) = e match</text>
+    <text x="40" y="76">EVar(v) → edit name</text>
+    <text x="40" y="94">EApp(a,b) → recurse a, recurse b</text>
+    <text x="40" y="112">ELam(_,b) → recurse b</text>
+    <text x="28" y="144">one method owns walk + edit</text>
+    <text x="28" y="162">nesting obscures the business rule</text>
+    <text x="476" y="50">given Plated[Expr]: descend only</text>
+    <text x="488" y="76">Plated.everywhere supplies the walk</text>
+    <text x="488" y="94">varName supplies the focus</text>
+    <text x="488" y="112">upper supplies the edit</text>
+    <text x="476" y="144">three independent, reusable parts</text>
+    <text x="476" y="162">the example declares only recursion</text>
   </g>
-  <g fill="none" stroke="currentColor" stroke-width="1">
-    <circle cx="386" cy="166" r="7.5" />
-    <circle cx="428" cy="166" r="7.5" />
-  </g>
-  <g fill="currentColor" font-size="12" text-anchor="middle">
-    <text x="386" y="170">1</text>
-    <text x="428" y="170">1</text>
-  </g>
-  <g fill="none" stroke="currentColor" stroke-width="1.2">
-    <path d="M406 166 H414" />
-  </g>
-  <g fill="currentColor">
-    <path d="M414 162.5 L422 166 L414 169.5 Z" />
-  </g>
+  <path d="M332 102 H448" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#d2-arrow)" />
+  <text x="390" y="90" fill="currentColor" font-size="12" text-anchor="middle">separate walk and edit</text>
 </svg>
 
 </figure>
@@ -686,10 +663,10 @@ hand-written recursive rebuild.</p>
     <span class="o">)</span>
   <span class="k">val</span> <span class="nv">nameL</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Var</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span>
     <span class="nc">Lens</span><span class="o">[</span><span class="kt">Var</span>, <span class="kt">String</span><span class="o">](</span><span class="nv">_</span><span class="o">.</span><span class="py">name</span><span class="o">,</span> <span class="o">(</span><span class="n">v</span><span class="o">,</span> <span class="n">n</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">v</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">name</span> <span class="k">=</span> <span class="n">n</span><span class="o">))</span>
-  <span class="k">val</span> <span class="nv">varName</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nf">compose</span><span class="o">(</span><span class="n">varP</span><span class="o">,</span> <span class="n">nameL</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">varName</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nv">varP</span><span class="o">.</span><span class="py">andThen</span><span class="o">(</span><span class="n">nameL</span><span class="o">)</span>
 
   <span class="k">def</span> <span class="nf">renameAll</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=</span>
-    <span class="n">summon</span><span class="o">[</span><span class="kt">Plated</span><span class="o">[</span><span class="kt">Expr</span><span class="o">]].</span><span class="py">everywhere</span><span class="o">(</span><span class="nf">over</span><span class="o">(</span><span class="n">varName</span><span class="o">,</span> <span class="nv">_</span><span class="o">.</span><span class="py">toUpperCase</span><span class="o">))(</span><span class="n">e</span><span class="o">)</span></code></pre></figure>
+    <span class="nv">Plated</span><span class="o">.</span><span class="py">everywhere</span><span class="o">(</span><span class="nf">over</span><span class="o">(</span><span class="n">varName</span><span class="o">,</span> <span class="nv">_</span><span class="o">.</span><span class="py">toUpperCase</span><span class="o">))(</span><span class="n">e</span><span class="o">)</span></code></pre></figure>
 
 </div>
 <div><h4>After · Haskell</h4>
@@ -701,7 +678,7 @@ hand-written recursive rebuild.</p>
 <span class="kr">import</span> <span class="nn">Data.Char</span> <span class="p">(</span><span class="nf">toUpper</span><span class="p">)</span>
 <span class="kr">import</span> <span class="nn">Optics</span>
   <span class="p">(</span> <span class="kt">Lens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Prism</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">PartialLens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Plated</span><span class="p">(</span><span class="o">..</span><span class="p">)</span>
-  <span class="p">,</span> <span class="nf">composeO</span><span class="p">,</span> <span class="nf">over</span><span class="p">,</span> <span class="nf">everywhere</span>
+  <span class="p">,</span> <span class="nf">andThen</span><span class="p">,</span> <span class="nf">over</span><span class="p">,</span> <span class="nf">everywhere</span>
   <span class="p">)</span>
 
 <span class="kr">data</span> <span class="kt">Var</span> <span class="o">=</span> <span class="kt">Var</span> <span class="p">{</span> <span class="n">vName</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">vRef</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
@@ -724,7 +701,7 @@ hand-written recursive rebuild.</p>
 <span class="n">nameL</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">view</span> <span class="o">=</span> <span class="n">vName</span><span class="p">,</span> <span class="n">set</span> <span class="o">=</span> <span class="nf">\</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">v</span> <span class="p">{</span> <span class="n">vName</span> <span class="o">=</span> <span class="n">n</span> <span class="p">}</span> <span class="p">}</span>
 
 <span class="n">varName</span> <span class="o">::</span> <span class="kt">PartialLens</span> <span class="kt">Expr</span> <span class="kt">String</span>
-<span class="n">varName</span> <span class="o">=</span> <span class="n">composeO</span> <span class="n">varP</span> <span class="n">nameL</span>
+<span class="n">varName</span> <span class="o">=</span> <span class="n">varP</span> <span class="p">`</span><span class="n">andThen</span><span class="p">`</span> <span class="n">nameL</span>
 
 <span class="n">renameAll</span> <span class="o">::</span> <span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">Expr</span>
 <span class="n">renameAll</span> <span class="o">=</span> <span class="n">everywhere</span> <span class="p">(</span><span class="n">over</span> <span class="n">varName</span> <span class="p">(</span><span class="n">map</span> <span class="n">toUpper</span><span class="p">))</span></code></pre></figure>
@@ -915,37 +892,39 @@ wrong — the container and the branch test fight over who owns the
 loop; composed optics keep the two apart.</p>
 
 <figure class="rf-figure">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 216" role="img" aria-labelledby="d3-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
-  <title id="d3-title">Replacing a map-with-match with a composed traversal, prism and lens. Before: bumpSucceeded maps with a branch test and rebuild in the same step. After: each .andThen succeeded .andThen value — the traversal reaches every element, the prism selects the succeeded branch, the lens edits its value; failures pass through untouched.</title>
-  <g fill="currentColor" font-size="12" opacity=".6">
-    <text x="16" y="26">before</text>
-    <text x="428" y="26">after</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 176" role="img" aria-labelledby="d3-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none">
+  <title id="d3-title">Before, bumpSucceeded combines the list walk, branch selection and value edit in one match. After, each, succeededP and valueL compose, then over adds one.</title>
+  <defs>
+    <marker id="d3-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="currentColor" />
+    </marker>
+  </defs>
+  <g fill="currentColor" font-size="12" opacity=".65">
+    <text x="16" y="22">before</text>
+    <text x="464" y="22">after</text>
   </g>
   <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
-    <rect x="16" y="36" width="388" height="136" rx="4" />
-    <rect x="428" y="36" width="336" height="136" rx="4" />
+    <rect x="16" y="30" width="300" height="126" rx="4" />
+    <rect x="464" y="30" width="300" height="126" rx="4" />
   </g>
-  <g fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3">
-    <rect x="44" y="100" width="332" height="26" rx="3" />
+  <g fill="rgba(128,128,128,.12)">
+    <rect x="30" y="58" width="272" height="42" rx="3" />
+    <rect x="478" y="58" width="272" height="42" rx="3" />
   </g>
   <g fill="currentColor" font-size="12">
-    <text x="28" y="56">bumpSucceeded(xs) =</text>
-    <text x="40" y="72">xs.map { case Succeeded(ok) =&gt;</text>
-    <text x="52" y="88">Succeeded(ok.copy(value = ok.value + 1))</text>
-    <text x="52" y="104">case f @ Failed(_) =&gt; f }</text>
-    <text x="52" y="126">branch test and rebuild</text>
-    <text x="52" y="140">in the same step</text>
-    <text x="440" y="56">each .andThen succeeded</text>
-    <text x="452" y="72">.andThen value</text>
-    <text x="440" y="92">every element,</text>
-    <text x="452" y="108">succeeded branch,</text>
-    <text x="452" y="124">edit its value</text>
-    <text x="440" y="144">failures pass through</text>
+    <text x="28" y="50">xs.map { result → result match</text>
+    <text x="40" y="76">Succeeded(ok) → bump ok.value</text>
+    <text x="40" y="94">Failed(msg) → keep unchanged</text>
+    <text x="28" y="122">walk + branch + field edit</text>
+    <text x="28" y="140">are one nested operation</text>
+    <text x="476" y="50">succeededP.andThen(valueL).each</text>
+    <text x="488" y="76">each: every list element</text>
+    <text x="488" y="94">prism: success · lens: value</text>
+    <text x="476" y="122">over(eachSucceeded, _ + 1)</text>
+    <text x="476" y="140">failed values pass through</text>
   </g>
-  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".8">
-    <text x="220" y="166">traversal over the list</text>
-    <text x="596" y="166">composed optic</text>
-  </g>
+  <path d="M332 92 H448" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#d3-arrow)" />
+  <text x="390" y="80" fill="currentColor" font-size="12" text-anchor="middle">compose three steps</text>
 </svg>
 
 </figure>
@@ -1012,9 +991,8 @@ loop; composed optics keep the two apart.</p>
     <span class="o">)</span>
   <span class="k">val</span> <span class="nv">valueL</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Ok</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span>
     <span class="nc">Lens</span><span class="o">[</span><span class="kt">Ok</span>, <span class="kt">Int</span><span class="o">](</span><span class="nv">_</span><span class="o">.</span><span class="py">value</span><span class="o">,</span> <span class="o">(</span><span class="n">ok</span><span class="o">,</span> <span class="n">v</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">ok</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">value</span> <span class="k">=</span> <span class="n">v</span><span class="o">))</span>
-  <span class="k">val</span> <span class="nv">okVal</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">Result</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="nf">compose</span><span class="o">(</span><span class="n">succeededP</span><span class="o">,</span> <span class="n">valueL</span><span class="o">)</span>
-
-  <span class="k">val</span> <span class="nv">eachSucceeded</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Result</span><span class="o">]</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="nf">each</span><span class="o">(</span><span class="n">okVal</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">eachSucceeded</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Result</span><span class="o">]</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nv">succeededP</span><span class="o">.</span><span class="py">andThen</span><span class="o">(</span><span class="n">valueL</span><span class="o">).</span><span class="py">each</span>
 
   <span class="k">def</span> <span class="nf">bumpSucceeded</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Result</span><span class="o">])</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Result</span><span class="o">]</span> <span class="k">=</span>
     <span class="nf">over</span><span class="o">(</span><span class="n">eachSucceeded</span><span class="o">,</span> <span class="k">_</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)(</span><span class="n">xs</span><span class="o">)</span></code></pre></figure>
@@ -1026,7 +1004,10 @@ loop; composed optics keep the two apart.</p>
 <span class="c1">-- reach every element, match the succeeded branch, edit its value.</span>
 <span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
 
-<span class="kr">import</span> <span class="nn">Optics</span> <span class="p">(</span><span class="kt">Lens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Prism</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">PartialLens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="nf">composeO</span><span class="p">,</span> <span class="nf">each</span><span class="p">,</span> <span class="nf">over</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Optics</span>
+  <span class="p">(</span> <span class="kt">Lens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Prism</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">PartialLens</span><span class="p">(</span><span class="o">..</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nf">andThen</span><span class="p">,</span> <span class="nf">each</span><span class="p">,</span> <span class="nf">over</span>
+  <span class="p">)</span>
 
 <span class="kr">data</span> <span class="kt">Ok</span>     <span class="o">=</span> <span class="kt">Ok</span>     <span class="p">{</span> <span class="n">okValue</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
   <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
@@ -1042,11 +1023,8 @@ loop; composed optics keep the two apart.</p>
 <span class="n">valueL</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="kt">Ok</span> <span class="kt">Int</span>
 <span class="n">valueL</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">view</span> <span class="o">=</span> <span class="n">okValue</span><span class="p">,</span> <span class="n">set</span> <span class="o">=</span> <span class="nf">\</span><span class="p">(</span><span class="n">ok</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ok</span> <span class="p">{</span> <span class="n">okValue</span> <span class="o">=</span> <span class="n">v</span> <span class="p">}</span> <span class="p">}</span>
 
-<span class="n">okVal</span> <span class="o">::</span> <span class="kt">PartialLens</span> <span class="kt">Result</span> <span class="kt">Int</span>
-<span class="n">okVal</span> <span class="o">=</span> <span class="n">composeO</span> <span class="n">succeededP</span> <span class="n">valueL</span>
-
 <span class="n">eachSucceeded</span> <span class="o">::</span> <span class="kt">PartialLens</span> <span class="p">[</span><span class="kt">Result</span><span class="p">]</span> <span class="kt">Int</span>
-<span class="n">eachSucceeded</span> <span class="o">=</span> <span class="n">each</span> <span class="n">okVal</span>
+<span class="n">eachSucceeded</span> <span class="o">=</span> <span class="n">each</span> <span class="p">(</span><span class="n">succeededP</span> <span class="p">`</span><span class="n">andThen</span><span class="p">`</span> <span class="n">valueL</span><span class="p">)</span>
 
 <span class="n">bumpSucceeded</span> <span class="o">::</span> <span class="p">[</span><span class="kt">Result</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">Result</span><span class="p">]</span>
 <span class="n">bumpSucceeded</span> <span class="o">=</span> <span class="n">over</span> <span class="n">eachSucceeded</span> <span class="p">(</span><span class="o">+</span> <span class="mi">1</span><span class="p">)</span></code></pre></figure>
