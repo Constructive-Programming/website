@@ -5,7 +5,7 @@ module After where
 import Data.Char (toUpper)
 import Optics
   ( Lens(..), Prism(..), PartialLens(..), Plated(..)
-  , composeO, over, everywhere
+  , andThen, over, everywhere
   )
 
 data Var = Var { vName :: String, vRef :: Int }
@@ -28,7 +28,7 @@ nameL :: Lens Var String
 nameL = Lens { view = vName, set = \(v, n) -> v { vName = n } }
 
 varName :: PartialLens Expr String
-varName = composeO varP nameL
+varName = varP `andThen` nameL
 
 renameAll :: Expr -> Expr
 renameAll = everywhere (over varName (map toUpper))

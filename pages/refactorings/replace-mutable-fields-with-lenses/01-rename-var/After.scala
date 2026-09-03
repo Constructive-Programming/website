@@ -18,6 +18,6 @@ object After:
     )
   val nameL: Lens[Var, String] =
     Lens[Var, String](_.name, (v, n) => v.copy(name = n))
-  val varName: PartialLens[Expr, String] = compose(varP, nameL)
+  val varName: PartialLens[Expr, String] = varP.andThen(nameL)
 
   def upperVarName(e: Expr): Expr = over(varName, _.toUpperCase)(e)

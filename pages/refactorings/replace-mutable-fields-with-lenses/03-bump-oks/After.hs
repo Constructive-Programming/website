@@ -2,7 +2,10 @@
 -- reach every element, match the succeeded branch, edit its value.
 module After where
 
-import Optics (Lens(..), Prism(..), PartialLens(..), composeO, each, over)
+import Optics
+  ( Lens(..), Prism(..), PartialLens(..)
+  , andThen, each, over
+  )
 
 data Ok     = Ok     { okValue :: Int }
   deriving (Eq, Show)
@@ -18,11 +21,8 @@ succeededP = Prism
 valueL :: Lens Ok Int
 valueL = Lens { view = okValue, set = \(ok, v) -> ok { okValue = v } }
 
-okVal :: PartialLens Result Int
-okVal = composeO succeededP valueL
-
 eachSucceeded :: PartialLens [Result] Int
-eachSucceeded = each okVal
+eachSucceeded = each (succeededP `andThen` valueL)
 
 bumpSucceeded :: [Result] -> [Result]
 bumpSucceeded = over eachSucceeded (+ 1)

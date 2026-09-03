@@ -1,41 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 200" role="img" aria-labelledby="d1-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
-  <title id="d1-title">Replacing a hand-written match with a composed prism and lens. Before: upperVarName(e) matches Var(n, r), rebuilds it, and passes every other shape through; the dotted region is the match and rebuild. After: varName = prism(varP).andThen(lens(nameL)) — the prism decides whether the value is a Var, the lens edits its name, and one over(varName, upper) applies the rewrite; the miss passes through untouched.</title>
-  <g fill="currentColor" font-size="12" opacity=".6">
-    <text x="16" y="26">before</text>
-    <text x="428" y="26">after</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 176" role="img" aria-labelledby="d1-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none">
+  <title id="d1-title">Before, upperVarName matches EVar and rebuilds its name. After, varP is composed with nameL, then over applies uppercase; misses pass through.</title>
+  <defs>
+    <marker id="d1-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="currentColor"/>
+    </marker>
+  </defs>
+  <g fill="currentColor" font-size="12" opacity=".65">
+    <text x="16" y="22">before</text>
+    <text x="464" y="22">after</text>
   </g>
   <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
-    <rect x="16" y="36" width="388" height="128" rx="4"/>
-    <rect x="428" y="36" width="336" height="128" rx="4"/>
+    <rect x="16" y="30" width="300" height="126" rx="4"/>
+    <rect x="464" y="30" width="300" height="126" rx="4"/>
   </g>
-  <g fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3">
-    <rect x="44" y="62" width="332" height="34" rx="3"/>
-    <rect x="44" y="112" width="332" height="26" rx="3"/>
+  <g fill="rgba(128,128,128,.12)">
+    <rect x="30" y="58" width="272" height="42" rx="3"/>
+    <rect x="478" y="58" width="272" height="42" rx="3"/>
   </g>
   <g fill="currentColor" font-size="12">
     <text x="28" y="50">upperVarName(e) = e match</text>
-    <text x="40" y="70">case Var(n, r) =&gt; Var(n.toUpper, r)</text>
-    <text x="40" y="88">case other =&gt; other</text>
-    <text x="52" y="108">match + rebuild</text>
-    <text x="52" y="126">pass-through</text>
-    <text x="440" y="50">varName = varP .andThen nameL</text>
-    <text x="452" y="70">over(varName, _.toUpperCase):</text>
-    <text x="464" y="88">prism decides the hit (Var)</text>
-    <text x="464" y="106">lens edits the name</text>
-    <text x="464" y="124">miss passes through</text>
+    <text x="40" y="76">EVar(v) → EVar(v.copy(name = upper))</text>
+    <text x="40" y="94">other → other</text>
+    <text x="28" y="122">navigation and edit are one match</text>
+    <text x="28" y="140">each use repeats the path</text>
+    <text x="476" y="50">varName = varP.andThen(nameL)</text>
+    <text x="488" y="76">varP: choose the EVar branch</text>
+    <text x="488" y="94">nameL: focus the name field</text>
+    <text x="476" y="122">over(varName, upper)</text>
+    <text x="476" y="140">misses pass through unchanged</text>
   </g>
-  <g fill="none" stroke="currentColor" stroke-width="1">
-    <circle cx="386" cy="132" r="7.5"/>
-    <circle cx="428" cy="132" r="7.5"/>
-  </g>
-  <g fill="currentColor" font-size="12" text-anchor="middle">
-    <text x="386" y="136">1</text>
-    <text x="428" y="136">1</text>
-  </g>
-  <g fill="none" stroke="currentColor" stroke-width="1.2">
-    <path d="M406 132 H414"/>
-  </g>
-  <g fill="currentColor">
-    <path d="M414 128.5 L422 132 L414 135.5 Z"/>
-  </g>
+  <path d="M332 92 H448" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#d1-arrow)"/>
+  <text x="390" y="80" fill="currentColor" font-size="12" text-anchor="middle">compose the path</text>
 </svg>
