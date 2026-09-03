@@ -1,6 +1,5 @@
-// Same, with the single varName optic applied at every node of the
-// tree: how to reach the name is defined once, and the walk only
-// decides where it applies.
+// Same, with the single varName optic applied at every node: the walk
+// comes from Plated (which fields recurse), not from the example.
 object After:
   import Optics.*
 
@@ -12,6 +11,12 @@ object After:
 
   import Expr.*
 
+  given Plated[Expr] with
+    def descend(f: Expr => Expr)(e: Expr): Expr = e match
+      case EApp(a, b)  => EApp(f(a), f(b))
+      case ELam(b, bd) => ELam(b, f(bd))
+      case e           => e
+
   val varP: Prism[Expr, Var] =
     Prism[Expr, Var](
       { case EVar(v) => Some(v); case _ => None },
@@ -21,11 +26,5 @@ object After:
     Lens[Var, String](_.name, (v, n) => v.copy(name = n))
   val varName: PartialLens[Expr, String] = compose(varP, nameL)
 
-  // Bottom-up: apply the rewrite at every node, descending first.
-  def everywhere(f: Expr => Expr)(e: Expr): Expr = e match
-    case EVar(_)     => f(e)
-    case EApp(a, b)  => f(EApp(everywhere(f)(a), everywhere(f)(b)))
-    case ELam(b, bd) => f(ELam(b, everywhere(f)(bd)))
-
   def renameAll(e: Expr): Expr =
-    everywhere(over(varName, _.toUpperCase))(e)
+    summon[Plated[Expr]].everywhere(over(varName, _.toUpperCase))(e)

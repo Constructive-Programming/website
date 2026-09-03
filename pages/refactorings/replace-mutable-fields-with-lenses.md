@@ -58,14 +58,15 @@ effects — each recipe runnable against the library.
 ## Motivation
 
 Reach for the lens when access to a field needs to be *decoupled from
-its manipulation*. The smell is repetition of field handling: an
-object-with-accessors whose setters are one-liners nothing intercepts,
-a copy-update chain that grows a level for every record you descend,
-or an update that must be re-derived by hand each time a field moves.
-The optics version of the corridor is a *value*, so it can be passed
+its manipulation*. The smell is multiple long methods that do too
+much — the complexity of reaching the values is mixed up with the
+code for the changes you want to make, and each operation re-derives
+its own path. A lens separates the two: how you get to a value and
+what you do once you have it stop being one entangled method. The
+optics version of the corridor is a *value*, so it can be passed
 around, stored, and composed into paths that reach several levels
 down without ever repeating the intermediate records; and a function
-that needs "every `Instant` in whatever you hand me" can ask for the
+that needs "every `Instant` in whatever you hand me" can call the
 optic instead of the type. When the invariant itself matters — a
 balance that must never go negative, a size that must bracket its
 children — the pure writer makes the transition a value the type
@@ -235,11 +236,14 @@ Now the same edit is applied at *every* node of the tree — the nesting
 is what makes the hand-written version hurt. The Before version is a
 recursive walk that rebuilds a hit by hand at each level of the
 recursion; add a level to the tree and the rebuild appears again. The
-After version reuses the *same* `varName` optic from example 1 inside
-a bottom-up `everywhere` walk: "how to reach a variable name" is
-written once, and the walk only decides *where* it applies. This is
-eo's "visit across whole trees" recipe — one derivation and one
-`.andThen`, rather than a rewrite.
+The After version reuses the *same* `varName` optic from example 1,
+and the walk comes from `Plated` — the recursion of the type as a
+value, declared once (which fields are the sub-terms) and reused
+`everywhere`. The lens says "how to reach a variable name"; the
+`Plated` instance says "where the tree recurses"; and the walk applies
+the optic at every node. This is eo's "visit across whole trees"
+recipe — one `Plated` instance and one `everywhere`, rather than a
+hand-written recursive rebuild.
 
 <figure class="rf-figure">
 {% include_relative replace-mutable-fields-with-lenses/02-rename-tree/diagram.svg %}

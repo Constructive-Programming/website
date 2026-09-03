@@ -30,3 +30,13 @@ object Optics:
 
   def over[S, A](pl: PartialLens[S, A], f: A => A): S => S =
     pl.modify(f)
+
+  // Plated: the recursion of a recursive type, as a value. An instance
+  // says which fields are the sub-terms (the "plate"); `everywhere`
+  // then applies a rewrite at every node, bottom-up, without the type
+  // knowing how to walk itself.
+  trait Plated[S]:
+    def descend(f: S => S)(s: S): S
+    def everywhere(f: S => S): S => S =
+      s => descend(everywhere(f))(f(s))
+

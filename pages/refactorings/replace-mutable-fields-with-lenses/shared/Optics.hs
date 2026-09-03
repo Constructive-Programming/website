@@ -1,7 +1,7 @@
 -- Shared optic building blocks for the examples on this page: a Lens,
 -- a Prism, a composed PartialLens, and a traversal `each`. Compiled by
 -- run.sh but not shown on the page, so each example is the move itself.
-module Optics (Lens(..), Prism(..), PartialLens(..), composeO, each, over, modify) where
+module Optics (Lens(..), Prism(..), PartialLens(..), Plated(..), everywhere, composeO, each, over, modify) where
 
 import Data.Maybe (listToMaybe)
 
@@ -37,3 +37,13 @@ each pl = PartialLens
 
 over :: PartialLens s a -> (a -> a) -> s -> s
 over pl = plModify pl
+
+-- Plated: the recursion of a recursive type, as a value. An instance
+-- says which fields are the sub-terms (the "plate"); `everywhere`
+-- then applies a rewrite at every node, bottom-up.
+class Plated s where
+  descend :: (s -> s) -> s -> s
+
+everywhere :: Plated s => (s -> s) -> s -> s
+everywhere f s = descend (everywhere f) (f s)
+
