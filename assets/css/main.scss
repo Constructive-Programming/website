@@ -773,3 +773,47 @@ html[data-theme="dark"] .site-footer .footer-icons a:hover { color: $cp-accent-d
    its tokens win over the generic card/button rules above.
    ============================================================ */
 @import 'home';
+
+/* ============================================================
+   Refactoring catalogue — /refactorings/ and its entries.
+   ============================================================ */
+.refactoring-list li { margin-bottom: 0.2rem; }
+.refactoring-pending { opacity: 0.55; }
+
+/* Entry pages: Scala and Haskell side by side on wide viewports,
+   stacked below. Each pane scrolls on its own so the page never
+   scrolls horizontally. */
+.rf-pair {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+@media (min-width: 1000px) {
+  /* Bleed past the prose measure so two 80-column panes fit side by side. */
+  .rf-pair {
+    grid-template-columns: 1fr 1fr;
+    width: min(100vw - 3rem, 1360px);
+    margin-left: calc(50% - min(50vw - 1.5rem, 680px));
+  }
+}
+.rf-pair > div { min-width: 0; }
+.rf-pair pre, .rf-pair code { font-size: 0.78rem; }
+.rf-pair h4 {
+  font-family: $cp-mono;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin: 0 0 0.4rem;
+}
+.rf-pair pre { overflow-x: auto; margin: 0; }
+.rf-pair .highlight { margin: 0; }
+
+.rf-figure { margin: 2rem 0; }
+.rf-figure svg { width: 100%; height: auto; display: block; }
+.rf-figure figcaption { font-size: 0.9rem; opacity: 0.75; margin-top: 0.5rem; }
+.rf-crumb { font-size: 0.9rem; opacity: 0.75; margin-bottom: 1.5rem; }
+.rf-spec { margin: 1rem 0 2rem; }
+.rf-spec summary { cursor: pointer; font-size: 0.95rem; }
+.rf-spec[open] summary { margin-bottom: 0.75rem; }

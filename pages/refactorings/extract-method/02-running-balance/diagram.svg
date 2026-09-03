@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 300" role="img" aria-labelledby="d2-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="d2-title">Extracting step from settle as a nested definition. Before: settle folds the transactions with an inline lambda whose free variables are limit and fee. After: step stays inside settle; limit and fee remain in scope and are captured, balance and tx are the parameters, and settle calls txs.foldLeft(opening)(step).</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="26">before</text>
+    <text x="428" y="26">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="36" width="388" height="214" rx="4"/>
+    <rect x="428" y="36" width="336" height="214" rx="4"/>
+  </g>
+  <rect x="52" y="82" width="340" height="82" rx="3" fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3"/>
+  <rect x="452" y="72" width="288" height="92" rx="3" fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1"/>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="58">settle(opening, limit, fee, txs) =</text>
+    <text x="40" y="76">txs.foldLeft(opening) {</text>
+    <text x="52" y="96">(balance, tx) =&gt;</text>
+    <text x="64" y="114">val next = balance + tx</text>
+    <text x="64" y="132">if tx &lt; 0 &amp;&amp; next &lt; -limit</text>
+    <text x="64" y="150">then next - fee else next</text>
+    <text x="40" y="178">}</text>
+    <text x="28" y="202" opacity=".75">free in the lambda: limit, fee</text>
+    <text x="440" y="56">settle(opening, limit, fee, txs) =</text>
+    <text x="464" y="90" font-weight="600">def step(balance, tx) =</text>
+    <text x="476" y="108">val next = balance + tx</text>
+    <text x="476" y="126">if tx &lt; 0 &amp;&amp; next &lt; -limit</text>
+    <text x="476" y="144">then next - fee else next</text>
+    <text x="440" y="196">txs.foldLeft(opening)(step)</text>
+    <text x="440" y="220" opacity=".75">limit, fee — stay in scope, captured</text>
+    <text x="440" y="236" opacity=".75">balance, tx — the fold's arguments</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1">
+    <circle cx="386" cy="96" r="7.5"/>
+    <circle cx="428" cy="196" r="7.5"/>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle">
+    <text x="386" y="100">1</text>
+    <text x="428" y="200">1</text>
+  </g>
+  <path d="M652 188 V168" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <path d="M648.5 168 L652 158 L655.5 168 Z" fill="currentColor"/>
+  <text x="640" y="180" fill="currentColor" font-size="12" text-anchor="end">step</text>
+</svg>

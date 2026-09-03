@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 184" role="img" aria-labelledby="koan-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="koan-title">Extract / Inline method: one equation read in two directions. Left: f x = … e …. Right: g v = e and f x = … g v …. The free variables of e are the parameters v — except where the definition stays nested, in which case v is just what lies outside that nested scope. The arrow to the right is extract (fold, lambda-lift); the arrow to the left is inline (unfold, beta).</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="28">before</text>
+    <text x="424" y="28">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="40" width="200" height="100" rx="4"/>
+    <rect x="424" y="40" width="200" height="100" rx="4"/>
+  </g>
+  <g fill="currentColor" font-size="14" text-anchor="middle">
+    <text x="116" y="76">f x = … <tspan font-style="italic" font-weight="700">e</tspan> …</text>
+    <text x="524" y="70">g <tspan font-style="italic" font-weight="700">v</tspan> = <tspan font-style="italic">e</tspan></text>
+    <text x="524" y="94">f x = … <tspan font-weight="700">g <tspan font-style="italic">v</tspan></tspan> …</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".75">
+    <text x="116" y="104"><tspan font-style="italic">e</tspan>: the region to extract</text>
+    <text x="116" y="122">free variables of <tspan font-style="italic">e</tspan>: <tspan font-style="italic">v</tspan></text>
+    <text x="524" y="122"><tspan font-style="italic">v</tspan>: the parameters of g</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M232 74 H398"/>
+    <path d="M408 110 H242"/>
+  </g>
+  <g fill="currentColor">
+    <path d="M398 70.5 L406 74 L398 77.5 Z"/>
+    <path d="M242 106.5 L234 110 L242 113.5 Z"/>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle">
+    <text x="320" y="64">extract (define and fold / lambda-lift)</text>
+    <text x="320" y="128">inline (unfold and &beta;-reduce / denest)</text>
+  </g>
+  <text x="320" y="170" fill="currentColor" font-size="12" text-anchor="middle" opacity=".75"><tspan font-style="italic">v</tspan> are the free variables of <tspan font-style="italic">e</tspan>; they become the parameters of g</text>
+</svg>
