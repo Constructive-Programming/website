@@ -1,0 +1,47 @@
+# Constructive Programming refactorings — the catalogue at /refactorings/.
+# An item with a `slug` has a page at /refactorings/<slug>/; items without
+# one are listed unlinked until their page is written.
+
+- group: "Refactorings"
+  items:
+    - { name: "Extract method", slug: extract-method }
+    - { name: "Replace mutable fields with lenses" }
+    - { name: "Replace global state with parameter" }
+    - { name: "Introduce ReaderT (Kleisli)" }
+    - { name: "Replace loop with fold" }
+    - { name: "Replace recursion with fold" }
+    - { name: "Replace inheritance with natural transformation" }
+    - { name: "Replace exception with extended response type" }
+    - { name: "Replace null with optional" }
+    - { name: "Replace optional fields with sum types" }
+    - { name: "Replace sum types with optional fields" }
+    - { name: "Replace parameter with reduced type" }
+    - { name: "Replace mutable variable with recursion" }
+    - { name: "Replace similar methods with generic cousin" }
+    - { name: "Extract constant" }
+    - { name: "Merge into module" }
+    - { name: "Extract generic algebra" }
+    - { name: "Wrap side effect" }
+    - { name: "Pull out effect" }
+    - { name: "Lazy lists to eager arrows" }
+    - { name: "Replace unit tests with property-based test" }
+
+- group: "With higher-kinded types"
+  items:
+    - { name: "Generalize over input constraint" }
+    - { name: "Isolate business key via data parametrization" }
+    - { name: "Remove recursion from GADT" }
+    - { name: "Replace visitor with type class" }
+    - { name: "Replace concrete classes with final tagless interpretation" }
+    - { name: "Replace final tagless with free monad" }
+    - { name: "Replace free monad with final tagless encoding" }
+    - { name: "Replace strategy with tagless final" }
+    - { name: "Replace subtypes with type class instances" }
+    - { name: "Replace pattern matching with type class dispatch" }
+    - { name: "Introduce higher-kinded constraint" }
+
+- group: "With dependent types"
+  items:
+    - { name: "Introduce parameter-value-dependent constraint" }
+    - { name: "Introduce (path-)dependent type" }
+    - { name: "Replace (path-)dependent type with type class constraint" }

@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 404" role="img" aria-labelledby="d3-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="d3-title">Extracting binary from eval. Before: eval handles Add, Mul and Div with the same shape, for a from eval(l) and b from eval(r), differing only in the combining step. After: each case calls binary(l, r)(op) with the operands unevaluated and the combining step as op; binary evaluates l then r and applies op, calling back into eval.</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="26">before</text>
+    <text x="428" y="26">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="36" width="388" height="220" rx="4"/>
+    <rect x="428" y="36" width="336" height="180" rx="4"/>
+    <rect x="428" y="300" width="336" height="90" rx="4"/>
+  </g>
+  <g fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3">
+    <rect x="46" y="99" width="340" height="18" rx="3"/>
+    <rect x="46" y="135" width="340" height="18" rx="3"/>
+    <rect x="46" y="171" width="340" height="36" rx="3"/>
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="58">eval(e) = e match</text>
+    <text x="40" y="76">case Lit(n) =&gt; Some(n)</text>
+    <text x="40" y="94">case Add(l, r) =&gt;</text>
+    <text x="52" y="112">for a &lt;- eval(l); b &lt;- eval(r) yield a + b</text>
+    <text x="40" y="130">case Mul(l, r) =&gt;</text>
+    <text x="52" y="148">for a &lt;- eval(l); b &lt;- eval(r) yield a * b</text>
+    <text x="40" y="166">case Div(l, r) =&gt;</text>
+    <text x="52" y="184">for a &lt;- eval(l); b &lt;- eval(r); if b != 0</text>
+    <text x="52" y="202">yield a / b</text>
+    <text x="28" y="226" opacity=".75">the shape repeats three times; only the</text>
+    <text x="28" y="242" opacity=".75">combining step differs, and it becomes op</text>
+    <text x="440" y="58">eval(e) = e match</text>
+    <text x="452" y="76">case Lit(n) =&gt; Some(n)</text>
+    <text x="452" y="94">case Add(l, r) =&gt;</text>
+    <text x="464" y="112">binary(l, r)((a, b) =&gt; Some(a + b))</text>
+    <text x="452" y="130">case Mul(l, r) =&gt;</text>
+    <text x="464" y="148">binary(l, r)((a, b) =&gt; Some(a * b))</text>
+    <text x="452" y="166">case Div(l, r) =&gt;</text>
+    <text x="464" y="184">binary(l, r)((a, b) =&gt;</text>
+    <text x="476" y="202">Option.when(b != 0)(a / b))</text>
+    <text x="440" y="322" font-size="13" font-weight="600">binary(l, r)(op) =</text>
+    <text x="452" y="340">for a &lt;- eval(l); b &lt;- eval(r)</text>
+    <text x="476" y="358">c &lt;- op(a, b)</text>
+    <text x="452" y="376">yield c</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1">
+    <circle cx="386" cy="99" r="7.5"/>
+    <circle cx="386" cy="135" r="7.5"/>
+    <circle cx="386" cy="171" r="7.5"/>
+    <circle cx="428" cy="300" r="7.5"/>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle">
+    <text x="386" y="103">1</text>
+    <text x="386" y="139">1</text>
+    <text x="386" y="175">1</text>
+    <text x="428" y="304">1</text>
+  </g>
+  <g fill="none" stroke="currentColor">
+    <path d="M460 216 V292" stroke-width="1.2"/>
+    <path d="M720 300 V224" stroke-width="1" stroke-dasharray="3 3"/>
+  </g>
+  <g fill="currentColor">
+    <path d="M456.5 292 L460 300 L463.5 292 Z"/>
+    <path d="M716.5 224 L720 216 L723.5 224 Z"/>
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="472" y="248">l, r <tspan opacity=".7">— the operands, unevaluated</tspan></text>
+    <text x="472" y="266">op <tspan opacity=".7">— the combining step</tspan></text>
+    <text x="710" y="290" text-anchor="end" opacity=".7">calls back: eval(l), eval(r)</text>
+  </g>
+</svg>

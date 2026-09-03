@@ -64,3 +64,10 @@ typings/
 /Gemfile.lock
 /.jekyll-metadata
 .sass-cache/
+
+# Refactoring examples: scala-cli and GHC build output
+.scala-build/
+.bsp/
+dist-newstyle/
+*.hi
+*.o

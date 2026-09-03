@@ -37,3 +37,8 @@ katex: true
 color_theme: auto
 remote_theme: sylhare/Type-on-Strap
 plugins: [jekyll-paginate, jekyll-seo-tag, jekyll-feed, jekyll-remote-theme]
+
+# Refactoring example sources are pulled into their page with
+# include_relative; do not also publish them as static files.
+exclude:
+  - pages/refactorings/extract-method/
