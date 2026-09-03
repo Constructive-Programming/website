@@ -1,0 +1,51 @@
+# Lessons
+
+Append-only log, newest at the bottom. Each entry: what happened, what it cost, what to do
+differently. A line marked **rule** is binding on the next run until it is folded into SKILL.md,
+brief.md or workflow.js and deleted here. Keep the calibration table current.
+
+## Calibration
+
+| knob | value | why |
+|---|---|---|
+| hedgehog (Scala) | `qa.hedgehog::hedgehog-core:0.14.0`, `hedgehog-runner:0.14.0` | 0.13.0 is refused by scala-cli's outdated-dep check |
+| Scala | 3.3.4 via scala-cli 1.12.x | matches the site's other Scala |
+| Haskell | GHC 9.8.4 + hedgehog, docker image `cp-hedgehog` | no host ghc; nix store is read-only |
+| `cp-hedgehog` build | ~2.5 min (cabal update + install --lib hedgehog) | one-off per machine |
+| test count | 100 default; **500** when a property has an equality boundary | measured: 100 tests missed `<` vs `<=` mutants 60–90% of the time |
+| generator ranges | narrow (−30..30, limits 0..20) for boundary-heavy code; full `Int` only in adversarial probes | narrow ranges hit `next == -limit` often; wide ones almost never |
+| pane width | source lines ≤ 72 chars | 77-char comment lines overflowed a 608px pane at 0.78rem mono |
+| workflow | 22 agents, ≈ 65 min wall-clock over two runs (12 min to the first crash + 53 min resumed); the reviewer's mutation + probe round is the long pole (≈ 15–20 min) | extract-method, 2026-09-03 |
+
+## 2026-09-03 — 01 Extract method (first entry; the skill was extracted from this run)
+
+- **Toolchain.** No ghc on the host; `nix shell`/`nix-shell` fail (registry needs network config; store is
+  read-only). `docker run haskell:9.8-slim` + `cabal install --lib hedgehog` works; baked into `cp-hedgehog`
+  and into run.sh's fallback. scala-hedgehog 0.14.0: `Test.renderReport(..., ansiCodesSupported = false)`;
+  `object Props extends Properties` brings its own main, so run with `--main-class spec`.
+- **Reviewer, round 1 (blocking).** Example 02's generators were too weak: mutants `tx < 0 → tx <= 0` and
+  `next < -limit → next <= -limit` survived most runs in both languages. Cause: wide ranges (−500..500)
+  rarely hit the equality boundary and `fee = 0` hides the fee branch. Fix: ranges −30..30 / 0..20 / fee
+  1..20 and `withTests 500`; both mutants then caught 10/10. → became the generator rules in brief.md.
+- **Reviewer, round 1 (optional, applied).** Haskell Before had the step as a `where` binding while Scala
+  had an inline lambda; the two Befores were not parallel. Rewritten as an inline lambda. → rule in brief.
+- **Reviewer, round 2 (optional, applied).** Comment "never throws" overclaimed: GHC `div` overflows at
+  `minBound / -1`. Reworded, and the page says the partiality is preserved, not fixed. `foldl` → `foldl'`.
+- **Citation skeptic.** One of 15 references was refuted on its *claim*, not its existence: "spends most of
+  its effort on this analysis" about Stocker's Scala refactoring thesis was not supported; softened to
+  "must perform exactly this analysis". → skeptic prompt now names overstatement as a failure.
+- **Harness.** A session limit killed the reviewer mid-run; `Workflow({scriptPath, resumeFromRunId})`
+  replayed the 18 finished agents from cache and re-ran only the reviewer. Cached agents may return empty
+  results; read `journal.jsonl` first.
+- **Jekyll.** `exclude:` the sources dir in `_config.yml`; `include_relative` still reads excluded files.
+  `{% highlight scala %}{% include_relative … %}{% endhighlight %}` works inside raw HTML `<div>`s, so the
+  side-by-side panes need no `markdown="1"`. Dot-dirs (`.scala-build`, `.bsp`) are ignored by Jekyll
+  automatically. Two 80-column panes do not fit the 68ch prose measure; `.rf-pair` bleeds to
+  `min(100vw - 3rem, 1360px)` on ≥1000px viewports.
+- **Time.** Research + 15 citation checks ran in parallel with the examples build (both ≈ 10 min); the
+  reviewer's two rounds plus the fix took most of the 53-minute resumed run; diagrams with browser
+  render-checks ≈ 15 min. Toolchain probing before the workflow cost ≈ 10 min the first time. The main
+  agent used the wait to write the page and check the layout in a scratch build — do the same.
+- **Browser contention.** The diagram agent and the main agent share one Chrome; resize/reload calls on
+  the main agent's tab hang for minutes while the other is screenshotting. Do layout screenshots before
+  the Diagrams phase starts, or after it ends.
