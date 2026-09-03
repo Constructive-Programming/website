@@ -5,7 +5,7 @@
 - group: "Refactorings"
   items:
     - { name: "Extract / Inline method", slug: extract-method }
-    - { name: "Replace mutable fields with lenses" }
+    - { name: "Replace mutable fields with lenses", slug: replace-mutable-fields-with-lenses }
     - { name: "Replace global state with parameter" }
     - { name: "Introduce ReaderT (Kleisli)" }
     - { name: "Replace loop with fold" }

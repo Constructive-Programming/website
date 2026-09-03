@@ -26,34 +26,30 @@ the steps below and the `workflow.js` prompts; if you find one that has not, fol
 1. Branch from `master`: `refactoring/<slug>`.
 2. Pick the entry: the first item in `_data/refactorings.yml` without a `slug`, unless the user
    names one. Add `slug: <slug>` to it (that is what links it on the index page).
-3. Toolchain check (the workflow agents assume these work):
+3. Toolchain check (the agents assume these work):
    - `scala-cli --version` (hedgehog `qa.hedgehog::hedgehog-core:0.14.0` + `hedgehog-runner:0.14.0`).
    - `docker image inspect cp-hedgehog` — if missing, `sh pages/refactorings/extract-method/run.sh`
-     builds it (about 2.5 minutes). GHC is not installed on the host; nix is read-only.
+     builds it (about 2.5 minutes). GHC is not installed here; nix is read-only.
 4. Write the brief to the scratchpad: copy `brief.md` from this directory, fill the `<...>` fields.
-   The workflow agents read the brief, not this file.
+   The agents that build the entry read the brief, not this file.
 
-## 2. Run the workflow (research ∥ examples → verify loop → diagrams)
+## 2. Run the workflow (research ∥ examples → review → diagrams)
 
-```
-Workflow({
-  scriptPath: ".claude/skills/refactoring-entry/workflow.js",
-  args: {
-    slug: "<slug>", name: "<Name>", number: <n>, total: 35,
-    brief: "<abs path to brief.md>", scratch: "<abs scratchpad dir>",
-    repo: "<abs repo root>",
-    seeds: ["<paper or tool that anchors the OO side>", "<the FP-side paper>", ...],
-    examples: ["<example 1 idea>", "<example 2 idea>", "<example 3 idea>"]
-  }
-})
-```
+This skill describes a *workflow*, not a Claude-specific runner. The phases below are mandatory;
+how you parallelise them depends on your agent runtime:
 
-- The script runs two tracks in parallel: **research → per-citation skeptics → fix-up**, and
-  **examples → reviewer (mutation + adversarial probes) → fix, up to 3 rounds → diagrams**.
-- If an agent dies (session limit, API error), relaunch with `resumeFromRunId`; finished agents replay
-  from cache. Read `journal.jsonl` before assuming a result is empty.
-- While it runs: write `pages/refactorings/<slug>.md` from the extract-method page (next step), and
-  build the site in a scratch copy with stub SVGs to catch Liquid errors early.
+- **Research** — with verified citations (one skeptic pass per reference), and
+- **Examples** — build + run the 3 Before/After/Spec pairs in both languages, then
+- **Review** — mutation-check + adversarial probes; fix, up to 3 rounds, then
+- **Diagrams** — inline SVG koan + one per example.
+
+If your runtime provides a batch/orchestration runner (e.g. `workflow.js` in this directory is a
+Claude Code `Workflow` script that runs both tracks in parallel and resumes crashed agents from
+`journal.jsonl`), use it with `slug/name/number/total/brief/scratch/repo/seeds/examples` args — but
+any agent can run the phases itself in order (research → citation checks → examples → review →
+diagrams), which is exactly what `workflow.js` does under the hood. While research runs, write
+`pages/refactorings/<slug>.md` from the extract-method page (next step) and build the site in a
+scratch copy with stub SVGs to catch Liquid errors early.
 
 ## 3. Assemble the page
 
@@ -82,9 +78,25 @@ Rules that came from review, keep them:
   markdown inside raw block HTML, and IALs on numbered items break the list).
 - Source lines ≤ 72 characters or the pane scrolls horizontally on a 1280px screen.
 - No `{{` `}}` `{%` `%}` in any included source (Liquid runs before highlighting).
-- Copy `run.sh` from extract-method unchanged into the new sources directory.
+- Copy `run.sh` from extract-method unchanged into the new sources directory (then adjust it only
+  if the entry has a real reason to, e.g. a `shared/` module — see next bullet).
 - Add the new sources directory to `exclude:` in `_config.yml` (sources are included via
   `include_relative`, not published as static files).
+- **Setup shared across examples lives in `shared/` and is never shown on the page.** If the entry
+  needs shared machinery (an optic library, a hedgehog spec runner, a common data type), put it in
+  `pages/refactorings/<slug>/shared/` and have `run.sh` compile it (`scala-cli run "$d" … "$SHARED"`
+  for Scala, `-i"$SHARED"` for Haskell) — but do NOT `include_relative` it. Each Example
+  `Before/After/Spec` on the page is then the *move itself*, with a one-line note in the page that
+  the shared setup is hidden. The reviewer considers inline setup (e.g. redefining a Lens type in
+  every After) accidental complexity that buries the motivation.
+- **Never hand-write intermediate helpers in an example.** If the example needs a walk over a
+  recursive type, a fold, or a traversal builder, do not define it in the example's `After` —
+  add it to `shared/` (e.g. a `Plated` class with `descend`/`everywhere`, as in eo's "visit
+  across whole trees" recipe) or use a library, and have the example declare only the instance
+  (`which fields recurse`). A hand-rolled `everywhere` in an example buries the motivation: the
+  optic is the reusable thing, not the helper. This is the same rule as the `shared/` bullet
+  above — shared machinery stays off the page — extended to any intermediate helper the
+  example needs.
 - Do not claim totality or purity the code does not have (e.g. `Int` `div` overflow).
 
 ## 4. Verify before the PR
@@ -100,7 +112,8 @@ Rules that came from review, keep them:
 ## 5. Ship
 
 Commit sources + page + data + config on the branch; push (SSH remote works; if `gh auth status`
-fails ask the user to run `! gh auth login -h github.com -p ssh -w`); open the PR with the
+fails ask the user to run `! gh auth login -h github.com -p ssh -w` — or use whichever GitHub
+tool your environment provides); open the PR with the
 reviewer's mutation table and probe summary in the body. The PR preview URL is
 `https://www.constructive.dev/pr-preview/pr-<N>/refactorings/<slug>/`.
 

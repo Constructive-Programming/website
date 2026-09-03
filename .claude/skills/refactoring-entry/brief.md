@@ -38,7 +38,9 @@ when it does not apply.
 
 ## Code layout (examples agent writes these; reviewer runs them)
 pages/refactorings/<slug>/
-  run.sh                      # copied unchanged from extract-method; runs every NN-*/ dir in both languages
+  run.sh                      # copied from extract-method; runs every NN-*/ dir in both languages
+  shared/                     # shared setup (optics, spec runner, common types) — compiled in,
+                              # NEVER included on the page; each example is then the move itself
   NN-<ex>/Before.scala        # object Before { ... }   the pre-refactoring program
   NN-<ex>/After.scala         # object After  { ... }   the refactored version (same public entry point signature)
   NN-<ex>/Spec.scala          # hedgehog property: forAll generated inputs, Before.f(x) ==== After.f(x). `@main def spec()`.
@@ -49,7 +51,12 @@ pages/refactorings/<slug>/
   * every file self-contained, readable, SHORT (Before/After 8–25 lines each); lines ≤ 72 characters;
   * NO `{{`, `}}`, `{%`, `%}` sequences anywhere (Liquid would eat them);
   * one-line comment at the top of Before/After saying what the program does; no essay comments;
-  * the Scala and Haskell Befores must be parallel (same shape: if Scala has an inline lambda, so does Haskell).
+  * the Scala and Haskell Befores must be parallel (same shape: if Scala has an inline lambda, so does Haskell);
+  * **never hand-write intermediate helpers in an example** — if the example needs a walk over a
+    recursive type, a fold, or a traversal builder, put it in `shared/` (e.g. a `Plated`
+    class with `descend`/`everywhere`, as in eo's "visit across whole trees" recipe) or use a
+    library, and declare only the type's instance in the example (`which fields recurse`). A
+    hand-rolled helper in an example buries the move under the tool.
 - Scala: Scala 3.3.x, directives at the top of Spec.scala only:
     //> using scala 3.3.4
     //> using dep qa.hedgehog::hedgehog-core:0.14.0

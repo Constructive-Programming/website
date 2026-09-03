@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 216" role="img" aria-labelledby="d2-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="d2-title">Replacing a recursive match with one optic reused at every node. Before: renameAll recurses over the tree and matches+rebuilds Var at each node by hand. After: everywhere(over(varName, upper)) — the same varName optic from example 1 applied at every node, bottom-up; the walk decides where, the optic decides how.</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="26">before</text>
+    <text x="428" y="26">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="36" width="388" height="136" rx="4"/>
+    <rect x="428" y="36" width="336" height="136" rx="4"/>
+  </g>
+  <g fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3">
+    <rect x="44" y="104" width="176" height="24" rx="3"/>
+    <rect x="210" y="128" width="176" height="24" rx="3"/>
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="56">renameAll(e) =</text>
+    <text x="40" y="72">e match</text>
+    <text x="52" y="88">EVar(v) =&gt; EVar(v.copy(name = upper))</text>
+    <text x="52" y="104">EApp(f, x) =&gt; EApp(renameAll(f),</text>
+    <text x="64" y="120">renameAll(x))</text>
+    <text x="52" y="134">ELam(b, bd) =&gt; ELam(b, renameAll(bd))</text>
+    <text x="52" y="156">the rebuild appears at</text>
+    <text x="52" y="170">every depth</text>
+    <text x="440" y="56">everywhere(over(varName, upper))</text>
+    <text x="452" y="72">walk decides where:</text>
+    <text x="464" y="88">every node, bottom-up</text>
+    <text x="452" y="108">varName decides how:</text>
+    <text x="464" y="124">prism then lens, from ex. 1</text>
+    <text x="452" y="148">one optic, reused</text>
+    <text x="452" y="164">at every depth</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1">
+    <circle cx="386" cy="166" r="7.5"/>
+    <circle cx="428" cy="166" r="7.5"/>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle">
+    <text x="386" y="170">1</text>
+    <text x="428" y="170">1</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M406 166 H414"/>
+  </g>
+  <g fill="currentColor">
+    <path d="M414 162.5 L422 166 L414 169.5 Z"/>
+  </g>
+</svg>
