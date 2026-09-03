@@ -42,3 +42,4 @@ plugins: [jekyll-paginate, jekyll-seo-tag, jekyll-feed, jekyll-remote-theme]
 # include_relative; do not also publish them as static files.
 exclude:
   - pages/refactorings/extract-method/
+  - pages/refactorings/replace-mutable-fields-with-lenses/

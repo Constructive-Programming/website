@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 196" role="img" aria-labelledby="koan-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="koan-title">Replace mutable fields with lenses / replace lenses with mutable fields. Left: a record field read and written directly, spelled out at every call site. Right: the same field as a lens value packaging get :: s -> a and set :: a -> s -> s, so every read is get, every write is set or modify. The arrow to the right is replace (package get and set as one composable value); the arrow to the left is inline (drop the lens and access the field directly). The three lens laws — get (set v s) = v, set (get s) s = s, set v2 (set v1 s) = set v2 s — are the equation the move is checked against.</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="28">before</text>
+    <text x="424" y="28">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="40" width="200" height="104" rx="4"/>
+    <rect x="424" y="40" width="200" height="104" rx="4"/>
+  </g>
+  <g fill="currentColor" font-size="14" text-anchor="middle">
+    <text x="116" y="66">field <tspan font-style="italic" font-weight="700">balance</tspan></text>
+    <text x="524" y="62">balanceLens =</text>
+    <text x="524" y="84">Lens { get, set }</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".9">
+    <text x="116" y="92">read: <tspan font-style="italic">a.balance</tspan></text>
+    <text x="116" y="110">write: <tspan font-style="italic">copy</tspan> with balance</text>
+    <text x="116" y="132">every call site spells the</text>
+    <text x="116" y="146">field out again</text>
+    <text x="524" y="108">read: <tspan font-weight="700">get</tspan> balanceLens</text>
+    <text x="524" y="128">write: <tspan font-weight="700">set</tspan> / <tspan font-weight="700">modify</tspan></text>
+    <text x="524" y="148">lens composes along paths</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M232 76 H398"/>
+    <path d="M408 116 H242"/>
+  </g>
+  <g fill="currentColor">
+    <path d="M398 72.5 L406 76 L398 79.5 Z"/>
+    <path d="M242 112.5 L234 116 L242 119.5 Z"/>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle">
+    <text x="320" y="62">replace (package get + set into a lens)</text>
+    <text x="320" y="132">inline (drop the lens, access the field)</text>
+  </g>
+  <text x="320" y="176" fill="currentColor" font-size="12" text-anchor="middle" opacity=".75"><tspan font-style="italic">get</tspan> (<tspan font-style="italic">set v s</tspan>) = <tspan font-style="italic">v</tspan> &#183; <tspan font-style="italic">set</tspan> (<tspan font-style="italic">get s</tspan>) <tspan font-style="italic">s</tspan> = <tspan font-style="italic">s</tspan> &#183; <tspan font-style="italic">set v&#8322;</tspan> (<tspan font-style="italic">set v&#8321; s</tspan>) = <tspan font-style="italic">set v&#8322; s</tspan></text>
+</svg>

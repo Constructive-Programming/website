@@ -75,3 +75,30 @@ brief.md or workflow.js and deleted here. Keep the calibration table current.
   after the item) attach to the *enclosing* `<ol>` at a break point and split the list. The working
   pattern is: a single `<ol>` with raw `<li id="ref-N">` items, and hand-render inline markdown to
   `<em>`/`<a>` yourself. Folded into SKILL.md §3, workflow.js research prompt, and brief.md.
+
+## 2026-09-26 — 02 Replace mutable fields with lenses
+
+- **Scala/Haskell Spec must compare *result values*, not the Before/After records.** The two sides carry
+  different record types (they must — the point is that After's type can differ). Asserting
+  `Before.x(...) ==== After.x(...)` where the tuple/record types differ makes hedgehog upcast to `Any`
+  and report structural inequality, or fail to compile without a derived `Eq`. Compare projections:
+  `(before.field, ...) ==== (after.field, ...)`. The reference extract-method avoided this by returning
+  primitives; lens examples return records, so this bites immediately. → rule in brief.
+- **A lens is a focus on one path; composition is for nested paths, not merging sibling fields.** A first
+  02 tried `compose(x, y)` on two lenses with the same source to build a pair-lens — that is not a lens
+  (no single field focus), and it does not typecheck. The textbook "compose two lenses" example is a
+  nested record: `player . x`. When the refactoring is about *every element* (all sizes in a tree), a
+  single lens does not fit — that is a traversal; the coherent example uses a total per-node lens inside
+  the recursion. → design note for future lens-like entries.
+- **A partial lens (entryFile on a sum) forces `error`/`sys.error` in the getter; a reviewer would flag
+  it and the property can only test the defined region.** Switched 03 to a total `Lens[Node, Int]` on a
+  plain record — partiality is a real pitfall to *write about*, not a good example shape.
+- **Mutation-checking discipline.** A wrong-typed mutant is not a valid test; the compose-swap mutant
+  was a type error in both languages (itself evidence the lens types are sound). Use sign flips,
+  off-by-ones, dropped cases as mutants; drop mutants that fail to compile rather than reporting a pass.
+- **Toolchain.** `scala-cli run <dir> --main-class spec` works; `docker run cp-hedgehog runghc -i<dir>
+  <dir>/Spec.hs` works. Width rule held at 72 chars for all sources. Time: examples+verify ≈ 45 min;
+  mutation+probes ≈ 15 min.
+- **Workflow-runner gap.** This environment has no Claude Code `Workflow` batch runner; executed the
+  workflow phases directly (research → citation verify → examples → mutate/probes → diagrams). Recorded
+  findings here so the skill's workflow prompt matches when the runner is available.
