@@ -175,13 +175,14 @@ the entry point.
 ## Three examples
 
 Each example is the same program twice, `Before` and `After`, in Scala 3
-and in Haskell, using a tiny self-contained optic encoding — a lens, a
-prism, a traversal, and the compositions between them — so the sources
-run with no dependencies. The entry point keeps its name and its type,
-the optic is the only difference, and a hedgehog property generates
-inputs and demands that both versions agree on every one of them. The
-three are eo's "navigate structures" recipes, in increasing depth of
-nesting.
+and in Haskell. The optic building blocks — a lens, a prism, a
+traversal, and the compositions between them — and the hedgehog spec
+runner live in the entry's `shared/` directory: compiled by `run.sh`,
+never shown on the page, so each example is the move itself. The entry
+point keeps its name and its type, the optic is the only difference,
+and a hedgehog property verifies that both versions agree on every
+generated input. The three are eo's "navigate structures" recipes, in
+increasing depth of nesting.
 
 ### 1 · A single node: prism and lens composed
 

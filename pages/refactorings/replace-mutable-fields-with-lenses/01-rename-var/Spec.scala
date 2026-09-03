@@ -73,13 +73,4 @@ object Props extends Properties:
     case T.TVar(_, _)   => false
     case T.TApp(f, x)   => tNoVars(f) && tNoVars(x)
     case T.TLam(_, b)   => tNoVars(b)
-
-@main def spec(): Unit =
-  val results = Props.tests.map { t =>
-    val r = Property.check(t.withConfig(PropertyConfig.default),
-      t.result, Seed.fromTime())
-    println(Test.renderReport(
-      "Props", t, r, ansiCodesSupported = false))
-    r.status
-  }
-  if !results.forall(_ == Status.ok) then sys.exit(1)
+@main def spec(): Unit = SpecRunner.run(Props.tests)

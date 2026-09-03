@@ -38,7 +38,9 @@ when it does not apply.
 
 ## Code layout (examples agent writes these; reviewer runs them)
 pages/refactorings/<slug>/
-  run.sh                      # copied unchanged from extract-method; runs every NN-*/ dir in both languages
+  run.sh                      # copied from extract-method; runs every NN-*/ dir in both languages
+  shared/                     # shared setup (optics, spec runner, common types) — compiled in,
+                              # NEVER included on the page; each example is then the move itself
   NN-<ex>/Before.scala        # object Before { ... }   the pre-refactoring program
   NN-<ex>/After.scala         # object After  { ... }   the refactored version (same public entry point signature)
   NN-<ex>/Spec.scala          # hedgehog property: forAll generated inputs, Before.f(x) ==== After.f(x). `@main def spec()`.

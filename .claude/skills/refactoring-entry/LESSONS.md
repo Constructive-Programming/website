@@ -124,3 +124,18 @@ brief.md or workflow.js and deleted here. Keep the calibration table current.
   inputs explicitly. `Gen.list/Gen.string` argument order differs between Scala and Haskell hedgehog.
 - **Time.** Rework cost ≈ 1h (examples+specs+diagrams+page). The eo cookbook itself is the source of
   truth for optics recipes; reference it with anchors.
+
+## 2026-09-26 — 02 shared/ setup must not appear on the page (post-PR review round 2)
+
+- **Rule (blocking).** Setup shared between examples is *accidental complexity* if shown. A lens
+  entry redefining `Lens`/`Prism`/`PartialLens` in every `After` buries the motivation in the
+  definition of the tool. Move shared machinery to `pages/refactorings/<slug>/shared/` — compiled
+  by `run.sh` (`scala-cli run "$d" --main-class spec "$SHARED"`, `runghc -i"$SHARED"`), never
+  `include_relative`'d. Executed in 02: `shared/Optics.scala|.hs` and `shared/SpecRunner.scala`;
+  the page says the shared files are hidden, each example is the move itself.
+  → folded into SKILL.md §3 and brief.md.
+- **Skill must be agent-agnostic.** It lived in `.claude/skills/` and assumed the Claude Code
+  `Workflow(...)` runner. Rewrote §2 (the workflow) to describe the phases generically — research ·
+  examples · review · diagrams — with the Claude `workflow.js`/`journal.jsonl` as one optional
+  orchestrator, and generalized the `gh`/ship steps. The `Workflow` script stays but nothing else
+  assumes Claude.

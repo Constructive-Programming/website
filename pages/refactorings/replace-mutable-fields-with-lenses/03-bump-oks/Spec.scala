@@ -53,13 +53,4 @@ object Props extends Properties:
         case (R.Failed(m1), R.Failed(m0))       => m1 == m0
         case _                                  => false
       } ==== true
-
-@main def spec(): Unit =
-  val results = Props.tests.map { t =>
-    val r = Property.check(t.withConfig(PropertyConfig.default),
-      t.result, Seed.fromTime())
-    println(Test.renderReport(
-      "Props", t, r, ansiCodesSupported = false))
-    r.status
-  }
-  if !results.forall(_ == Status.ok) then sys.exit(1)
+@main def spec(): Unit = SpecRunner.run(Props.tests)

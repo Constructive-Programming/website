@@ -71,13 +71,4 @@ object Props extends Properties:
       refsUnchanged(f1, f2) && refsUnchanged(x1, x2)
     case (T.TLam(_, b1), T.TLam(_, b2)) => refsUnchanged(b1, b2)
     case _ => false
-
-@main def spec(): Unit =
-  val results = Props.tests.map { t =>
-    val r = Property.check(t.withConfig(PropertyConfig.default),
-      t.result, Seed.fromTime())
-    println(Test.renderReport(
-      "Props", t, r, ansiCodesSupported = false))
-    r.status
-  }
-  if !results.forall(_ == Status.ok) then sys.exit(1)
+@main def spec(): Unit = SpecRunner.run(Props.tests)
