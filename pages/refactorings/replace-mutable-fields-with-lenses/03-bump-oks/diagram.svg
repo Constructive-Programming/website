@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 216" role="img" aria-labelledby="d3-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="d3-title">Replacing a map-with-match with a composed traversal, prism and lens. Before: bumpSucceeded maps with a branch test and rebuild in the same step. After: each .andThen succeeded .andThen value — the traversal reaches every element, the prism selects the succeeded branch, the lens edits its value; failures pass through untouched.</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="26">before</text>
+    <text x="428" y="26">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="36" width="388" height="136" rx="4"/>
+    <rect x="428" y="36" width="336" height="136" rx="4"/>
+  </g>
+  <g fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3">
+    <rect x="44" y="100" width="332" height="26" rx="3"/>
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="56">bumpSucceeded(xs) =</text>
+    <text x="40" y="72">xs.map { case Succeeded(ok) =&gt;</text>
+    <text x="52" y="88">Succeeded(ok.copy(value = ok.value + 1))</text>
+    <text x="52" y="104">case f @ Failed(_) =&gt; f }</text>
+    <text x="52" y="126">branch test and rebuild</text>
+    <text x="52" y="140">in the same step</text>
+    <text x="440" y="56">each .andThen succeeded</text>
+    <text x="452" y="72">.andThen value</text>
+    <text x="440" y="92">every element,</text>
+    <text x="452" y="108">succeeded branch,</text>
+    <text x="452" y="124">edit its value</text>
+    <text x="440" y="144">failures pass through</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".8">
+    <text x="220" y="166">traversal over the list</text>
+    <text x="596" y="166">composed optic</text>
+  </g>
+</svg>
