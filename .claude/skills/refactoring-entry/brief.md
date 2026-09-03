@@ -28,6 +28,9 @@ when it does not apply.
 - Motivation (page section 1, before any mechanics): <why go in each direction — the smell that drives the move,
   the smell that drives its inverse (e.g. duplication / long methods vs speculative generality / coupling)>
 - Known anchors to verify and cite (find more; verify all): <list>
+- References render as raw HTML: each item is `<li id="ref-N">…</li>` inside a plain `<ol>` (Kramdown
+  won't run markdown inside raw block HTML, so inline `*em*` → `<em>` and `<url>` → `<a href>` by hand).
+  In-text citations are the links `[[n](#ref-n)]`.
 - Example ideas (adjust if you find better, keep the progression simple → free variables/effects → recursion/laziness):
   1. <...>
   2. <...>

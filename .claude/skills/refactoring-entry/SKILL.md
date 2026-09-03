@@ -76,6 +76,10 @@ direction, before any mechanics — the reader should know when to reach for the
 how to perform it.
 
 Rules that came from review, keep them:
+- In-text citations are links: write `[[n](#ref-n)]` (render → [<a href="#ref-n">n</a>]);
+  each reference list item is raw HTML `<li id="ref-N">…</li>` inside a plain `<ol>`, with
+  markdown inline formatting hand-rendered to `<em>` and `<a href>` (Kramdown will not process
+  markdown inside raw block HTML, and IALs on numbered items break the list).
 - Source lines ≤ 72 characters or the pane scrolls horizontally on a 1280px screen.
 - No `{{` `}}` `{%` `%}` in any included source (Liquid runs before highlighting).
 - Copy `run.sh` from extract-method unchanged into the new sources directory.

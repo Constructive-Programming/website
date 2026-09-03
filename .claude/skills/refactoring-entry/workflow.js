@@ -87,7 +87,7 @@ How the property-based test states the equivalence (forAll x. before x == after 
 A numbered list. EVERY reference must be real. Use WebSearch/WebFetch to confirm title, authors, year, venue, and a working URL (DOI, ACM DL, author's page, or arXiv) for each one BEFORE including it. If you cannot verify an item, leave it out. Prefer primary sources. Aim for 10–14 references. Anchors to start from (verify them too):
 ${SEEDS}
 Always include: Fowler (Refactoring, 1999 and/or 2018), Claessen & Hughes QuickCheck ICFP 2000, hedgehog (GitHub), and Thompson's "Refactoring functional programs" (AFP 2004, LNCS 3622) or HaRe where the move exists there.
-Cite in-text as [n]. Prose: tight, editorial, 900–1500 words, sentences not bullets (the caveats section may use a short list). Claims about what a tool or paper does must be modest and literally supported by it. Do not write code. No Liquid-looking sequences ({{ or {%).
+Cite in-text as [[n](#ref-n)], a link to the reference at the bottom of the page (sample the extract-method page source for the exact markup the reference list uses — raw <li id="ref-N"> items inside a plain <ol>, hand-rendered inline HTML). Prose: tight, editorial, 900–1500 words, sentences not bullets (the caveats section may use a short list). Claims about what a tool or paper does must be modest and literally supported by it. Do not write code. No Liquid-looking sequences ({{ or {%).
 
 Return the file path, the references array (id = the [n] number, plus title/authors/year/venue/url/claim), and a 3-sentence summary.`,
     { label: `research:${A.slug}`, phase: 'Research', schema: RESEARCH_SCHEMA, effort: 'high' })

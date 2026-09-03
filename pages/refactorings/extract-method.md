@@ -13,16 +13,16 @@ Extract / Inline Method is the pair everyone learns first. Extract: find
 a region of a method body that does one nameable thing, move it into a
 new method, and replace the region with a call. Inline: take a call and
 replace it with the body of the method it names. Fowler's 1999 catalogue
-gave Extract that name [1]; the second edition renamed it Extract
+gave Extract that name [[1](#ref-1)]; the second edition renamed it Extract
 Function, lists Inline Function as its inverse, and rewrote the mechanics
-for a language without classes [2]. The lineage is older. Griswold's 1991
+for a language without classes [[2](#ref-2)]. The lineage is older. Griswold's 1991
 thesis treated
 restructuring as meaning-preserving manipulation of a program dependence
 graph, with a tool holding the semantics fixed while the programmer moved
-code about [4]. Opdyke's 1992 thesis gave the first full treatment of
+code about [[4](#ref-4)]. Opdyke's 1992 thesis gave the first full treatment of
 "refactoring" for the object-oriented setting, and stated each operation
 as a transformation with explicit preconditions under which behaviour is
-preserved [3].
+preserved [[3](#ref-3)].
 
 ## Motivation
 
@@ -60,7 +60,7 @@ top-level one.
 Fowler's mechanics are short: create a method named for what the region
 does, copy the region into it, pass the locals the region reads as
 parameters, return the locals it writes or refuse, replace the region with
-the call, test [1, 2]. "Refuse" is where the preconditions live. In an
+the call, test [[1](#ref-1)], [[2](#ref-2)]. "Refuse" is where the preconditions live. In an
 imperative language a region of statements is not a value; it is a
 sequence of effects on a mutable environment. The extracted method must
 see the same environment the region saw, hand back every change the rest
@@ -69,9 +69,9 @@ as the region ran. A region that assigns two locals, or whose reads are
 interleaved with writes to the same fields elsewhere, cannot be lifted
 without changing the program. Fowler's advice to reduce temps first pushes
 the code toward the case where extraction is safe; Opdyke's precondition
-list makes the same demand formally [3]. Every automated refactoring tool
+list makes the same demand formally [[3](#ref-3)]. Every automated refactoring tool
 since, including Stocker's Scala refactoring library behind the Scala IDE
-[15], must perform exactly this analysis.
+[[15](#ref-15)], must perform exactly this analysis.
 
 ## To and from
 
@@ -104,8 +104,8 @@ exposes constants and structure that further rewrites can act on, and for
 removing indirection that no longer earns its name. Burstall and
 Darlington's system gets almost all of its power from alternating the
 two: unfold to expose a pattern, apply a law, fold to recover a recursion
-with a better shape [5]. A compiler's simplifier works the unfolding half
-at scale [9]. The programmer works at a larger grain with a different
+with a better shape [[5](#ref-5)]. A compiler's simplifier works the unfolding half
+at scale [[9](#ref-9)]. The programmer works at a larger grain with a different
 objective, but the moves are the same moves.
 
 ## Three examples
@@ -166,8 +166,8 @@ would have been a second, different refactoring.
 
 The fold's step function reads `limit` and `fee`, which are parameters of
 `settle`. A top-level extraction would have to make those free variables
-leading parameters — Johnsson's lambda lifting [6], and HaRe's *generalise
-definition* [10]. But both languages also let the definition stay where it
+leading parameters — Johnsson's lambda lifting [[6](#ref-6)], and HaRe's *generalise
+definition* [[10](#ref-10)]. But both languages also let the definition stay where it
 is used: `step` nests inside `settle`, `limit` and `fee` remain in scope
 and are captured, and only `balance` and `tx` — the values the fold
 supplies — become the parameters. This is the scope judgement from the
@@ -200,7 +200,7 @@ giving its caller a new signature.
 Nesting keeps `step` private: callers of `settle` can observe only that
 the closing balance agrees with the unrefactored version — exactly what
 the single property checks. The inverse picture is Danvy and Schultz's
-lambda dropping [7], restoring block structure by dropping parameters
+lambda dropping [[7](#ref-7)], restoring block structure by dropping parameters
 that are invariant across a call graph back into scope.
 
 <details class="rf-spec">
@@ -285,7 +285,7 @@ of this section.
   In Haskell a `let`-bound expression is evaluated at most once per
   binding, a top-level constant applicative form is shared for the
   program's lifetime, and a function body is recomputed per call unless
-  full laziness floats it out [8]. Extraction can change space and time,
+  full laziness floats it out [[8](#ref-8)]. Extraction can change space and time,
   including turning a bounded computation into a leak, without changing
   the result.
 - **Strictness.** A definition that pattern-matches on a parameter forces
@@ -328,26 +328,26 @@ This is not a new idea dressed up. It is the abstraction step of Burstall
 and Darlington's 1977 fold/unfold system, where a program is a set of
 equations and the permitted moves are to define a new equation, to unfold
 a call by replacing it with its right-hand side, and to fold a
-sub-expression back into a call wherever it matches one [5]. Extract is
+sub-expression back into a call wherever it matches one [[5](#ref-5)]. Extract is
 definition followed by fold; Inline is unfold. Johnsson's lambda lifting,
 which turns nested local functions into top-level equations by adding
 their free variables as parameters, is extraction pushed to the whole
-program [6]; Danvy and Schultz's lambda dropping is the inverse, restoring
+program [[6](#ref-6)]; Danvy and Schultz's lambda dropping is the inverse, restoring
 block structure by dropping parameters that are invariant across a call
-graph back into scope [7]. Let-floating in GHC moves bindings inward or
+graph back into scope [[7](#ref-7)]. Let-floating in GHC moves bindings inward or
 outward for sharing and allocation, relying on the same fact that a
-binding may be placed anywhere its free variables are in scope [8]. And
+binding may be placed anywhere its free variables are in scope [[8](#ref-8)]. And
 GHC's inliner performs the inverse of extraction thousands of times a
 build, unfolding and beta-reducing wherever the result is smaller or
 faster; Peyton Jones and Marlow's account of it is, read from the other
-side, an account of when extraction costs nothing at runtime [9].
+side, an account of when extraction costs nothing at runtime [[9](#ref-9)].
 
 The Haskell Refactorer, HaRe, offers the pair as tool operations:
 *introduce definition*, which names a selected sub-expression;
 *generalise definition*, which turns a sub-expression into a parameter;
-and *unfold*, which replaces a call with the body [10, 11]. Thompson's
+and *unfold*, which replaces a call with the body [[10](#ref-10)], [[11](#ref-11)]. Thompson's
 Advanced Functional Programming lecture notes set these out as equations
-between programs and discuss where the equations hold [12].
+between programs and discuss where the equations hold [[12](#ref-12)].
 
 That is the point. With referential transparency the OO precondition does
 not become easier to satisfy; it disappears, because the transformation is
@@ -365,9 +365,9 @@ Because extraction is an equation, its correctness is a property: for all
 inputs *x* in the domain of the entry point, `Before x == After x`. That is
 a one-line property in the sense Claessen and Hughes introduced with
 QuickCheck, where a generator produces inputs and the framework searches
-for a counterexample and shrinks it to a minimal one [13]. The catalogue
+for a counterexample and shrinks it to a minimal one [[13](#ref-13)]. The catalogue
 states every entry this way, in Scala and in Haskell, with hedgehog on
-both sides [14]. Hedgehog is used because its shrinking is integrated
+both sides [[14](#ref-14)]. Hedgehog is used because its shrinking is integrated
 into the generator, so a shrunk counterexample obeys the same invariants
 as a generated one and the minimal failing input it reports is a real
 input of the program, not an artefact of a separate shrinker.
@@ -391,18 +391,23 @@ with hedgehog installed or Docker, and ends with `all properties passed`.
 
 ## References
 
-1. Martin Fowler, with contributions by Kent Beck, John Brant, William Opdyke and Don Roberts. *Refactoring: Improving the Design of Existing Code*. Addison-Wesley, 1999. <https://martinfowler.com/books/refactoring.html>
-2. Martin Fowler. *Refactoring: Improving the Design of Existing Code*, second edition. Addison-Wesley, 2018. Catalogue entry "Extract Function" (formerly Extract Method; inverse of Inline Function). <https://refactoring.com/catalog/extractFunction.html>
-3. William F. Opdyke. *Refactoring Object-Oriented Frameworks*. PhD thesis, University of Illinois at Urbana-Champaign, 1992 (Tech. Report UIUCDCS-R-92-1759). <https://www.laputan.org/pub/papers/opdyke-thesis.pdf>
-4. William G. Griswold. *Program Restructuring as an Aid to Software Maintenance*. PhD thesis, University of Washington, 1991. Technical report 91-08-04. <https://cseweb.ucsd.edu/~wgg/Abstracts/gristhesis.pdf>
-5. R. M. Burstall and John Darlington. "A Transformation System for Developing Recursive Programs". *Journal of the ACM* 24(1):44–67, 1977. <https://doi.org/10.1145/321992.321996>
-6. Thomas Johnsson. "Lambda Lifting: Transforming Programs to Recursive Equations". In *Functional Programming Languages and Computer Architecture (FPCA 1985)*, LNCS 201, pp. 190–203. Springer, 1985. <https://doi.org/10.1007/3-540-15975-4_37>
-7. Olivier Danvy and Ulrik P. Schultz. "Lambda-dropping: transforming recursive equations into programs with block structure". *Theoretical Computer Science* 248(1–2):243–287, 2000. <https://www.sciencedirect.com/science/article/pii/S0304397500000542>
-8. Simon Peyton Jones, Will Partain and André Santos. "Let-floating: moving bindings to give faster programs". In *Proceedings of the ACM SIGPLAN International Conference on Functional Programming (ICFP 1996)*, pp. 1–12. <https://doi.org/10.1145/232627.232630>
-9. Simon Peyton Jones and Simon Marlow. "Secrets of the Glasgow Haskell Compiler inliner". *Journal of Functional Programming* 12(4–5):393–434, 2002. <https://doi.org/10.1017/S0956796802004331>
-10. Huiqing Li, Claus Reinke and Simon Thompson. "Tool support for refactoring functional programs". In *Proceedings of the ACM SIGPLAN Workshop on Haskell (Haskell 2003)*, pp. 27–38. <https://doi.org/10.1145/871895.871899>
-11. Huiqing Li, Simon Thompson and Claus Reinke. "The Haskell Refactorer, HaRe, and its API". *Electronic Notes in Theoretical Computer Science* 141(4):29–34, 2005 (LDTA 2005). <https://doi.org/10.1016/j.entcs.2005.02.053>
-12. Simon Thompson. "Refactoring Functional Programs". In *Advanced Functional Programming (AFP 2004), Revised Lectures*, LNCS 3622, pp. 331–357. Springer, 2005. <https://doi.org/10.1007/11546382_9>
-13. Koen Claessen and John Hughes. "QuickCheck: a lightweight tool for random testing of Haskell programs". In *Proceedings of the ACM SIGPLAN International Conference on Functional Programming (ICFP 2000)*, pp. 268–279. <https://doi.org/10.1145/351240.351266>
-14. Jacob Stanley and contributors. *Hedgehog: release with confidence, state-of-the-art property testing*. <https://github.com/hedgehogqa/haskell-hedgehog> and <https://github.com/hedgehogqa/scala-hedgehog>
-15. Mirko Stocker. *Scala Refactoring*. Master's thesis, HSR Hochschule für Technik Rapperswil, 2010. <https://eprints.ost.ch/id/eprint/286/>
+<ol>
+<li id="ref-1">Martin Fowler, with contributions by Kent Beck, John Brant, William Opdyke and Don Roberts. <em>Refactoring: Improving the Design of Existing Code</em>. Addison-Wesley, 1999. <a href="https://martinfowler.com/books/refactoring.html">https://martinfowler.com/books/refactoring.html</a></li>
+<li id="ref-2">Martin Fowler. <em>Refactoring: Improving the Design of Existing Code</em>, second edition. Addison-Wesley, 2018. Catalogue entry &ldquo;Extract Function&rdquo; (formerly Extract Method; inverse of Inline Function). <a href="https://refactoring.com/catalog/extractFunction.html">https://refactoring.com/catalog/extractFunction.html</a></li>
+<li id="ref-3">William F. Opdyke. <em>Refactoring Object-Oriented Frameworks</em>. PhD thesis, University of Illinois at Urbana-Champaign, 1992 (Tech. Report UIUCDCS-R-92-1759). <a href="https://www.laputan.org/pub/papers/opdyke-thesis.pdf">https://www.laputan.org/pub/papers/opdyke-thesis.pdf</a></li>
+<li id="ref-4">William G. Griswold. <em>Program Restructuring as an Aid to Software Maintenance</em>. PhD thesis, University of Washington, 1991. Technical report 91-08-04. <a href="https://cseweb.ucsd.edu/~wgg/Abstracts/gristhesis.pdf">https://cseweb.ucsd.edu/~wgg/Abstracts/gristhesis.pdf</a></li>
+<li id="ref-5">R. M. Burstall and John Darlington. &ldquo;A Transformation System for Developing Recursive Programs&rdquo;. <em>Journal of the ACM</em> 24(1):44&ndash;67, 1977. <a href="https://doi.org/10.1145/321992.321996">https://doi.org/10.1145/321992.321996</a></li>
+<li id="ref-6">Thomas Johnsson. &ldquo;Lambda Lifting: Transforming Programs to Recursive Equations&rdquo;. In <em>Functional Programming Languages and Computer Architecture (FPCA 1985)</em>, LNCS 201, pp. 190&ndash;203. Springer, 1985. <a href="https://doi.org/10.1007/3-540-15975-4_37">https://doi.org/10.1007/3-540-15975-4_37</a></li>
+<li id="ref-7">Olivier Danvy and Ulrik P. Schultz. &ldquo;Lambda-dropping: transforming recursive equations into programs with block structure&rdquo;. <em>Theoretical Computer Science</em> 248(1&ndash;2):243&ndash;287, 2000. <a href="https://www.sciencedirect.com/science/article/pii/S0304397500000542">https://www.sciencedirect.com/science/article/pii/S0304397500000542</a></li>
+<li id="ref-8">Simon Peyton Jones, Will Partain and Andr&eacute; Santos. &ldquo;Let-floating: moving bindings to give faster programs&rdquo;. In <em>Proceedings of the ACM SIGPLAN International Conference on Functional Programming (ICFP 1996)</em>, pp. 1&ndash;12. <a href="https://doi.org/10.1145/232627.232630">https://doi.org/10.1145/232627.232630</a></li>
+<li id="ref-9">Simon Peyton Jones and Simon Marlow. &ldquo;Secrets of the Glasgow Haskell Compiler inliner&rdquo;. <em>Journal of Functional Programming</em> 12(4&ndash;5):393&ndash;434, 2002. <a href="https://doi.org/10.1017/S0956796802004331">https://doi.org/10.1017/S0956796802004331</a></li>
+<li id="ref-10">Huiqing Li, Claus Reinke and Simon Thompson. &ldquo;Tool support for refactoring functional programs&rdquo;. In <em>Proceedings of the ACM SIGPLAN Workshop on Haskell (Haskell 2003)</em>, pp. 27&ndash;38. <a href="https://doi.org/10.1145/871895.871899">https://doi.org/10.1145/871895.871899</a></li>
+<li id="ref-11">Huiqing Li, Simon Thompson and Claus Reinke. &ldquo;The Haskell Refactorer, HaRe, and its API&rdquo;. <em>Electronic Notes in Theoretical Computer Science</em> 141(4):29&ndash;34, 2005 (LDTA 2005). <a href="https://doi.org/10.1016/j.entcs.2005.02.053">https://doi.org/10.1016/j.entcs.2005.02.053</a></li>
+<li id="ref-12">Simon Thompson. &ldquo;Refactoring Functional Programs&rdquo;. In <em>Advanced Functional Programming (AFP 2004), Revised Lectures</em>, LNCS 3622, pp. 331&ndash;357. Springer, 2005. <a href="https://doi.org/10.1007/11546382_9">https://doi.org/10.1007/11546382_9</a></li>
+<li id="ref-13">Koen Claessen and John Hughes. &ldquo;QuickCheck: a lightweight tool for random testing of Haskell programs&rdquo;. In <em>Proceedings of the ACM SIGPLAN International Conference on Functional Programming (ICFP 2000)</em>, pp. 268&ndash;279. <a href="https://doi.org/10.1145/351240.351266">https://doi.org/10.1145/351240.351266</a></li>
+<li id="ref-14">Jacob Stanley and contributors. <em>Hedgehog: release with confidence, state-of-the-art property testing</em>. <a href="https://github.com/hedgehogqa/haskell-hedgehog">https://github.com/hedgehogqa/haskell-hedgehog</a> and <a href="https://github.com/hedgehogqa/scala-hedgehog">https://github.com/hedgehogqa/scala-hedgehog</a></li>
+<li id="ref-15">Mirko Stocker. <em>Scala Refactoring</em>. Master&rsquo;s thesis, HSR Hochschule f&uuml;r Technik Rapperswil, 2010. <a href="https://eprints.ost.ch/id/eprint/286/">https://eprints.ost.ch/id/eprint/286/</a></li>
+</ol>
+
+
+

@@ -63,3 +63,15 @@ brief.md or workflow.js and deleted here. Keep the calibration table current.
 - **Rule.** Prompt-forced page structure in workflow.js: the research prompt now enumerates the exact H2
   headings in order with Motivation first — check that list whenever a section is added or renamed, or the
   assemble-the-page step and the research step will disagree on shape.
+
+## 2026-09-03 — Reference citations are links (post-PR-12 review round 6)
+
+- **Reviewer (kryptt).** In-text `[n]` references must be links that navigate to the reference list.
+  Also update the skill with this info. Implemented:
+  - In-text citations → `[[n](#ref-n)]`, rendering as [<a href="#ref-n">n</a>].
+  - Reference list items → raw HTML `<li id="ref-N">…</li>` inside a plain `<ol>`.
+- **Kramdown traps (rule).** Kramdown 1.x will not process markdown inside raw block HTML (`<li>`, even
+  with `markdown="1"` — it escapes the inner tags); IALs on numbered list items (`{: #ref-N}` on a line
+  after the item) attach to the *enclosing* `<ol>` at a break point and split the list. The working
+  pattern is: a single `<ol>` with raw `<li id="ref-N">` items, and hand-render inline markdown to
+  `<em>`/`<a>` yourself. Folded into SKILL.md §3, workflow.js research prompt, and brief.md.
