@@ -1,13 +1,5 @@
 [
   
-    {
-      "title"    : "Refactorings",
-      "category" : "",
-      "tags"     : "refactoring, tools",
-      "url"      : "/2019/10/18/Refactorings.html",
-      "date"     : "2019-10-18 00:00:00 +0000"
-    },
-  
   
   
   {
@@ -30,6 +22,16 @@
   
   
   
+  {
+      "title"    : "Extract / Inline Method",
+      "subtitle"    : "Extract / Inline method: name a sub-expression, and its free variables become the parameters — inline a call, and its arguments flow back into the body",
+      "category" : "",
+      "tags"     : "refactorings, extract-method",
+      "url"      : "/refactorings/extract-method/"
+  },
+  
+  
+  
   
   
   {
@@ -41,6 +43,16 @@
   },
   
   
+  
+  
+  
+  {
+      "title"    : "Refactorings",
+      "subtitle"    : "The Constructive Programming refactoring catalogue",
+      "category" : "",
+      "tags"     : "refactorings",
+      "url"      : "/refactorings/"
+  },
   
   
   
