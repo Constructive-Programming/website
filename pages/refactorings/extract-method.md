@@ -4,6 +4,7 @@ title: Extract method
 subtitle: "Extract method: name a sub-expression, and its free variables become the parameters"
 permalink: /refactorings/extract-method/
 tags: [refactorings, extract-method]
+hide: true   # entry pages are reached from the catalogue, not the top-right nav
 ---
 
 <p class="rf-crumb"><a href="{{ '/refactorings/' | relative_url }}">← The refactoring catalogue</a> · 1 of 35</p>
