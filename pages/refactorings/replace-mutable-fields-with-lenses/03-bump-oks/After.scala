@@ -17,9 +17,8 @@ object After:
     )
   val valueL: Lens[Ok, Int] =
     Lens[Ok, Int](_.value, (ok, v) => ok.copy(value = v))
-  val okVal: PartialLens[Result, Int] = compose(succeededP, valueL)
-
-  val eachSucceeded: PartialLens[List[Result], Int] = each(okVal)
+  val eachSucceeded: PartialLens[List[Result], Int] =
+    succeededP.andThen(valueL).each
 
   def bumpSucceeded(xs: List[Result]): List[Result] =
     over(eachSucceeded, _ + 1)(xs)

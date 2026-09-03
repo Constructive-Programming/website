@@ -143,8 +143,21 @@ brief.md or workflow.js and deleted here. Keep the calibration table current.
   hand-defined `everywhere` that used to sit in an "across a whole tree" example's After and
   buries the point (the optic is the reusable bit, not the walk). If the example needs shared
   walk machinery, add `Plated`/`everywhere` to `shared/` (a `trait`/`class` with a `descend`
-  instance per type; `everywhere f s = descend (everywhere f) (f s)`) and declare the type's
+  instance per type; `everywhere f s = f (descend (everywhere f) s)`) and declare the type's
   `Plated` instance in the example — the walk comes from the library, the example only says
   which fields recurse. Same for any helper (a fold over the tree, a traversal builder): it
   belongs in `shared/` or a library, not re-derived in the example.
   → folded into SKILL.md §3 and brief.md ("Never hand-write helpers").
+
+
+## 2026-09-26 — 02 clean examples and diagram overlap review
+
+- **Examples.** Keep domain optics named and compositional (`varP.andThen(nameL)`,
+  `.each`, `Plated.everywhere`); do not expose global `compose` calls or intermediate
+  values that the fluent API can express. Corrected `Plated.everywhere` to bottom-up:
+  transform children through `descend`, then apply the node rewrite.
+- **Diagrams.** Numbered circles on panel borders, arrows crossing boxes and dashed
+  highlights through text produced visible overlap artifacts. Use a wide center gutter,
+  marker-ended arrows entirely inside that gutter, and low-alpha highlight fills with
+  no stroke. Render the actual SVG at desktop and mobile widths before assembly.
+  → folded into workflow.js's diagram prompt.

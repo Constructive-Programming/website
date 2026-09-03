@@ -3,7 +3,7 @@
 module After where
 
 import Data.Char (toUpper)
-import Optics (Lens(..), Prism(..), PartialLens(..), composeO, over)
+import Optics (Lens(..), Prism(..), PartialLens(..), andThen, over)
 
 data Var   = Var   { vName :: String, vRef :: Int }
   deriving (Eq, Show)
@@ -20,7 +20,7 @@ nameL :: Lens Var String
 nameL = Lens { view = vName, set = \(v, n) -> v { vName = n } }
 
 varName :: PartialLens Expr String
-varName = composeO varP nameL
+varName = varP `andThen` nameL
 
 upperVarName :: Expr -> Expr
 upperVarName = over varName (map toUpper)
