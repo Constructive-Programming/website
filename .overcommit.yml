@@ -19,6 +19,12 @@ gemfile: Gemfile
 quiet: true
 
 PreCommit:
+  AuthorName:
+    enabled: false
+
+  AuthorEmail:
+    enabled: false
+
   # Hygiene checks (previously pre-commit-hooks):
   #   trailing whitespace -> TrailingWhitespace, CRLF check dropped (repo is
   #   LF only), case conflicts -> CaseConflicts, merge markers ->

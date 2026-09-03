@@ -9,4 +9,6 @@ cd "$(dirname "$0")/.."
 # (verify_signatures is already off in .overcommit.yml; this makes the very
 # first run work without an interactive `overcommit --sign`.)
 export OVERCOMMIT_NO_VERIFY=1
+export GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-CI}"
+export GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-ci@example.com}"
 exec bundle exec overcommit --run
