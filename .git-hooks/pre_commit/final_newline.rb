@@ -19,10 +19,6 @@ module Overcommit::Hook::PreCommit
 
         unless content.end_with?("\n")
           errors << "#{file}: missing final newline"
-          next
-        end
-        if content.end_with?("\n\n")
-          errors << "#{file}: multiple blank lines at end of file"
         end
       end
 
