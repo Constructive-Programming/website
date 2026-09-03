@@ -102,3 +102,25 @@ brief.md or workflow.js and deleted here. Keep the calibration table current.
 - **Workflow-runner gap.** This environment has no Claude Code `Workflow` batch runner; executed the
   workflow phases directly (research → citation verify → examples → mutate/probes → diagrams). Recorded
   findings here so the skill's workflow prompt matches when the runner is available.
+
+## 2026-09-26 — 02 Replace mutable fields with lenses (post-PR review rework)
+
+- **Reviewer (kryptt) asked for the optics framing, not the lens framing.** The entry should teach
+  *optics* (lens · prism · traversal) and the "how to reach vs what to do" separation, mention that
+  optics are lawful *by construction* (not per-example law properties in the page), reuse the eo
+  cookbook recipes, and justify the inverse by decoupling not paying for itself (no cross-domain
+  boundaries). Law-solvers (cats-eo-laws, monocle-law, genvalidity-hspec-optics) belong in
+  Verification, not as hand-written law properties.
+- **Rule.** Example trios should escalate *nesting* (single node → every tree node → sparse walk over a
+  list) so the composed optic's value is visible; the setter-optic encoding (`(a -> a) -> (s -> s)`)
+  is compact but reads cryptic next to same-shaped Lens/Prism data types — prefer explicit
+  `Lens`/`Prism`/`Traversal` cases with `compose` (prism .andThen lens, each .andThen prism .andThen
+  lens) for the page.
+- **Rule (spec comparison).** Keep comparing via projected tuples/`from*` converters (Before/After
+  have distinct record types), and add a *purpose* second property (hit/miss, only-X-changed) rather
+  than also the lens laws — laws are by construction, the purpose property is the page's real check.
+- **Generators.** `Gen.unicode` yields control chars (`\NUL`) that `toUpper` leaves alone; for
+  "all names uppercased" style invariants use `Gen.alpha` (ASCII letters) or exclude non-letter
+  inputs explicitly. `Gen.list/Gen.string` argument order differs between Scala and Haskell hedgehog.
+- **Time.** Rework cost ≈ 1h (examples+specs+diagrams+page). The eo cookbook itself is the source of
+  truth for optics recipes; reference it with anchors.
