@@ -10,6 +10,11 @@ exclude_rule 'fenced-code-language'
 # entirely), and Liquid-driven pages have no heading at all.
 exclude_rule 'first-line-h1'
 
+# The refactoring pages carry citations and koans as raw HTML blocks (the
+# refactoring skill writes them that way because kramdown won't process
+# markdown inside raw block HTML). Inline HTML is fine here by design.
+exclude_rule 'no-inline-html'
+
 # The refactorings post steps are numbered 1., 2., 3., ...; require a
 # consistent ordered sequence instead of mdl's default "one" style.
 rule 'MD029', :style => :ordered

@@ -408,6 +408,3 @@ with hedgehog installed or Docker, and ends with `all properties passed`.
 <li id="ref-14">Jacob Stanley and contributors. <em>Hedgehog: release with confidence, state-of-the-art property testing</em>. <a href="https://github.com/hedgehogqa/haskell-hedgehog">https://github.com/hedgehogqa/haskell-hedgehog</a> and <a href="https://github.com/hedgehogqa/scala-hedgehog">https://github.com/hedgehogqa/scala-hedgehog</a></li>
 <li id="ref-15">Mirko Stocker. <em>Scala Refactoring</em>. Master&rsquo;s thesis, HSR Hochschule f&uuml;r Technik Rapperswil, 2010. <a href="https://eprints.ost.ch/id/eprint/286/">https://eprints.ost.ch/id/eprint/286/</a></li>
 </ol>
-
-
-

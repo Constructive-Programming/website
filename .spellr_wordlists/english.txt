@@ -16,6 +16,7 @@ behaviour
 bfc
 bodireel
 btn
+catalogue
 cdn
 centred
 cet
@@ -63,6 +64,7 @@ eval
 evals
 favicon
 fira
+fowler
 fraunces
 gadt
 gemfile
@@ -89,6 +91,7 @@ jspm
 katex
 kinded
 kleisli
+kramdown
 kvk
 lambek
 linecap
@@ -117,6 +120,7 @@ noreply
 npm
 num
 onclick
+opdyke
 opsz
 oss
 otravo
@@ -136,6 +140,7 @@ pullquote
 readme
 recurse
 reddit
+refactorings
 refactorings
 repl
 rhansen

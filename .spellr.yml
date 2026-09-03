@@ -2,6 +2,11 @@
 # spell checker. Checked files obey .gitignore; these excludes are for
 # Jekyll/generated trees that git ignores anyway, kept explicit so `spellr`
 # behaves identically from any directory.
+#
+# Policy: spellr checks the site's prose (Markdown, YAML/JSON data, HTML,
+# SCSS). Non-prose files are excluded: refactoring source samples (.scala .hs)
+# and scripts are code with their own vocabulary, and .claude/skills are
+# agent-internal docs full of tool-specific terms — none are site spelling.
 excludes:
   - .git/
   - _site/
@@ -10,6 +15,12 @@ excludes:
   - node_modules/
   - .venv/
   - Gemfile.lock
+  - .claude/
+  - '*.scala'
+  - '*.hs'
+  - '*.js'
+  - 'run.sh'
+  - pages/refactorings/
 
 # Site-specific spelling lives in .spellr_wordlists/english.txt; regenerate
 # or extend it with `bundle exec spellr --wordlist`.

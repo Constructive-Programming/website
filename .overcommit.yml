@@ -62,6 +62,16 @@ PreCommit:
     enabled: true
     requires_files: true
     command: ['bundle', 'exec', 'mdl']
+    exclude:
+      # The refactorings section carries raw-HTML citation blocks (single
+      # <li> lines with entities/URLs) and ref-link prose that the
+      # refactoring skill writes deliberately; those can't be wrapped to
+      # 80 cols without breaking the markup. Exempt only that section.
+      - 'pages/refactorings/**/*'
+      # .claude/skills are agent-internal docs, not site prose.
+      - '.claude/**/*'
+      # The catalogue index page has the same citation conventions.
+      - 'pages/refactorings.md'
 
   # Spelling with spellr (Ruby, replaces codespell — see
   # .git-hooks/pre_commit/spellr.rb). Wordlist: .spellr_wordlists/.
