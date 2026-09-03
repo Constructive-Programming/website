@@ -113,16 +113,18 @@ since, including Stocker’s Scala refactoring library behind the Scala IDE
     <path d="M242 106.5 L234 110 L242 113.5 Z" />
   </g>
   <g fill="currentColor" font-size="12" text-anchor="middle">
-    <text x="320" y="64">extract (fold / lambda-lift)</text>
-    <text x="320" y="128">inline (unfold / beta)</text>
+    <text x="320" y="64">extract (define and fold / lambda-lift)</text>
+    <text x="320" y="128">inline (unfold and &beta;-reduce / denest)</text>
   </g>
   <text x="320" y="170" fill="currentColor" font-size="12" text-anchor="middle" opacity=".75"><tspan font-style="italic">v</tspan> are the free variables of <tspan font-style="italic">e</tspan>; they become the parameters of g</text>
 </svg>
 
 <figcaption>The koan. One equation, read in two directions: extract
-(define and fold) to the right, inline (unfold and β-reduce) to the left.
-The free variables of the region <em>e</em> are exactly the parameters
-of the new definition.</figcaption>
+(define and fold; lambda-lift, or simply nest the definition) to the
+right, inline (unfold and β-reduce; denest) to the left. The free
+variables of the region <em>e</em> become the parameters of a top-level
+definition — nested, they stay in the enclosing scope instead, and only
+what lies further out is passed.</figcaption>
 </figure>
 
 <p>The catalogue lists each refactoring in both directions because the two
