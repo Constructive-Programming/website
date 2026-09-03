@@ -20,20 +20,12 @@ prop_settle_agrees = withTests 500 $ property $ do
   limit   <- forAll genLimit
   fee     <- forAll genFee
   txs     <- forAll (Gen.list (Range.linear 0 20) genAmount)
-  Before.settle opening limit fee txs === After.settle opening limit fee txs
-
-prop_step_is_one_step :: Property
-prop_step_is_one_step = withTests 500 $ property $ do
-  balance <- forAll genAmount
-  limit   <- forAll genLimit
-  fee     <- forAll genFee
-  tx      <- forAll genAmount
-  After.step limit fee balance tx === Before.settle balance limit fee [tx]
+  Before.settle opening limit fee txs ===
+    After.settle opening limit fee txs
 
 main :: IO ()
 main = do
   ok <- checkParallel $ Group "Props"
     [ ("settle: Before == After", prop_settle_agrees)
-    , ("step is settle over a single transaction", prop_step_is_one_step)
     ]
   unless ok exitFailure

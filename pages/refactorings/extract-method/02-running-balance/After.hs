@@ -1,13 +1,13 @@
--- Closing balance after a run of transactions; each debit that leaves the
--- account below its overdraft limit is charged a fee.
+-- Closing balance after a run of transactions; `step` is extracted from
+-- the fold lambda and stays nested, capturing `limit` and `fee`.
 module After where
 
 import Data.List (foldl')
 
 settle :: Int -> Int -> Int -> [Int] -> Int
-settle opening limit fee = foldl' (step limit fee) opening
-
-step :: Int -> Int -> Int -> Int -> Int
-step limit fee balance tx =
-  let next = balance + tx
-  in if tx < 0 && next < negate limit then next - fee else next
+settle opening limit fee =
+  foldl' step opening
+  where
+    step balance tx =
+      let next = balance + tx
+      in if tx < 0 && next < negate limit then next - fee else next

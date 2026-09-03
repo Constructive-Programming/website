@@ -60,8 +60,9 @@ Workflow({
 Start from `pages/refactorings/extract-method.md`. Keep: front matter shape (`layout: page`,
 `subtitle` carries the koan and names both directions, `permalink: /refactorings/<slug>/`, `tags`,
 `hide: true` so entry pages stay out of the top-right nav), the crumb line, the
-section order (Motivation · The move · The functional reading · To and from + koan figure ·
-Three examples · When it is not an equivalence · Checking it · References) — **Motivation is always
+section order (Motivation · The move · To and from + koan figure ·
+Three examples · Pitfalls + a collapsible "The functional reading" footnote ·
+Verification · References) — **Motivation is always
 the first section, before The move** — the `rf-pair` /
 `rf-figure` / `rf-spec` markup, and the `run.sh` instructions. Replace the prose with
 `<scratch>/research.md` (after its citation fix-up) and write one paragraph per example from

@@ -26,7 +26,7 @@ preserved [3].
 
 ## Motivation
 
-The two directions answer different smells, and the direction you choose
+The two directions answer different [code smells](https://en.wikipedia.org/wiki/Code_smell), and the direction you choose
 records a judgement about the code. Extract when the same shape of work
 recurs in more than one place and the duplication would otherwise drift
 out of sync, each copy fixed separately; or when a method has grown so
@@ -42,6 +42,18 @@ a seam whose callers are coupled through its implementation rather than
 its contract hides nothing — the name adds a hop, not meaning. Inlining
 removes the hop and lets the body breathe into the caller, where the
 constants and structure the name kept apart become visible again.
+
+Both languages here let a method nest inside the method that uses it, and
+that adds a third, finer judgement: where exactly the boundary falls. When
+you extract into a nested method, the values the region still sees from the
+enclosing scope simply stay in scope — they are *captured*, not passed —
+and only the values it needs from further out become the actual parameters.
+Choosing the scope of the extraction is therefore a judgement about which
+values should remain accessible and which should be made explicit, and the
+same region can be rendered with all of its dependencies in scope, or with
+some, or with none. The worst of the three looks like the same program with
+an extra name; the best gives the step function a boundary as sharp as a
+top-level one.
 
 ## The move
 
@@ -60,49 +72,6 @@ the code toward the case where extraction is safe; Opdyke's precondition
 list makes the same demand formally [3]. Every automated refactoring tool
 since, including Stocker's Scala refactoring library behind the Scala IDE
 [15], must perform exactly this analysis.
-
-## The functional reading
-
-In a referentially transparent language the region is an expression, and
-an expression depends only on its free variables. Extracting it means
-naming it: write a definition whose parameters are the free variables of
-the region and whose body is the region, then replace the region with an
-application of the new name to those variables. There is no environment
-to rebuild because there is no environment; the free variables are the
-whole of what the expression could see, and the type checker tells you
-what they are.
-
-This is not a new idea dressed up. It is the abstraction step of Burstall
-and Darlington's 1977 fold/unfold system, where a program is a set of
-equations and the permitted moves are to define a new equation, to unfold
-a call by replacing it with its right-hand side, and to fold a
-sub-expression back into a call wherever it matches one [5]. Extract is
-definition followed by fold; Inline is unfold. Johnsson's lambda lifting,
-which turns nested local functions into top-level equations by adding
-their free variables as parameters, is extraction pushed to the whole
-program [6]; Danvy and Schultz's lambda dropping is the inverse, restoring
-block structure by dropping parameters that are invariant across a call
-graph back into scope [7]. Let-floating in GHC moves bindings inward or
-outward for sharing and allocation, relying on the same fact that a
-binding may be placed anywhere its free variables are in scope [8]. And
-GHC's inliner performs the inverse of extraction thousands of times a
-build, unfolding and beta-reducing wherever the result is smaller or
-faster; Peyton Jones and Marlow's account of it is, read from the other
-side, an account of when extraction costs nothing at runtime [9].
-
-The Haskell Refactorer, HaRe, offers the pair as tool operations:
-*introduce definition*, which names a selected sub-expression;
-*generalise definition*, which turns a sub-expression into a parameter;
-and *unfold*, which replaces a call with the body [10, 11]. Thompson's
-Advanced Functional Programming lecture notes set these out as equations
-between programs and discuss where the equations hold [12].
-
-That is the point. With referential transparency the OO precondition does
-not become easier to satisfy; it disappears, because the transformation is
-an instance of the language's own equational theory. Replacing an
-expression with a name bound to it is the beta rule read backwards.
-Extraction stops being something you hope preserved behaviour and becomes
-an equation you wrote down.
 
 ## To and from
 
@@ -194,11 +163,15 @@ would have been a second, different refactoring.
 ### 2 · Running balance: the region closes over locals
 
 The fold's step function reads `limit` and `fee`, which are parameters of
-`settle` and not in scope at the top level. Extracting it means those free
-variables become leading parameters: `step(limit, fee)` is partially
-applied to give the fold exactly the two-argument function it wants. This
-is Johnsson's lambda lifting done by hand [6], and HaRe's *generalise
-definition* [10].
+`settle`. A top-level extraction would have to make those free variables
+leading parameters — Johnsson's lambda lifting [6], and HaRe's *generalise
+definition* [10]. But both languages also let the definition stay where it
+is used: `step` nests inside `settle`, `limit` and `fee` remain in scope
+and are captured, and only `balance` and `tx` — the values the fold
+supplies — become the parameters. This is the scope judgement from the
+Motivation section: the same region, extracted with its dependencies kept
+in scope instead of made explicit, earns a boundary of its own without
+giving its caller a new signature.
 
 <figure class="rf-figure">
 {% include_relative extract-method/02-running-balance/diagram.svg %}
@@ -222,14 +195,14 @@ definition* [10].
 </div>
 </div>
 
-The lifted `step` is now a value in its own right, and the second
-property says what it is: `settle` over a single transaction. That is the
-generalisation payoff of the extract direction. Reading the equation the
-other way, dropping `limit` and `fee` back into a local `where` is
-Danvy and Schultz's lambda dropping [7].
+Nesting keeps `step` private: callers of `settle` can observe only that
+the closing balance agrees with the unrefactored version — exactly what
+the single property checks. The inverse picture is Danvy and Schultz's
+lambda dropping [7], restoring block structure by dropping parameters
+that are invariant across a call graph back into scope.
 
 <details class="rf-spec">
-<summary>The property: <code>Before.settle == After.settle</code>, and <code>step</code> is a one-transaction <code>settle</code></summary>
+<summary>The property: <code>Before.settle == After.settle</code> on generated transaction runs</summary>
 <div class="rf-pair">
 <div><h4>Spec · Scala</h4>
 {% highlight scala %}{% include_relative extract-method/02-running-balance/Spec.scala %}{% endhighlight %}
@@ -289,10 +262,14 @@ that both versions throw on the same input.
 </div>
 </details>
 
-## When it is not an equivalence
+## Pitfalls
 
 The equation has hypotheses, and each is one of the constructive
 criteria. Where a hypothesis fails, extraction changes the program.
+In a language with referential transparency the OO precondition does not
+become easier to satisfy; it disappears, and the move becomes an equation.
+The structures that make that true are gathered in the footnote at the end
+of this section.
 
 - **Side effects and evaluation order.** If the region performs effects,
   moving it into a definition can change when and how often they happen.
@@ -332,7 +309,55 @@ In each case the fix is the same: restore the hypothesis, by making the
 region pure, total and terminating and by renaming, or admit that this is
 not a refactoring and test it as a change.
 
-## Checking it
+<details class="rf-spec">
+<summary>The functional reading</summary>
+<div markdown="1">
+
+In a referentially transparent language the region is an expression, and
+an expression depends only on its free variables. Extracting it means
+naming it: write a definition whose parameters are the free variables of
+the region and whose body is the region, then replace the region with an
+application of the new name to those variables. There is no environment
+to rebuild because there is no environment; the free variables are the
+whole of what the expression could see, and the type checker tells you
+what they are.
+
+This is not a new idea dressed up. It is the abstraction step of Burstall
+and Darlington's 1977 fold/unfold system, where a program is a set of
+equations and the permitted moves are to define a new equation, to unfold
+a call by replacing it with its right-hand side, and to fold a
+sub-expression back into a call wherever it matches one [5]. Extract is
+definition followed by fold; Inline is unfold. Johnsson's lambda lifting,
+which turns nested local functions into top-level equations by adding
+their free variables as parameters, is extraction pushed to the whole
+program [6]; Danvy and Schultz's lambda dropping is the inverse, restoring
+block structure by dropping parameters that are invariant across a call
+graph back into scope [7]. Let-floating in GHC moves bindings inward or
+outward for sharing and allocation, relying on the same fact that a
+binding may be placed anywhere its free variables are in scope [8]. And
+GHC's inliner performs the inverse of extraction thousands of times a
+build, unfolding and beta-reducing wherever the result is smaller or
+faster; Peyton Jones and Marlow's account of it is, read from the other
+side, an account of when extraction costs nothing at runtime [9].
+
+The Haskell Refactorer, HaRe, offers the pair as tool operations:
+*introduce definition*, which names a selected sub-expression;
+*generalise definition*, which turns a sub-expression into a parameter;
+and *unfold*, which replaces a call with the body [10, 11]. Thompson's
+Advanced Functional Programming lecture notes set these out as equations
+between programs and discuss where the equations hold [12].
+
+That is the point. With referential transparency the OO precondition does
+not become easier to satisfy; it disappears, because the transformation is
+an instance of the language's own equational theory. Replacing an
+expression with a name bound to it is the beta rule read backwards.
+Extraction stops being something you hope preserved behaviour and becomes
+an equation you wrote down.
+
+</div>
+</details>
+
+## Verification
 
 Because extraction is an equation, its correctness is a property: for all
 inputs *x* in the domain of the entry point, `Before x == After x`. That is

@@ -77,10 +77,10 @@ What the move IS in a referentially transparent, typed language; which transform
 ## To and from
 The two directions as a pair. State the equation or the isomorphism. Say what each direction is *for*.
 
-## When it is not an equivalence
+## Pitfalls
 Concrete caveats, each one sentence + why: effects and evaluation order; sharing and evaluation count (Scala def/val, Haskell let/CAF, full laziness); strictness and bottom; exceptions and non-termination; name capture or type-inference changes; anything specific to this move.
 
-## Checking it
+## Verification
 How the property-based test states the equivalence (forAll x. before x == after x), hedgehog both sides, and one paragraph on mutation-checking the spec.
 
 ## References

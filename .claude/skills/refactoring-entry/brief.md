@@ -14,9 +14,17 @@
   one equation.
 
 ## This refactoring
-- OO reading: <one paragraph: what the OO/imperative world calls it, where it is catalogued>
+Every entry carries the structure: Motivation first, then the move, the
+functional reading (a collapsible footnote inside Pitfalls), to & from,
+examples, pitfalls, verification, references. Fill the fields below; omit one
+when it does not apply.
+- OO reading: <one paragraph: what the OO/imperative world calls it, where it is catalogued — ONLY when
+  one exists; many moves (higher-order, higher-kinded, dependent-typed) have no OO counterpart, and for
+  those the OO reading is dropped entirely>
 - FP reading: <one paragraph: what it is in a referentially transparent language; which papers/transformations>
-- Inverse: <name of the reverse move and when it is used>
+- Dual: <the reverse move — ALWAYS present. Every refactoring is presented as a pair: extract / inline
+  method, introduce / eliminate generics, ... The catalogue name, page title and subtitle carry both
+  sides; the two directions are one equation>
 - Motivation (page section 1, before any mechanics): <why go in each direction — the smell that drives the move,
   the smell that drives its inverse (e.g. duplication / long methods vs speculative generality / coupling)>
 - Known anchors to verify and cite (find more; verify all): <list>
@@ -72,4 +80,6 @@ pages/refactorings/<slug>/
 ## Style
 - Site prose: crisp, editorial, no hype; sentences, not bullets, in body text (the caveats section may use a list).
 - Claims about tools and papers must be modest and literally supported by the cited source.
-- Code: idiomatic, small, no clever tricks; the refactoring must be the only difference between Before and After.
+- Code: idiomatic, set in a very common domain subject matter, and just enough code to get the point
+  across — no accidental complexity, no clever tricks; the refactoring must be the only difference
+  between Before and After.

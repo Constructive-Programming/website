@@ -6,7 +6,6 @@ import hedgehog.*, hedgehog.core.*, hedgehog.runner.*
 object Props extends Properties:
   def tests: List[Test] = List(
     property("settle: Before == After", settleAgrees).withTests(500),
-    property("step is settle over a single transaction", stepIsOneStep).withTests(500),
   )
 
   val genAmount: Gen[Int] = Gen.int(Range.linear(-30, 30))
@@ -19,20 +18,15 @@ object Props extends Properties:
       limit   <- genLimit.forAll
       fee     <- genFee.forAll
       txs     <- genAmount.list(Range.linear(0, 20)).forAll
-    yield Before.settle(opening, limit, fee, txs) ==== After.settle(opening, limit, fee, txs)
-
-  def stepIsOneStep: Property =
-    for
-      balance <- genAmount.forAll
-      limit   <- genLimit.forAll
-      fee     <- genFee.forAll
-      tx      <- genAmount.forAll
-    yield After.step(limit, fee)(balance, tx) ==== Before.settle(balance, limit, fee, List(tx))
+    yield Before.settle(opening, limit, fee, txs) ====
+      After.settle(opening, limit, fee, txs)
 
 @main def spec(): Unit =
   val results = Props.tests.map { t =>
-    val r = Property.check(t.withConfig(PropertyConfig.default), t.result, Seed.fromTime())
-    println(Test.renderReport("Props", t, r, ansiCodesSupported = false))
+    val r = Property.check(t.withConfig(PropertyConfig.default),
+      t.result, Seed.fromTime())
+    println(Test.renderReport("Props", t, r,
+      ansiCodesSupported = false))
     r.status
   }
   if !results.forall(_ == Status.ok) then sys.exit(1)

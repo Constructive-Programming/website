@@ -1,5 +1,5 @@
-// Closing balance after a run of transactions; each debit that leaves the
-// account below its overdraft limit is charged a fee.
+// Closing balance after a run of transactions; a debit that leaves
+// the account below its overdraft limit is charged a fee.
 object Before:
   def settle(opening: Int, limit: Int, fee: Int, txs: List[Int]): Int =
     txs.foldLeft(opening) { (balance, tx) =>
