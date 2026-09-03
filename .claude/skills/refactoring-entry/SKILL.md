@@ -89,6 +89,14 @@ Rules that came from review, keep them:
   `Before/After/Spec` on the page is then the *move itself*, with a one-line note in the page that
   the shared setup is hidden. The reviewer considers inline setup (e.g. redefining a Lens type in
   every After) accidental complexity that buries the motivation.
+- **Never hand-write intermediate helpers in an example.** If the example needs a walk over a
+  recursive type, a fold, or a traversal builder, do not define it in the example's `After` —
+  add it to `shared/` (e.g. a `Plated` class with `descend`/`everywhere`, as in eo's "visit
+  across whole trees" recipe) or use a library, and have the example declare only the instance
+  (`which fields recurse`). A hand-rolled `everywhere` in an example buries the motivation: the
+  optic is the reusable thing, not the helper. This is the same rule as the `shared/` bullet
+  above — shared machinery stays off the page — extended to any intermediate helper the
+  example needs.
 - Do not claim totality or purity the code does not have (e.g. `Int` `div` overflow).
 
 ## 4. Verify before the PR

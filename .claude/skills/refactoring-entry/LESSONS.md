@@ -139,9 +139,12 @@ brief.md or workflow.js and deleted here. Keep the calibration table current.
   examples · review · diagrams — with the Claude `workflow.js`/`journal.jsonl` as one optional
   orchestrator, and generalized the `gh`/ship steps. The `Workflow` script stays but nothing else
   assumes Claude.
-- **Rule (blocking).** Do not hand-write the recursion in an "across a whole tree" example. A
-  hand-defined `everywhere` in the example's After buries the point (the optic is reused, not the
-  walk). Add `Plated`/`everywhere` to `shared/` (a `trait`/`class` with a `descend` instance per
-  type; `everywhere f s = descend (everywhere f) (f s)`) and declare the type's `Plated` instance
-  in the example — the walk comes from the library, the example only says which fields recurse.
-  Mention eo's "visit across whole trees" recipe. → folded into brief.md's lens-example guidance.
+- **Rule (blocking).** Do not hand-write intermediate helper methods in an example — like the
+  hand-defined `everywhere` that used to sit in an "across a whole tree" example's After and
+  buries the point (the optic is the reusable bit, not the walk). If the example needs shared
+  walk machinery, add `Plated`/`everywhere` to `shared/` (a `trait`/`class` with a `descend`
+  instance per type; `everywhere f s = descend (everywhere f) (f s)`) and declare the type's
+  `Plated` instance in the example — the walk comes from the library, the example only says
+  which fields recurse. Same for any helper (a fold over the tree, a traversal builder): it
+  belongs in `shared/` or a library, not re-derived in the example.
+  → folded into SKILL.md §3 and brief.md ("Never hand-write helpers").
