@@ -1,0 +1,97 @@
+[
+  
+  
+  
+  {
+      "title"    : "About",
+      "subtitle"    : "The methodology and the team",
+      "category" : "",
+      "tags"     : "about",
+      "url"      : "/pr-preview/pr-13/about/"
+  },
+  
+  
+  
+  {
+      "title"    : "Engagements",
+      "subtitle"    : "How we work — three offerings, one bar for quality",
+      "category" : "",
+      "tags"     : "engagements",
+      "url"      : "/pr-preview/pr-13/engagements/"
+  },
+  
+  
+  
+  {
+      "title"    : "Extract / Inline Method",
+      "subtitle"    : "Extract / Inline method: name a sub-expression, and its free variables become the parameters — inline a call, and its arguments flow back into the body",
+      "category" : "",
+      "tags"     : "refactorings, extract-method",
+      "url"      : "/pr-preview/pr-13/refactorings/extract-method/"
+  },
+  
+  
+  
+  
+  
+  {
+      "title"    : "Libraries",
+      "subtitle"    : "Open engineering output from the practice",
+      "category" : "",
+      "tags"     : "libraries",
+      "url"      : "/pr-preview/pr-13/libraries/"
+  },
+  
+  
+  
+  
+  
+  {
+      "title"    : "Refactorings",
+      "subtitle"    : "The Constructive Programming refactoring catalogue",
+      "category" : "",
+      "tags"     : "refactorings",
+      "url"      : "/pr-preview/pr-13/refactorings/"
+  },
+  
+  
+  
+  {
+      "title"    : "Replace Mutable Fields with Lenses",
+      "subtitle"    : "Replace mutable fields with lenses: package a field&#39;s reader and pure writer as one value, and the read becomes get, the write becomes set or modify — inline the lens, and a field that is never composed just becomes a field again",
+      "category" : "",
+      "tags"     : "refactorings, replace-mutable-fields-with-lenses",
+      "url"      : "/pr-preview/pr-13/refactorings/replace-mutable-fields-with-lenses/"
+  },
+  
+  
+  
+  
+  
+  {
+      "title"    : "Search",
+      "subtitle"    : "What are you looking for?",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/pr-preview/pr-13/search/"
+  },
+  
+  
+  
+  {
+      "title"    : "Tags",
+      "subtitle"    : "",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/pr-preview/pr-13/tags/"
+  },
+  
+  
+  
+  
+  
+  
+  
+  
+  {}
+]

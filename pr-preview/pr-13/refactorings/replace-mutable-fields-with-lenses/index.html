@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.5, maximum-scale=5"> <!-- Theme Mode --> <script> const darkBtn = "Dark"; const lightBtn = "Light"; const isAutoTheme = true; const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; if (isAutoTheme) { document.documentElement.setAttribute('data-theme', sessionStorage.getItem('theme') ?? preferredTheme); } else { document.documentElement.setAttribute('data-theme', "auto"); } </script> <!-- Globals consumed by main.min.js. We don't use the cookie/GA features but the script references these variables unguarded; declaring them as empty strings makes main.min.js no-op those branches and still attach its DOMContentLoaded listeners. --> <script> const cookieName = 'cookie-notice-dismissed-https://www.constructive.dev'; const isCookieConsent = ''; const analyticsName = ''; const analyticsNameGA4 = ''; </script> <!-- Theme JS — KaTeX init + theme-toggle + navbar toggle. --> <script defer src="/pr-preview/pr-13/assets/js/main.min.js"></script> <!-- Local stylesheet — drives everything: type scale, layout, grid, cards, buttons. No external CSS framework. --> <link rel="stylesheet" href="/pr-preview/pr-13/assets/css/main.css"> <!-- Favicon set — SVG primary, ICO fallback, apple-touch for iOS. --> <link rel="icon" type="image/svg+xml" href="/pr-preview/pr-13/assets/img/favicon.svg"> <link rel="alternate icon" type="image/x-icon" href="/pr-preview/pr-13/assets/img/favicon.ico"> <link rel="apple-touch-icon" sizes="180x180" href="/pr-preview/pr-13/assets/img/apple-touch-icon.png"> <!-- RSS auto-discovery --> <link rel="alternate" type="application/rss+xml" title="Constructive Programming" href="https://www.constructive.dev/pr-preview/pr-13/feed.xml"> <!-- KaTeX 0.16.38 --> <script defer src="/pr-preview/pr-13/assets/js/vendor/katex.min.js"></script> <script defer src="/pr-preview/pr-13/assets/js/vendor/katex.auto-render.min.js" onload="renderMathInElement(document.body);"></script> <!-- Mermaid 11.13.0 --> <!-- Simple-Jekyll-Search 2.1.3 --> <script src="/pr-preview/pr-13/assets/js/vendor/simple-jekyll-search.min.js" type="text/javascript"></script> <!-- Open Graph + Twitter --> <meta property="og:image" content="https://www.constructive.dev/pr-preview/pr-13/assets/img/og-image.png"> <meta name="twitter:image" content="https://www.constructive.dev/pr-preview/pr-13/assets/img/og-image.png"> <meta name="twitter:card" content="summary_large_image"> <meta property="og:type" content="website" /> <!-- Begin Jekyll SEO tag v2.9.0 --> <title>Replace Mutable Fields with Lenses | Constructive Programming</title> <meta name="generator" content="Jekyll v4.4.1" /> <meta property="og:title" content="Replace Mutable Fields with Lenses" /> <meta property="og:locale" content="en_US" /> <meta name="description" content="Software consultancy for platform teams: AI-accelerated delivery inside type-driven guardrails. Architecture reviews, embedded senior engineers (Scala, Rust, TypeScript), and agent-native development workflows." /> <meta name="twitter:description" property="og:description" content="Software consultancy for platform teams: AI-accelerated delivery inside type-driven guardrails. Architecture reviews, embedded senior engineers (Scala, Rust, TypeScript), and agent-native development workflows." /> <link rel="canonical" href="https://www.constructive.dev/pr-preview/pr-13/refactorings/replace-mutable-fields-with-lenses/" /> <meta property="og:url" content="https://www.constructive.dev/pr-preview/pr-13/refactorings/replace-mutable-fields-with-lenses/" /> <meta property="og:site_name" content="Constructive Programming" /> <meta property="og:type" content="website" /> <meta name="twitter:card" content="summary" /> <meta name="twitter:title" content="Replace Mutable Fields with Lenses" /> <script type="application/ld+json"> {"@context":"https://schema.org","@type":"WebPage","description":"Software consultancy for platform teams: AI-accelerated delivery inside type-driven guardrails. Architecture reviews, embedded senior engineers (Scala, Rust, TypeScript), and agent-native development workflows.","headline":"Replace Mutable Fields with Lenses","url":"https://www.constructive.dev/pr-preview/pr-13/refactorings/replace-mutable-fields-with-lenses/"}</script> <!-- End Jekyll SEO tag --> </head>
+  <body>
+    
+    <header class="site-header"> <!-- Logo and title --> <div class="branding"> <a class="site-title" aria-label="Constructive Programming" href="/pr-preview/pr-13/"> Constructive Programming </a> </div> <!-- Toggle menu --> <nav class="clear"> <a aria-label="Open menu" id="pull" class="toggle" href="#"> <svg class="cp-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <rect x="4" y="6" width="16" height="2" rx="1"/> <rect x="4" y="11" width="16" height="2" rx="1"/> <rect x="4" y="16" width="16" height="2" rx="1"/> </svg> </a> <!-- Menu --> <ul class="hide"> <li class="separator"> | </li> <li> <a class="clear" aria-label="About" title="About" href="/pr-preview/pr-13/about/"><span class="navbar-label">About</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Engagements" title="Engagements" href="/pr-preview/pr-13/engagements/"><span class="navbar-label">Engagements</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Libraries" title="Libraries" href="/pr-preview/pr-13/libraries/"><span class="navbar-label">Libraries</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Refactorings" title="Refactorings" href="/pr-preview/pr-13/refactorings/"><span class="navbar-label">Refactorings</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Search" title="Search" href="/pr-preview/pr-13/search/"><i class="navbar-icon fa-search" aria-hidden="true"></i><span class="navbar-label navbar-label-with-icon">Search</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Tags" title="Tags" href="/pr-preview/pr-13/tags/"><i class="navbar-icon fa-tags" aria-hidden="true"></i><span class="navbar-label navbar-label-with-icon">Tags</span> </a> </li> <li class="separator"> | </li> <li><a id="theme-toggle" title="Dark" aria-label="Dark" onclick="themeToggle()"></a></li> </ul> </nav> </header>
+    <main class="content">
+      
+<article >
+    <header id="main" style="background-image: url('')">
+        <div class="title-padder">
+            <h1 id="Replace+Mutable+Fields+with+Lenses" class="title subtitle-as-header">Replace mutable fields with lenses: package a field's reader and pure writer as one value, and the read becomes get, the write becomes set or modify — inline the lens, and a field that is never composed just becomes a field again</h1>
+            
+        </div>
+    </header>
+    <section class="post-content">
+        <p class="rf-crumb"><a href="/pr-preview/pr-13/refactorings/">← The refactoring catalogue</a> · 2 of 35</p>
+
+<p>A mutable field is a place where the class’s invariants can be broken:
+any method can read it, any method can write it, and nothing stops a
+write from putting the object into a state the other methods did not
+anticipate. Object-oriented refactoring has a ladder of moves up this
+smell — Fowler’s <em>Encapsulate Variable</em> (the catalogue entry that used
+to be <em>Encapsulate Field</em>, and before that <em>Self-Encapsulate Field</em>)
+hides the field behind accessor methods [<a href="#ref-1">1</a>], [<a href="#ref-2">2</a>], and <em>Remove Setting
+Method</em> then removes the setter once the field no longer needs to be
+written from outside the class [<a href="#ref-3">3</a>]. The field is still a field; it is
+just visited through a corridor.</p>
+
+<p>The functional reading goes one step further: a field of an immutable
+record is not a location, it is a projection, and a projection that can
+also be written is a <em>lens</em> — a value packaging <code class="language-plaintext highlighter-rouge">get :: s -&gt; a</code> and
+<code class="language-plaintext highlighter-rouge">set :: a -&gt; s -&gt; s</code> [<a href="#ref-4">4</a>]. Replacing a mutable field with a lens means
+making the record immutable and routing every read through <code class="language-plaintext highlighter-rouge">get</code> and
+every write through <code class="language-plaintext highlighter-rouge">set</code> (or <code class="language-plaintext highlighter-rouge">modify</code>, which reads, applies a pure
+function and writes in one step). The single field’s lens <em>composes</em>
+with the lenses of enclosing records, so a deep update that once
+touched five records by hand becomes one composed path. And because
+<code class="language-plaintext highlighter-rouge">set</code> is a pure function, the writes cannot run off and mutate
+something the rest of the program is looking at; the state transition
+is a value again. The three lens laws — <code class="language-plaintext highlighter-rouge">get (set v s) = v</code>,
+<code class="language-plaintext highlighter-rouge">set (get s) s = s</code>, <code class="language-plaintext highlighter-rouge">set v₂ (set v₁ s) = set v₂ s</code> — are exactly
+the equations under which the move is a refactoring, and they are
+stateable as property tests [<a href="#ref-4">4</a>], [<a href="#ref-5">5</a>].</p>
+
+<p>The inverse direction is just as useful. A lens that is never composed,
+never updated through a path, and never read by more than one caller is
+abstraction tax: the reader and writer are already next to each other,
+and a <code class="language-plaintext highlighter-rouge">get</code>/<code class="language-plaintext highlighter-rouge">set</code> pair or a plain field says the same thing with less
+machinery. Inlining the lens — replacing <code class="language-plaintext highlighter-rouge">lens.get(s)</code>, <code class="language-plaintext highlighter-rouge">lens.set(v)(s)</code>
+and <code class="language-plaintext highlighter-rouge">lens.modify(f)(s)</code> with direct field access — is the move that
+removes indirection that no longer earns its name. Foster, Greenwald,
+Moore, Pierce and Schmitt’s notion of a <em>well-behaved lens</em> is the
+property-theoretic core both directions are checked against: the two
+functions are a lens exactly when the GetPut and PutGet laws (the first
+two above, in the form they state) hold [<a href="#ref-4">4</a>].</p>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>Reach for the lens when the same field is read and written in many
+places and the writes compose. The smell is repetition of field
+handling: an object-with-accessors whose setters are one-liners that
+nothing intercepts, a copy-update chain that grows a level for every
+record you descend, or an update that must be re-derived by hand each
+time a field moves. An OO class can hold its invariants in accessor
+methods, but the corridor is per-type and per-field; a lens is a value,
+so it can be passed around, stored, and composed into paths that reach
+several levels down without ever repeating the intermediate records.
+When the invariant itself matters — a balance that must never go
+negative, a size that must bracket its children — the pure writer makes
+the transition a value the type system and the tests can see, and a
+<em>bad</em> write is a failed check rather than a corrupted object.</p>
+
+<p>Reach for the inverse when the lens is speculative generality. The
+smell that drives Inline is the mirror image: a field whose updates are
+all one level deep, a lens composed nowhere, a get/set pair whose writer
+is <code class="language-plaintext highlighter-rouge">const</code>-like and whose reader is the identity. The abstraction costs
+a reader a detour — what is <em>set v₂ (set v₁ s)</em> doing when the program
+only ever calls <code class="language-plaintext highlighter-rouge">set</code> once? — and it costs the compiler nothing it can
+deduce. When all the code does with the field is read it once, or write
+it once, a plain field or a pair of functions is clearer. The two moves
+are one equation read in two directions; which direction you choose
+records a judgement about whether the field is part of a <em>path</em> or a
+<em>leaf</em>.</p>
+
+<h2 id="the-move">The move</h2>
+
+<p>Both catalogue pages are short. <em>Encapsulate Variable</em>: create a
+function that reads the field, create one that writes it, replace every
+read with a call to the reader and every write with a call to the
+writer, and test [<a href="#ref-2">2</a>]. The precondition is that the readers and writers
+are the only way in and out — nothing may reach the field directly — and
+the payoff is that the class owns its representation. <em>Remove Setting
+Method</em>: once the field can be initialised and never needs to be
+reassigned, delete the setter and initialise at construction [<a href="#ref-3">3</a>]. Read
+the two together and they are the OO route to what the lens packages:
+reads through a named getter, writes through a named setter, and no
+bare <code class="language-plaintext highlighter-rouge">field = ...</code> anywhere. Herbert’s dissertation on Scala
+refactoring points at the same target from the tooling side: a
+refactoring that turns a mutable field into a pure accessor pair has to
+move the <em>writes</em>, and that is the whole analysis [<a href="#ref-11">11</a>].</p>
+
+<p>In the functional reading the move is mechanical. Make the record
+immutable. Define <code class="language-plaintext highlighter-rouge">get</code> as the record’s field accessor and <code class="language-plaintext highlighter-rouge">set</code> as a
+function returning a copy with the field replaced; package them as a
+lens value. Replace reads with <code class="language-plaintext highlighter-rouge">get</code>, writes with <code class="language-plaintext highlighter-rouge">set</code>, read-modify-
+write with <code class="language-plaintext highlighter-rouge">modify</code>. Where a field sits inside other records, compose
+the lenses along the path. The OO precondition — no direct access — is
+replaced by a type: the only way to reach the field is through the
+lens, and the type checker enforces it. The trickier part is what the
+OO ladder leaves implicit. <code class="language-plaintext highlighter-rouge">set</code> must leave every other field alone, so
+a lens is not just any <code class="language-plaintext highlighter-rouge">(get, set)</code> pair; it is one that satisfies the
+three laws, and those laws are precisely what a property test can check
+[<a href="#ref-4">4</a>].</p>
+
+<h2 id="the-functional-reading">The functional reading</h2>
+
+<p>In a referentially transparent language a record field is a <em>focus</em>: a
+value that indexes into a structure. A lens is a focus with a reader
+and a writer, and the two directions share one equation. <code class="language-plaintext highlighter-rouge">get</code> selects
+the focus; <code class="language-plaintext highlighter-rouge">set</code> replaces it; <code class="language-plaintext highlighter-rouge">modify f</code> is <code class="language-plaintext highlighter-rouge">set</code> after <code class="language-plaintext highlighter-rouge">get</code> after
+<code class="language-plaintext highlighter-rouge">f</code>. Nested records compose: the composite focus <code class="language-plaintext highlighter-rouge">outer . inner</code>
+selects <code class="language-plaintext highlighter-rouge">inner</code> inside <code class="language-plaintext highlighter-rouge">outer</code>, so a deep update becomes one path
+instead of a copy chain. What makes this a <em>refactoring</em> rather than a
+rewrite is that the three lens laws are equations between programs —
+<code class="language-plaintext highlighter-rouge">get (set v s) = v</code>, <code class="language-plaintext highlighter-rouge">set (get s) s = s</code>, <code class="language-plaintext highlighter-rouge">set v₂ (set v₁ s) =
+set v₂ s</code> — and they are exactly the conditions under which replacing
+field access with <code class="language-plaintext highlighter-rouge">get</code>/<code class="language-plaintext highlighter-rouge">set</code> preserves behaviour [<a href="#ref-4">4</a>], [<a href="#ref-5">5</a>].</p>
+
+<p>Foster, Greenwald, Moore, Pierce and Schmitt defined <em>well-behaved
+lenses</em> and proved a large catalog of combinators (composition, map,
+and recursion among them) that compose them while preserving those
+laws; their GetPut and PutGet are the first two equations above, and
+PutPut (the third) distinguishes the very well-behaved class [<a href="#ref-4">4</a>].
+O’Connor showed that lenses are exactly the coalgebras for the costate
+comonad — the categorical shape of “a structure with a distinguished
+hole” — which is why <code class="language-plaintext highlighter-rouge">get</code>/<code class="language-plaintext highlighter-rouge">set</code> pairs and the functor-based encodings
+coincide [<a href="#ref-6">6</a>]. Gibbons and Johnson give the equational proof of
+that correspondence [<a href="#ref-7">7</a>]. Van Laarhoven’s representation made the
+encoding practical: a lens as a polymorphic function
+<code class="language-plaintext highlighter-rouge">(a -&gt; f a) -&gt; (s -&gt; f s)</code> for all <em>functor</em> <code class="language-plaintext highlighter-rouge">f</code>, which composes with
+ordinary function composition and is what Kmett’s <em>lens</em> library and
+Pickering, Gibbons and Wu’s <em>profunctor optics</em> generalise [<a href="#ref-8">8</a>], [<a href="#ref-9">9</a>], [<a href="#ref-10">10</a>].
+On the OO side the same idea appears as a many-to-one refactoring
+in Stocker’s later Scala tooling [<a href="#ref-11">11</a>].</p>
+
+<p>Concretely, the reader never needs most of that. A lens is a <code class="language-plaintext highlighter-rouge">get</code> and
+a <code class="language-plaintext highlighter-rouge">set</code>, and a <code class="language-plaintext highlighter-rouge">modify</code> defined from them; if the field is nested, the
+lenses compose. The laws are the contract, and the contract is checked,
+not hoped.</p>
+
+<h2 id="to-and-from">To and from</h2>
+
+<figure class="rf-figure">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 196" role="img" aria-labelledby="koan-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="koan-title">Replace mutable fields with lenses / replace lenses with mutable fields. Left: a record field read and written directly, spelled out at every call site. Right: the same field as a lens value packaging get :: s -&gt; a and set :: a -&gt; s -&gt; s, so every read is get, every write is set or modify. The arrow to the right is replace (package get and set as one composable value); the arrow to the left is inline (drop the lens and access the field directly). The three lens laws — get (set v s) = v, set (get s) s = s, set v2 (set v1 s) = set v2 s — are the equation the move is checked against.</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="28">before</text>
+    <text x="424" y="28">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="40" width="200" height="104" rx="4" />
+    <rect x="424" y="40" width="200" height="104" rx="4" />
+  </g>
+  <g fill="currentColor" font-size="14" text-anchor="middle">
+    <text x="116" y="66">field <tspan font-style="italic" font-weight="700">balance</tspan></text>
+    <text x="524" y="62">balanceLens =</text>
+    <text x="524" y="84">Lens { get, set }</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".9">
+    <text x="116" y="92">read: <tspan font-style="italic">a.balance</tspan></text>
+    <text x="116" y="110">write: <tspan font-style="italic">copy</tspan> with balance</text>
+    <text x="116" y="132">every call site spells the</text>
+    <text x="116" y="146">field out again</text>
+    <text x="524" y="108">read: <tspan font-weight="700">get</tspan> balanceLens</text>
+    <text x="524" y="128">write: <tspan font-weight="700">set</tspan> / <tspan font-weight="700">modify</tspan></text>
+    <text x="524" y="148">lens composes along paths</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M232 76 H398" />
+    <path d="M408 116 H242" />
+  </g>
+  <g fill="currentColor">
+    <path d="M398 72.5 L406 76 L398 79.5 Z" />
+    <path d="M242 112.5 L234 116 L242 119.5 Z" />
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle">
+    <text x="320" y="62">replace (package get + set into a lens)</text>
+    <text x="320" y="132">inline (drop the lens, access the field)</text>
+  </g>
+  <text x="320" y="176" fill="currentColor" font-size="12" text-anchor="middle" opacity=".75"><tspan font-style="italic">get</tspan> (<tspan font-style="italic">set v s</tspan>) = <tspan font-style="italic">v</tspan> &#183; <tspan font-style="italic">set</tspan> (<tspan font-style="italic">get s</tspan>) <tspan font-style="italic">s</tspan> = <tspan font-style="italic">s</tspan> &#183; <tspan font-style="italic">set v&#8322;</tspan> (<tspan font-style="italic">set v&#8321; s</tspan>) = <tspan font-style="italic">set v&#8322; s</tspan></text>
+</svg>
+
+<figcaption>The koan. One equation, read in two directions: replace
+(package the reader and pure writer of a field as a lens value) to the
+right, inline (drop the lens, access the field directly) to the left.
+The three lens laws — <em>get</em> (<em>set v s</em>) = <em>v</em>,
+<em>set</em> (<em>get s</em>) <em>s</em> = <em>s</em>, and
+<em>set v&#8322;</em> (<em>set v&#8321; s</em>) = <em>set v&#8322; s</em> —
+are the equation the move is checked against.</figcaption>
+</figure>
+
+<p>The catalogue lists each refactoring in both directions because the two
+moves are one equation read left to right and right to left. Replace a
+field with a lens: define <code class="language-plaintext highlighter-rouge">get</code> and <code class="language-plaintext highlighter-rouge">set</code> for the field, replace every
+read with <code class="language-plaintext highlighter-rouge">get</code>, every write with <code class="language-plaintext highlighter-rouge">set</code> or <code class="language-plaintext highlighter-rouge">modify</code>, and where the
+field is nested compose the lenses. Inline a lens: replace <code class="language-plaintext highlighter-rouge">get</code>, <code class="language-plaintext highlighter-rouge">set</code>
+and <code class="language-plaintext highlighter-rouge">modify</code> at their use sites with direct access, and delete the
+lens. The lens laws say both directions are behaviour-preserving:
+<code class="language-plaintext highlighter-rouge">get (set v s) = v</code> is the forward equation, <code class="language-plaintext highlighter-rouge">set (get s) s = s</code> the
+backward one, and <code class="language-plaintext highlighter-rouge">set v₂ (set v₁ s) = set v₂ s</code> says writing twice is
+writing the last value once [<a href="#ref-4">4</a>].</p>
+
+<p>The directions serve different ends. Replace is for containment, so the
+writes to a field are reachable only through a pure function and any
+invariant the writer holds is visible at the one place it is held; for
+composition, because a lens along a path reaches nested records without
+repeating them; and for reuse, because a lens is a value that can be
+passed to a function that reads and writes through it. Inline is for
+simplicity, because a field that is never composed or updated is
+clearer as a field; and for removing a seam, because a lens whose
+callers couple to its mechanics rather than its meaning adds a hop, not
+a guarantee. Both directions are checked by the same property: for all
+generated inputs, the before-program and the after-program agree on the
+entry point.</p>
+
+<h2 id="three-examples">Three examples</h2>
+
+<p>Each example is the same program twice, <code class="language-plaintext highlighter-rouge">Before</code> and <code class="language-plaintext highlighter-rouge">After</code>, in Scala 3
+and in Haskell. The entry point keeps its name and its type, the lens is
+the only difference, and a hedgehog property generates inputs and demands
+that both versions agree on every one of them. The sources below are
+included verbatim from the files the tests run against.</p>
+
+<h3 id="1--account-balance-the-field-becomes-a-lens">1 · Account balance: the field becomes a lens</h3>
+
+<p>A single mutable field — the balance — is read and written by
+<code class="language-plaintext highlighter-rouge">withdraw</code>. The Before version spells the update out with a copy; the
+After version packages the field’s <code class="language-plaintext highlighter-rouge">get</code> and pure <code class="language-plaintext highlighter-rouge">set</code> as one
+<code class="language-plaintext highlighter-rouge">Lens[Account, Int]</code> and routes the update through <code class="language-plaintext highlighter-rouge">modify</code>. The second
+property checks the three lens laws, which are the equation that makes
+the move a refactoring.</p>
+
+<figure class="rf-figure">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 196" role="img" aria-labelledby="d1-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="d1-title">Replacing the balance field with a lens in the withdraw program. Before: withdraw(Account(balance, bonus), amount) reads balance with a.balance and writes it with a.copy(balance = a.balance - amount); the dotted region is the field access and copy spell-out. After: withdraw is balance.modify(_ - amount)(a), where balanceLens = Lens(get = _.balance, set = b =&gt; a =&gt; a.copy(balance = b)).</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="26">before</text>
+    <text x="428" y="26">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="36" width="388" height="148" rx="4" />
+    <rect x="428" y="36" width="336" height="92" rx="4" />
+    <rect x="428" y="150" width="336" height="34" rx="4" />
+  </g>
+  <g fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3">
+    <rect x="44" y="84" width="336" height="66" rx="3" />
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="58">withdraw(a: Account, amount) =</text>
+    <text x="40" y="76">a.copy(balance = a.balance - amount)</text>
+    <text x="52" y="98">read: a.balance</text>
+    <text x="52" y="116">write: a.copy(balance = ...)</text>
+    <text x="52" y="134">every call site spells out the</text>
+    <text x="52" y="148">field update by hand</text>
+    <text x="440" y="58">withdraw(a, amount) =</text>
+    <text x="452" y="76">balanceLens.modify(_ - amount)(a)</text>
+    <text x="440" y="100">balanceLens =</text>
+    <text x="452" y="120">Lens(get = _.balance,</text>
+    <text x="452" y="136">     set = ...)</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".85">
+    <text x="212" y="168">field access + copy spell-out</text>
+    <text x="596" y="172">get and set packed as one value</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1">
+    <circle cx="386" cy="112" r="7.5" />
+    <circle cx="428" cy="156" r="7.5" />
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle">
+    <text x="386" y="116">1</text>
+    <text x="428" y="160">1</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M386 132 V144" />
+  </g>
+  <g fill="currentColor">
+    <path d="M382.5 144 L386 152 L389.5 144 Z" />
+  </g>
+</svg>
+
+</figure>
+
+<div class="rf-pair">
+<div><h4>Before · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Withdraw from an account: the balance changes, the bonus does not.</span>
+<span class="k">object</span> <span class="nc">Before</span><span class="k">:</span>
+  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Account</span><span class="o">(</span><span class="kt">balance:</span> <span class="kt">Int</span><span class="o">,</span> <span class="kt">bonus:</span> <span class="kt">Int</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">withdraw</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">Account</span><span class="o">,</span> <span class="n">amount</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Account</span> <span class="o">=</span>
+    <span class="nv">a</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">balance</span> <span class="k">=</span> <span class="nv">a</span><span class="o">.</span><span class="py">balance</span> <span class="o">-</span> <span class="n">amount</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>Before · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Withdraw from an account: the balance changes, the bonus does not.</span>
+<span class="kr">module</span> <span class="nn">Before</span> <span class="kr">where</span>
+
+<span class="kr">data</span> <span class="kt">Account</span> <span class="o">=</span> <span class="kt">Account</span> <span class="p">{</span> <span class="n">balance</span> <span class="o">::</span> <span class="kt">Int</span><span class="p">,</span> <span class="n">bonus</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
+
+<span class="n">withdraw</span> <span class="o">::</span> <span class="kt">Account</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Account</span>
+<span class="n">withdraw</span> <span class="n">a</span> <span class="n">amount</span> <span class="o">=</span> <span class="n">a</span> <span class="p">{</span> <span class="n">balance</span> <span class="o">=</span> <span class="n">balance</span> <span class="n">a</span> <span class="o">-</span> <span class="n">amount</span> <span class="p">}</span></code></pre></figure>
+
+</div>
+</div>
+
+<div class="rf-pair">
+<div><h4>After · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Same, with a lens on the balance: the getter and the pure setter</span>
+<span class="c1">// packed as one value.</span>
+<span class="k">object</span> <span class="nc">After</span><span class="k">:</span>
+  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Account</span><span class="o">(</span><span class="kt">balance:</span> <span class="kt">Int</span><span class="o">,</span> <span class="kt">bonus:</span> <span class="kt">Int</span><span class="o">)</span>
+
+  <span class="k">case</span> <span class="k">class</span> <span class="nc">Lens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">get</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">,</span> <span class="n">set</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=&gt;</span> <span class="n">S</span><span class="o">)</span><span class="k">:</span>
+    <span class="kt">def</span> <span class="kt">modify</span><span class="o">(</span><span class="kt">f:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=</span> <span class="n">s</span> <span class="k">=&gt;</span> <span class="nf">set</span><span class="o">(</span><span class="nf">f</span><span class="o">(</span><span class="nf">get</span><span class="o">(</span><span class="n">s</span><span class="o">)))(</span><span class="n">s</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">balance</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Account</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">Lens</span><span class="o">[</span><span class="kt">Account</span>, <span class="kt">Int</span><span class="o">](</span><span class="nv">_</span><span class="o">.</span><span class="py">balance</span><span class="o">,</span> <span class="n">b</span> <span class="k">=&gt;</span> <span class="n">a</span> <span class="k">=&gt;</span> <span class="nv">a</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">balance</span> <span class="k">=</span> <span class="n">b</span><span class="o">))</span>
+
+  <span class="k">def</span> <span class="nf">withdraw</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">Account</span><span class="o">,</span> <span class="n">amount</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Account</span> <span class="o">=</span>
+    <span class="nv">balance</span><span class="o">.</span><span class="py">modify</span><span class="o">(</span><span class="k">_</span> <span class="o">-</span> <span class="n">amount</span><span class="o">)(</span><span class="n">a</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>After · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Same, with a lens on the balance: the getter and the pure setter</span>
+<span class="c1">-- packed as one value.</span>
+<span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
+
+<span class="kr">data</span> <span class="kt">Account</span> <span class="o">=</span> <span class="kt">Account</span> <span class="p">{</span> <span class="n">balance</span> <span class="o">::</span> <span class="kt">Int</span><span class="p">,</span> <span class="n">bonus</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="kr">data</span> <span class="kt">Lens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">get</span> <span class="o">::</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">,</span> <span class="n">set</span> <span class="o">::</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="p">}</span>
+
+<span class="n">modify</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span>
+<span class="n">modify</span> <span class="n">l</span> <span class="n">f</span> <span class="n">s</span> <span class="o">=</span> <span class="n">set</span> <span class="n">l</span> <span class="p">(</span><span class="n">f</span> <span class="p">(</span><span class="n">get</span> <span class="n">l</span> <span class="n">s</span><span class="p">))</span> <span class="n">s</span>
+
+<span class="n">balanceLens</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="kt">Account</span> <span class="kt">Int</span>
+<span class="n">balanceLens</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">get</span> <span class="o">=</span> <span class="n">balance</span><span class="p">,</span> <span class="n">set</span> <span class="o">=</span> <span class="nf">\</span><span class="n">b</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span> <span class="p">{</span> <span class="n">balance</span> <span class="o">=</span> <span class="n">b</span> <span class="p">}</span> <span class="p">}</span>
+
+<span class="n">withdraw</span> <span class="o">::</span> <span class="kt">Account</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Account</span>
+<span class="n">withdraw</span> <span class="n">a</span> <span class="n">amount</span> <span class="o">=</span> <span class="n">modify</span> <span class="n">balanceLens</span> <span class="p">(</span><span class="n">subtract</span> <span class="n">amount</span><span class="p">)</span> <span class="n">a</span></code></pre></figure>
+
+</div>
+</div>
+
+<p>Note what did <em>not</em> change: <code class="language-plaintext highlighter-rouge">withdraw</code> still returns a new account, the
+bonus field is untouched, and <code class="language-plaintext highlighter-rouge">modify</code> is a function of the lens we
+could pass elsewhere. The property compares result <em>values</em> — both
+sides return their own record type, so the test reads <code class="language-plaintext highlighter-rouge">.balance</code> and
+<code class="language-plaintext highlighter-rouge">.bonus</code> off each result.</p>
+
+<details class="rf-spec">
+<summary>The property: <code>Before.withdraw == After.withdraw</code> on generated accounts, and the three lens laws</summary>
+<div class="rf-pair">
+<div><h4>Spec · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">//&gt; using scala 3.3.4</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-core:0.14.0</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-runner:0.14.0</span>
+<span class="k">import</span> <span class="nn">hedgehog.</span><span class="o">*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">core</span><span class="o">.*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">runner</span><span class="o">.*</span>
+
+<span class="k">object</span> <span class="nc">Props</span> <span class="k">extends</span> <span class="nc">Properties</span><span class="k">:</span>
+  <span class="kt">def</span> <span class="kt">tests:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Test</span><span class="o">]</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"withdraw: Before == After"</span><span class="o">,</span> <span class="n">agrees</span><span class="o">),</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"the balance lens obeys get-put, put-get, put-put"</span><span class="o">,</span> <span class="n">laws</span><span class="o">),</span>
+  <span class="o">)</span>
+
+  <span class="c1">// Raw values, so the same input feeds both Account types.</span>
+  <span class="k">val</span> <span class="nv">genInt</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="nv">Gen</span><span class="o">.</span><span class="py">int</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(-</span><span class="mi">30</span><span class="o">,</span> <span class="mi">30</span><span class="o">))</span>
+
+  <span class="k">def</span> <span class="nf">agrees</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span>
+      <span class="n">b</span>  <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">bn</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">am</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="k">val</span> <span class="nv">before</span> <span class="k">=</span> <span class="nv">Before</span><span class="o">.</span><span class="py">withdraw</span><span class="o">(</span><span class="nv">Before</span><span class="o">.</span><span class="py">Account</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">bn</span><span class="o">),</span> <span class="n">am</span><span class="o">)</span>
+      <span class="k">val</span> <span class="nv">after</span>  <span class="k">=</span> <span class="nv">After</span><span class="o">.</span><span class="py">withdraw</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">Account</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">bn</span><span class="o">),</span> <span class="n">am</span><span class="o">)</span>
+      <span class="o">(</span><span class="nv">before</span><span class="o">.</span><span class="py">balance</span><span class="o">,</span> <span class="nv">before</span><span class="o">.</span><span class="py">bonus</span><span class="o">)</span> <span class="o">====</span> <span class="o">(</span><span class="nv">after</span><span class="o">.</span><span class="py">balance</span><span class="o">,</span> <span class="nv">after</span><span class="o">.</span><span class="py">bonus</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">laws</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span>
+      <span class="n">b</span>  <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">bn</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">v1</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">v2</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="k">val</span> <span class="nv">a</span> <span class="k">=</span> <span class="nv">After</span><span class="o">.</span><span class="py">Account</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">bn</span><span class="o">)</span>
+      <span class="k">val</span> <span class="nv">l</span> <span class="k">=</span> <span class="nv">After</span><span class="o">.</span><span class="py">balance</span>
+      <span class="nv">l</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="n">v1</span><span class="o">)(</span><span class="n">a</span><span class="o">))</span> <span class="o">====</span> <span class="n">v1</span> <span class="n">and</span>
+        <span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="nv">l</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="n">a</span><span class="o">))(</span><span class="n">a</span><span class="o">)</span> <span class="o">====</span> <span class="n">a</span> <span class="n">and</span>
+        <span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="n">v2</span><span class="o">)(</span><span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="n">v1</span><span class="o">)(</span><span class="n">a</span><span class="o">))</span> <span class="o">====</span> <span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="n">v2</span><span class="o">)(</span><span class="n">a</span><span class="o">)</span>
+
+<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span>
+  <span class="k">val</span> <span class="nv">results</span> <span class="k">=</span> <span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">.</span><span class="py">map</span> <span class="o">{</span> <span class="n">t</span> <span class="k">=&gt;</span>
+    <span class="k">val</span> <span class="nv">r</span> <span class="k">=</span> <span class="nv">Property</span><span class="o">.</span><span class="py">check</span><span class="o">(</span><span class="nv">t</span><span class="o">.</span><span class="py">withConfig</span><span class="o">(</span><span class="nv">PropertyConfig</span><span class="o">.</span><span class="py">default</span><span class="o">),</span>
+      <span class="nv">t</span><span class="o">.</span><span class="py">result</span><span class="o">,</span> <span class="nv">Seed</span><span class="o">.</span><span class="py">fromTime</span><span class="o">())</span>
+    <span class="nf">println</span><span class="o">(</span><span class="nv">Test</span><span class="o">.</span><span class="py">renderReport</span><span class="o">(</span>
+      <span class="s">"Props"</span><span class="o">,</span> <span class="n">t</span><span class="o">,</span> <span class="n">r</span><span class="o">,</span> <span class="n">ansiCodesSupported</span> <span class="k">=</span> <span class="kc">false</span><span class="o">))</span>
+    <span class="nv">r</span><span class="o">.</span><span class="py">status</span>
+  <span class="o">}</span>
+  <span class="k">if</span> <span class="o">!</span><span class="nv">results</span><span class="o">.</span><span class="py">forall</span><span class="o">(</span><span class="k">_</span> <span class="o">==</span> <span class="nv">Status</span><span class="o">.</span><span class="py">ok</span><span class="o">)</span> <span class="n">then</span> <span class="nv">sys</span><span class="o">.</span><span class="py">exit</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>Spec · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="cp">{-# LANGUAGE OverloadedStrings #-}</span>
+<span class="kr">module</span> <span class="nn">Main</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Control.Monad</span> <span class="p">(</span><span class="nf">unless</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">System.Exit</span> <span class="p">(</span><span class="nf">exitFailure</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Hedgehog</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Gen</span> <span class="k">as</span> <span class="n">Gen</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Range</span> <span class="k">as</span> <span class="n">Range</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Before</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">After</span>
+
+<span class="n">genInt</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">Int</span>
+<span class="n">genInt</span> <span class="o">=</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="p">(</span><span class="o">-</span><span class="mi">30</span><span class="p">)</span> <span class="mi">30</span><span class="p">)</span>
+
+<span class="n">prop_agrees</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_agrees</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">b</span>  <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="n">bn</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="n">am</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="kr">let</span> <span class="n">before</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="n">withdraw</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">Account</span> <span class="n">b</span> <span class="n">bn</span><span class="p">)</span> <span class="n">am</span>
+      <span class="n">after</span>  <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="n">withdraw</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Account</span> <span class="n">b</span> <span class="n">bn</span><span class="p">)</span> <span class="n">am</span>
+  <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">balance</span> <span class="n">before</span><span class="p">,</span> <span class="kt">Before</span><span class="o">.</span><span class="n">bonus</span> <span class="n">before</span><span class="p">)</span>
+    <span class="o">===</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">balance</span> <span class="n">after</span><span class="p">,</span> <span class="kt">After</span><span class="o">.</span><span class="n">bonus</span> <span class="n">after</span><span class="p">)</span>
+
+<span class="c1">-- A lens has to satisfy the three equations; they are exactly what</span>
+<span class="c1">-- makes replacing a field with a get/set pair a refactoring.</span>
+<span class="n">prop_laws</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_laws</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">b</span>  <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="n">bn</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="n">v1</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="n">v2</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="kr">let</span> <span class="n">l</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="n">balanceLens</span>
+      <span class="n">a</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Account</span> <span class="n">b</span> <span class="n">bn</span>
+  <span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">get</span> <span class="n">l</span> <span class="n">a</span><span class="p">)</span> <span class="n">a</span> <span class="o">===</span> <span class="n">a</span>
+  <span class="kt">After</span><span class="o">.</span><span class="n">get</span> <span class="n">l</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="n">v1</span> <span class="n">a</span><span class="p">)</span> <span class="o">===</span> <span class="n">v1</span>
+  <span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="n">v2</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="n">v1</span> <span class="n">a</span><span class="p">)</span> <span class="o">===</span> <span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="n">v2</span> <span class="n">a</span>
+
+<span class="n">main</span> <span class="o">::</span> <span class="kt">IO</span> <span class="nb">()</span>
+<span class="n">main</span> <span class="o">=</span> <span class="kr">do</span>
+  <span class="n">ok</span> <span class="o">&lt;-</span> <span class="n">checkParallel</span> <span class="o">$</span> <span class="kt">Group</span> <span class="s">"Props"</span>
+    <span class="p">[</span> <span class="p">(</span><span class="s">"withdraw: Before == After"</span><span class="p">,</span> <span class="n">prop_agrees</span><span class="p">)</span>
+    <span class="p">,</span> <span class="p">(</span><span class="s">"balance lens obeys get-put, put-get, put-put"</span><span class="p">,</span> <span class="n">prop_laws</span><span class="p">)</span>
+    <span class="p">]</span>
+  <span class="n">unless</span> <span class="n">ok</span> <span class="n">exitFailure</span></code></pre></figure>
+
+</div>
+</div>
+</details>
+
+<h3 id="2--game-and-player-the-composed-path">2 · Game and player: the composed path</h3>
+
+<p>The player sits inside a game, and moving it means a copy-update chain
+that touches both records at every call. The After version composes
+<code class="language-plaintext highlighter-rouge">player . x</code> and <code class="language-plaintext highlighter-rouge">player . y</code> into paths and moves through them; the
+nested write is one step, not two. This is the composition property
+that made lenses famous: <code class="language-plaintext highlighter-rouge">compose</code> on lenses is exactly function
+composition read backwards, and the second property re-checks the lens
+laws for the composed path.</p>
+
+<figure class="rf-figure">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 200" role="img" aria-labelledby="d2-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="d2-title">Replacing nested copy-updates with a composed lens path. Before: moveX(g, dx) writes g.copy(player = g.player.copy(x = g.player.x + dx)) — the copy chain touches level, player and x. After: playerX = compose player x is one lens, and moveX(g, dx) = playerX.modify(_ + dx)(g); playerX reads g.player.x and writes the nested record in one step.</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="26">before</text>
+    <text x="428" y="26">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="36" width="388" height="128" rx="4" />
+    <rect x="428" y="36" width="336" height="128" rx="4" />
+  </g>
+  <g fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3">
+    <rect x="44" y="66" width="332" height="58" rx="3" />
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="58">moveX(g, dx) =</text>
+    <text x="40" y="76">g.copy(player =</text>
+    <text x="52" y="94">g.player.copy(x = g.player.x + dx))</text>
+    <text x="52" y="118">copy chain: level</text>
+    <text x="52" y="134">then player then x</text>
+    <text x="440" y="58">playerX = compose player x</text>
+    <text x="452" y="76">moveX(g, dx) =</text>
+    <text x="464" y="94">playerX.modify(_ + dx)(g)</text>
+    <text x="452" y="118">one lens reach:</text>
+    <text x="452" y="134">reads g.player.x,</text>
+    <text x="452" y="150">writes the whole path</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1">
+    <circle cx="386" cy="94" r="7.5" />
+    <circle cx="428" cy="94" r="7.5" />
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle">
+    <text x="386" y="98">1</text>
+    <text x="428" y="98">1</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M406 94 H414" />
+  </g>
+  <g fill="currentColor">
+    <path d="M414 90.5 L422 94 L414 97.5 Z" />
+  </g>
+</svg>
+
+</figure>
+
+<div class="rf-pair">
+<div><h4>Before · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Move the player inside a game: the nested copy-update touches</span>
+<span class="c1">// both records at every move.</span>
+<span class="k">object</span> <span class="nc">Before</span><span class="k">:</span>
+  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Player</span><span class="o">(</span><span class="kt">id:</span> <span class="kt">String</span><span class="o">,</span> <span class="kt">x:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">y</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span>
+  <span class="k">case</span> <span class="k">class</span> <span class="nc">Game</span><span class="o">(</span><span class="n">level</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">player</span><span class="k">:</span> <span class="kt">Player</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">moveX</span><span class="o">(</span><span class="n">g</span><span class="k">:</span> <span class="kt">Game</span><span class="o">,</span> <span class="n">dx</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Game</span> <span class="o">=</span>
+    <span class="nv">g</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">player</span> <span class="k">=</span> <span class="nv">g</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">x</span> <span class="k">=</span> <span class="nv">g</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">x</span> <span class="o">+</span> <span class="n">dx</span><span class="o">))</span>
+
+  <span class="k">def</span> <span class="nf">moveY</span><span class="o">(</span><span class="n">g</span><span class="k">:</span> <span class="kt">Game</span><span class="o">,</span> <span class="n">dy</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Game</span> <span class="o">=</span>
+    <span class="nv">g</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">player</span> <span class="k">=</span> <span class="nv">g</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">y</span> <span class="k">=</span> <span class="nv">g</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">y</span> <span class="o">+</span> <span class="n">dy</span><span class="o">))</span></code></pre></figure>
+
+</div>
+<div><h4>Before · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Move the player inside a game: the nested copy-update touches</span>
+<span class="c1">-- both records at every move.</span>
+<span class="kr">module</span> <span class="nn">Before</span> <span class="kr">where</span>
+
+<span class="kr">data</span> <span class="kt">Player</span> <span class="o">=</span> <span class="kt">Player</span> <span class="p">{</span> <span class="n">pid</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">px</span> <span class="o">::</span> <span class="kt">Int</span><span class="p">,</span> <span class="n">py</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
+<span class="kr">data</span> <span class="kt">Game</span>   <span class="o">=</span> <span class="kt">Game</span>   <span class="p">{</span> <span class="n">level</span> <span class="o">::</span> <span class="kt">Int</span><span class="p">,</span> <span class="n">gplayer</span> <span class="o">::</span> <span class="kt">Player</span> <span class="p">}</span>
+
+<span class="n">moveX</span> <span class="o">::</span> <span class="kt">Game</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Game</span>
+<span class="n">moveX</span> <span class="n">g</span> <span class="n">dx</span> <span class="o">=</span> <span class="n">g</span> <span class="p">{</span> <span class="n">gplayer</span> <span class="o">=</span> <span class="p">(</span><span class="n">gplayer</span> <span class="n">g</span><span class="p">)</span> <span class="p">{</span> <span class="n">px</span> <span class="o">=</span> <span class="n">px</span> <span class="p">(</span><span class="n">gplayer</span> <span class="n">g</span><span class="p">)</span> <span class="o">+</span> <span class="n">dx</span> <span class="p">}</span> <span class="p">}</span>
+
+<span class="n">moveY</span> <span class="o">::</span> <span class="kt">Game</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Game</span>
+<span class="n">moveY</span> <span class="n">g</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">g</span> <span class="p">{</span> <span class="n">gplayer</span> <span class="o">=</span> <span class="p">(</span><span class="n">gplayer</span> <span class="n">g</span><span class="p">)</span> <span class="p">{</span> <span class="n">py</span> <span class="o">=</span> <span class="n">py</span> <span class="p">(</span><span class="n">gplayer</span> <span class="n">g</span><span class="p">)</span> <span class="o">+</span> <span class="n">dy</span> <span class="p">}</span> <span class="p">}</span></code></pre></figure>
+
+</div>
+</div>
+
+<div class="rf-pair">
+<div><h4>After · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Same, with a composed path: player . x and player . y reach the</span>
+<span class="c1">// nested field in one step, no copy chain.</span>
+<span class="k">object</span> <span class="nc">After</span><span class="k">:</span>
+  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Player</span><span class="o">(</span><span class="kt">id:</span> <span class="kt">String</span><span class="o">,</span> <span class="kt">x:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">y</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span>
+  <span class="k">case</span> <span class="k">class</span> <span class="nc">Game</span><span class="o">(</span><span class="n">level</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">player</span><span class="k">:</span> <span class="kt">Player</span><span class="o">)</span>
+
+  <span class="k">case</span> <span class="k">class</span> <span class="nc">Lens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">get</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">,</span> <span class="n">set</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=&gt;</span> <span class="n">S</span><span class="o">)</span><span class="k">:</span>
+    <span class="kt">def</span> <span class="kt">modify</span><span class="o">(</span><span class="kt">f:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=</span> <span class="n">s</span> <span class="k">=&gt;</span> <span class="nf">set</span><span class="o">(</span><span class="nf">f</span><span class="o">(</span><span class="nf">get</span><span class="o">(</span><span class="n">s</span><span class="o">)))(</span><span class="n">s</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">compose</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">M</span>, <span class="kt">A</span><span class="o">](</span><span class="n">outer</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">M</span><span class="o">],</span>
+                       <span class="n">inner</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">M</span>, <span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">Lens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">s</span> <span class="k">=&gt;</span> <span class="nv">inner</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="nv">outer</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="n">s</span><span class="o">)),</span>
+      <span class="n">a</span> <span class="k">=&gt;</span> <span class="n">s</span> <span class="k">=&gt;</span> <span class="nv">outer</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="nv">inner</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="n">a</span><span class="o">)(</span><span class="nv">outer</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="n">s</span><span class="o">)))(</span><span class="n">s</span><span class="o">))</span>
+
+  <span class="k">val</span> <span class="nv">player</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Game</span>, <span class="kt">Player</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">Lens</span><span class="o">[</span><span class="kt">Game</span>, <span class="kt">Player</span><span class="o">](</span><span class="nv">_</span><span class="o">.</span><span class="py">player</span><span class="o">,</span> <span class="n">p</span> <span class="k">=&gt;</span> <span class="n">g</span> <span class="k">=&gt;</span> <span class="nv">g</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">player</span> <span class="k">=</span> <span class="n">p</span><span class="o">))</span>
+
+  <span class="k">val</span> <span class="nv">x</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Player</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">Lens</span><span class="o">[</span><span class="kt">Player</span>, <span class="kt">Int</span><span class="o">](</span><span class="nv">_</span><span class="o">.</span><span class="py">x</span><span class="o">,</span> <span class="n">v</span> <span class="k">=&gt;</span> <span class="n">p</span> <span class="k">=&gt;</span> <span class="nv">p</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">x</span> <span class="k">=</span> <span class="n">v</span><span class="o">))</span>
+  <span class="k">val</span> <span class="nv">y</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Player</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">Lens</span><span class="o">[</span><span class="kt">Player</span>, <span class="kt">Int</span><span class="o">](</span><span class="nv">_</span><span class="o">.</span><span class="py">y</span><span class="o">,</span> <span class="n">v</span> <span class="k">=&gt;</span> <span class="n">p</span> <span class="k">=&gt;</span> <span class="nv">p</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">y</span> <span class="k">=</span> <span class="n">v</span><span class="o">))</span>
+
+  <span class="k">val</span> <span class="nv">playerX</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Game</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="nf">compose</span><span class="o">(</span><span class="n">player</span><span class="o">,</span> <span class="n">x</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">playerY</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Game</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="nf">compose</span><span class="o">(</span><span class="n">player</span><span class="o">,</span> <span class="n">y</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">moveX</span><span class="o">(</span><span class="n">g</span><span class="k">:</span> <span class="kt">Game</span><span class="o">,</span> <span class="n">dx</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Game</span> <span class="o">=</span> <span class="nv">playerX</span><span class="o">.</span><span class="py">modify</span><span class="o">(</span><span class="k">_</span> <span class="o">+</span> <span class="n">dx</span><span class="o">)(</span><span class="n">g</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nf">moveY</span><span class="o">(</span><span class="n">g</span><span class="k">:</span> <span class="kt">Game</span><span class="o">,</span> <span class="n">dy</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Game</span> <span class="o">=</span> <span class="nv">playerY</span><span class="o">.</span><span class="py">modify</span><span class="o">(</span><span class="k">_</span> <span class="o">+</span> <span class="n">dy</span><span class="o">)(</span><span class="n">g</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>After · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Same, with a composed path: player . x and player . y reach the</span>
+<span class="c1">-- nested field in one step, no copy chain.</span>
+<span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
+
+<span class="kr">data</span> <span class="kt">Player</span> <span class="o">=</span> <span class="kt">Player</span> <span class="p">{</span> <span class="n">pid</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">px</span> <span class="o">::</span> <span class="kt">Int</span><span class="p">,</span> <span class="n">py</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+<span class="kr">data</span> <span class="kt">Game</span>   <span class="o">=</span> <span class="kt">Game</span>   <span class="p">{</span> <span class="n">level</span> <span class="o">::</span> <span class="kt">Int</span><span class="p">,</span> <span class="n">gplayer</span> <span class="o">::</span> <span class="kt">Player</span> <span class="p">}</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="kr">data</span> <span class="kt">Lens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">get</span> <span class="o">::</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">,</span> <span class="n">set</span> <span class="o">::</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="p">}</span>
+
+<span class="n">modify</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span>
+<span class="n">modify</span> <span class="n">l</span> <span class="n">f</span> <span class="n">s</span> <span class="o">=</span> <span class="n">set</span> <span class="n">l</span> <span class="p">(</span><span class="n">f</span> <span class="p">(</span><span class="n">get</span> <span class="n">l</span> <span class="n">s</span><span class="p">))</span> <span class="n">s</span>
+
+<span class="n">compose</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="n">s</span> <span class="n">m</span> <span class="o">-&gt;</span> <span class="kt">Lens</span> <span class="n">m</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="kt">Lens</span> <span class="n">s</span> <span class="n">a</span>
+<span class="n">compose</span> <span class="n">outer</span> <span class="n">inner</span> <span class="o">=</span> <span class="kt">Lens</span>
+  <span class="p">{</span> <span class="n">get</span> <span class="o">=</span> <span class="n">get</span> <span class="n">inner</span> <span class="o">.</span> <span class="n">get</span> <span class="n">outer</span>
+  <span class="p">,</span> <span class="n">set</span> <span class="o">=</span> <span class="nf">\</span><span class="n">a</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">set</span> <span class="n">outer</span> <span class="p">(</span><span class="n">set</span> <span class="n">inner</span> <span class="n">a</span> <span class="p">(</span><span class="n">get</span> <span class="n">outer</span> <span class="n">s</span><span class="p">))</span> <span class="n">s</span>
+  <span class="p">}</span>
+
+<span class="n">player</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="kt">Game</span> <span class="kt">Player</span>
+<span class="n">player</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">get</span> <span class="o">=</span> <span class="n">gplayer</span><span class="p">,</span> <span class="n">set</span> <span class="o">=</span> <span class="nf">\</span><span class="n">p</span> <span class="n">g</span> <span class="o">-&gt;</span> <span class="n">g</span> <span class="p">{</span> <span class="n">gplayer</span> <span class="o">=</span> <span class="n">p</span> <span class="p">}</span> <span class="p">}</span>
+
+<span class="n">x</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="kt">Player</span> <span class="kt">Int</span>
+<span class="n">x</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">get</span> <span class="o">=</span> <span class="n">px</span><span class="p">,</span> <span class="n">set</span> <span class="o">=</span> <span class="nf">\</span><span class="n">v</span> <span class="n">p</span> <span class="o">-&gt;</span> <span class="n">p</span> <span class="p">{</span> <span class="n">px</span> <span class="o">=</span> <span class="n">v</span> <span class="p">}</span> <span class="p">}</span>
+
+<span class="n">y</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="kt">Player</span> <span class="kt">Int</span>
+<span class="n">y</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">get</span> <span class="o">=</span> <span class="n">py</span><span class="p">,</span> <span class="n">set</span> <span class="o">=</span> <span class="nf">\</span><span class="n">v</span> <span class="n">p</span> <span class="o">-&gt;</span> <span class="n">p</span> <span class="p">{</span> <span class="n">py</span> <span class="o">=</span> <span class="n">v</span> <span class="p">}</span> <span class="p">}</span>
+
+<span class="n">playerX</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="kt">Game</span> <span class="kt">Int</span>
+<span class="n">playerX</span> <span class="o">=</span> <span class="n">compose</span> <span class="n">player</span> <span class="n">x</span>
+
+<span class="n">playerY</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="kt">Game</span> <span class="kt">Int</span>
+<span class="n">playerY</span> <span class="o">=</span> <span class="n">compose</span> <span class="n">player</span> <span class="n">y</span>
+
+<span class="n">moveX</span> <span class="o">::</span> <span class="kt">Game</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Game</span>
+<span class="n">moveX</span> <span class="n">g</span> <span class="n">dx</span> <span class="o">=</span> <span class="n">modify</span> <span class="n">playerX</span> <span class="p">(</span><span class="o">+</span> <span class="n">dx</span><span class="p">)</span> <span class="n">g</span>
+
+<span class="n">moveY</span> <span class="o">::</span> <span class="kt">Game</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Game</span>
+<span class="n">moveY</span> <span class="n">g</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">modify</span> <span class="n">playerY</span> <span class="p">(</span><span class="o">+</span> <span class="n">dy</span><span class="p">)</span> <span class="n">g</span></code></pre></figure>
+
+</div>
+</div>
+
+<p>Two notes. <code class="language-plaintext highlighter-rouge">compose</code> is a few lines because the whole encoding is a few
+lines — <code class="language-plaintext highlighter-rouge">Lens</code> is just a <code class="language-plaintext highlighter-rouge">get</code> and a <code class="language-plaintext highlighter-rouge">set</code>, and <code class="language-plaintext highlighter-rouge">modify</code> is defined
+from them; a library like Kmett’s or Monocle supplies the same
+combinators with more machinery behind them [<a href="#ref-8">8</a>], [<a href="#ref-11">11</a>]. And the
+property again compares result values, so it reads <code class="language-plaintext highlighter-rouge">.level</code>, <code class="language-plaintext highlighter-rouge">.player.x</code>
+and <code class="language-plaintext highlighter-rouge">.player.y</code> off each result rather than asserting record equality
+across two types.</p>
+
+<details class="rf-spec">
+<summary>The property: <code>Before.moveX/moveY == After.moveX/moveY</code> on generated games, and the composed lens obeys the laws</summary>
+<div class="rf-pair">
+<div><h4>Spec · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">//&gt; using scala 3.3.4</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-core:0.14.0</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-runner:0.14.0</span>
+<span class="k">import</span> <span class="nn">hedgehog.</span><span class="o">*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">core</span><span class="o">.*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">runner</span><span class="o">.*</span>
+
+<span class="k">object</span> <span class="nc">Props</span> <span class="k">extends</span> <span class="nc">Properties</span><span class="k">:</span>
+  <span class="kt">def</span> <span class="kt">tests:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Test</span><span class="o">]</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"moveX: Before == After"</span><span class="o">,</span> <span class="n">agreesX</span><span class="o">),</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"moveY: Before == After"</span><span class="o">,</span> <span class="n">agreesY</span><span class="o">),</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"the composed path lens player.x obeys the laws"</span><span class="o">,</span> <span class="n">laws</span><span class="o">),</span>
+  <span class="o">)</span>
+
+  <span class="c1">// Raw values, so the same input feeds both Game types.</span>
+  <span class="k">val</span> <span class="nv">genInt</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="nv">Gen</span><span class="o">.</span><span class="py">int</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(-</span><span class="mi">30</span><span class="o">,</span> <span class="mi">30</span><span class="o">))</span>
+  <span class="k">val</span> <span class="nv">genId</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="k">&lt;-</span> <span class="nv">Gen</span><span class="o">.</span><span class="py">int</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">9</span><span class="o">))</span> <span class="k">yield</span> <span class="s">"p"</span> <span class="o">+</span> <span class="nv">n</span><span class="o">.</span><span class="py">toString</span>
+
+  <span class="k">def</span> <span class="nf">agreesX</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span>
+      <span class="n">id</span> <span class="k">&lt;-</span> <span class="nv">genId</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">lv</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">px</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">py</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">dx</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="k">val</span> <span class="nv">b</span> <span class="k">=</span>
+        <span class="nv">Before</span><span class="o">.</span><span class="py">moveX</span><span class="o">(</span><span class="nv">Before</span><span class="o">.</span><span class="py">Game</span><span class="o">(</span><span class="n">lv</span><span class="o">,</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Player</span><span class="o">(</span><span class="n">id</span><span class="o">,</span> <span class="n">px</span><span class="o">,</span> <span class="n">py</span><span class="o">)),</span> <span class="n">dx</span><span class="o">)</span>
+      <span class="k">val</span> <span class="nv">a</span> <span class="k">=</span> <span class="nv">After</span><span class="o">.</span><span class="py">moveX</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">Game</span><span class="o">(</span><span class="n">lv</span><span class="o">,</span> <span class="nv">After</span><span class="o">.</span><span class="py">Player</span><span class="o">(</span><span class="n">id</span><span class="o">,</span> <span class="n">px</span><span class="o">,</span> <span class="n">py</span><span class="o">)),</span> <span class="n">dx</span><span class="o">)</span>
+      <span class="o">(</span><span class="nv">b</span><span class="o">.</span><span class="py">level</span><span class="o">,</span> <span class="nv">b</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">id</span><span class="o">,</span> <span class="nv">b</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">x</span><span class="o">,</span> <span class="nv">b</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">y</span><span class="o">)</span>
+        <span class="o">====</span> <span class="o">(</span><span class="nv">a</span><span class="o">.</span><span class="py">level</span><span class="o">,</span> <span class="nv">a</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">id</span><span class="o">,</span> <span class="nv">a</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">x</span><span class="o">,</span> <span class="nv">a</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">y</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">agreesY</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span>
+      <span class="n">id</span> <span class="k">&lt;-</span> <span class="nv">genId</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">lv</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">px</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">py</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">dy</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="k">val</span> <span class="nv">b</span> <span class="k">=</span>
+        <span class="nv">Before</span><span class="o">.</span><span class="py">moveY</span><span class="o">(</span><span class="nv">Before</span><span class="o">.</span><span class="py">Game</span><span class="o">(</span><span class="n">lv</span><span class="o">,</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Player</span><span class="o">(</span><span class="n">id</span><span class="o">,</span> <span class="n">px</span><span class="o">,</span> <span class="n">py</span><span class="o">)),</span> <span class="n">dy</span><span class="o">)</span>
+      <span class="k">val</span> <span class="nv">a</span> <span class="k">=</span> <span class="nv">After</span><span class="o">.</span><span class="py">moveY</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">Game</span><span class="o">(</span><span class="n">lv</span><span class="o">,</span> <span class="nv">After</span><span class="o">.</span><span class="py">Player</span><span class="o">(</span><span class="n">id</span><span class="o">,</span> <span class="n">px</span><span class="o">,</span> <span class="n">py</span><span class="o">)),</span> <span class="n">dy</span><span class="o">)</span>
+      <span class="o">(</span><span class="nv">b</span><span class="o">.</span><span class="py">level</span><span class="o">,</span> <span class="nv">b</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">id</span><span class="o">,</span> <span class="nv">b</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">x</span><span class="o">,</span> <span class="nv">b</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">y</span><span class="o">)</span>
+        <span class="o">====</span> <span class="o">(</span><span class="nv">a</span><span class="o">.</span><span class="py">level</span><span class="o">,</span> <span class="nv">a</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">id</span><span class="o">,</span> <span class="nv">a</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">x</span><span class="o">,</span> <span class="nv">a</span><span class="o">.</span><span class="py">player</span><span class="o">.</span><span class="py">y</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">laws</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span>
+      <span class="n">id</span> <span class="k">&lt;-</span> <span class="nv">genId</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">lv</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">px</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">py</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">v1</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">v2</span> <span class="k">&lt;-</span> <span class="nv">genInt</span><span class="o">.</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="k">val</span> <span class="nv">g</span>  <span class="k">=</span> <span class="nv">After</span><span class="o">.</span><span class="py">Game</span><span class="o">(</span><span class="n">lv</span><span class="o">,</span> <span class="nv">After</span><span class="o">.</span><span class="py">Player</span><span class="o">(</span><span class="n">id</span><span class="o">,</span> <span class="n">px</span><span class="o">,</span> <span class="n">py</span><span class="o">))</span>
+      <span class="k">val</span> <span class="nv">l</span>  <span class="k">=</span> <span class="nv">After</span><span class="o">.</span><span class="py">playerX</span>
+      <span class="nv">l</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="n">v1</span><span class="o">)(</span><span class="n">g</span><span class="o">))</span> <span class="o">====</span> <span class="n">v1</span> <span class="n">and</span>
+        <span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="nv">l</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="n">g</span><span class="o">))(</span><span class="n">g</span><span class="o">)</span> <span class="o">====</span> <span class="n">g</span> <span class="n">and</span>
+        <span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="n">v2</span><span class="o">)(</span><span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="n">v1</span><span class="o">)(</span><span class="n">g</span><span class="o">))</span> <span class="o">====</span> <span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="n">v2</span><span class="o">)(</span><span class="n">g</span><span class="o">)</span>
+
+<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span>
+  <span class="k">val</span> <span class="nv">results</span> <span class="k">=</span> <span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">.</span><span class="py">map</span> <span class="o">{</span> <span class="n">t</span> <span class="k">=&gt;</span>
+    <span class="k">val</span> <span class="nv">r</span> <span class="k">=</span> <span class="nv">Property</span><span class="o">.</span><span class="py">check</span><span class="o">(</span><span class="nv">t</span><span class="o">.</span><span class="py">withConfig</span><span class="o">(</span><span class="nv">PropertyConfig</span><span class="o">.</span><span class="py">default</span><span class="o">),</span>
+      <span class="nv">t</span><span class="o">.</span><span class="py">result</span><span class="o">,</span> <span class="nv">Seed</span><span class="o">.</span><span class="py">fromTime</span><span class="o">())</span>
+    <span class="nf">println</span><span class="o">(</span><span class="nv">Test</span><span class="o">.</span><span class="py">renderReport</span><span class="o">(</span>
+      <span class="s">"Props"</span><span class="o">,</span> <span class="n">t</span><span class="o">,</span> <span class="n">r</span><span class="o">,</span> <span class="n">ansiCodesSupported</span> <span class="k">=</span> <span class="kc">false</span><span class="o">))</span>
+    <span class="nv">r</span><span class="o">.</span><span class="py">status</span>
+  <span class="o">}</span>
+  <span class="k">if</span> <span class="o">!</span><span class="nv">results</span><span class="o">.</span><span class="py">forall</span><span class="o">(</span><span class="k">_</span> <span class="o">==</span> <span class="nv">Status</span><span class="o">.</span><span class="py">ok</span><span class="o">)</span> <span class="n">then</span> <span class="nv">sys</span><span class="o">.</span><span class="py">exit</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>Spec · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="cp">{-# LANGUAGE OverloadedStrings #-}</span>
+<span class="kr">module</span> <span class="nn">Main</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Control.Monad</span> <span class="p">(</span><span class="nf">unless</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">System.Exit</span> <span class="p">(</span><span class="nf">exitFailure</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Hedgehog</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Gen</span> <span class="k">as</span> <span class="n">Gen</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Range</span> <span class="k">as</span> <span class="n">Range</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Before</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">After</span>
+
+<span class="n">genInt</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">Int</span>
+<span class="n">genInt</span> <span class="o">=</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="p">(</span><span class="o">-</span><span class="mi">30</span><span class="p">)</span> <span class="mi">30</span><span class="p">)</span>
+
+<span class="n">genId</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">String</span>
+<span class="n">genId</span> <span class="o">=</span> <span class="p">(</span><span class="s">"p"</span> <span class="o">&lt;&gt;</span><span class="p">)</span> <span class="o">.</span> <span class="n">show</span> <span class="o">&lt;$&gt;</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="mi">0</span> <span class="mi">9</span><span class="p">)</span>
+
+<span class="n">prop_agrees</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_agrees</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">id</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genId</span>
+  <span class="n">lv</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="n">px</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="n">py</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="n">dx</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="n">dy</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="kr">let</span> <span class="n">bg</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Game</span> <span class="n">lv</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">Player</span> <span class="n">id</span> <span class="n">px</span> <span class="n">py</span><span class="p">)</span>
+      <span class="n">ag</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Game</span> <span class="n">lv</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Player</span> <span class="n">id</span> <span class="n">px</span> <span class="n">py</span><span class="p">)</span>
+      <span class="n">b1</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="n">moveX</span> <span class="n">bg</span> <span class="n">dx</span>
+      <span class="n">b2</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="n">moveY</span> <span class="n">bg</span> <span class="n">dy</span>
+      <span class="n">a1</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="n">moveX</span> <span class="n">ag</span> <span class="n">dx</span>
+      <span class="n">a2</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="n">moveY</span> <span class="n">ag</span> <span class="n">dy</span>
+  <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">level</span> <span class="n">b1</span><span class="p">,</span> <span class="kt">Before</span><span class="o">.</span><span class="n">px</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">gplayer</span> <span class="n">b1</span><span class="p">),</span>
+   <span class="kt">Before</span><span class="o">.</span><span class="n">py</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">gplayer</span> <span class="n">b1</span><span class="p">))</span>
+    <span class="o">===</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">level</span> <span class="n">a1</span><span class="p">,</span> <span class="kt">After</span><span class="o">.</span><span class="n">px</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">gplayer</span> <span class="n">a1</span><span class="p">),</span>
+         <span class="kt">After</span><span class="o">.</span><span class="n">py</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">gplayer</span> <span class="n">a1</span><span class="p">))</span>
+  <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">level</span> <span class="n">b2</span><span class="p">,</span> <span class="kt">Before</span><span class="o">.</span><span class="n">px</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">gplayer</span> <span class="n">b2</span><span class="p">),</span>
+   <span class="kt">Before</span><span class="o">.</span><span class="n">py</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">gplayer</span> <span class="n">b2</span><span class="p">))</span>
+    <span class="o">===</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">level</span> <span class="n">a2</span><span class="p">,</span> <span class="kt">After</span><span class="o">.</span><span class="n">px</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">gplayer</span> <span class="n">a2</span><span class="p">),</span>
+         <span class="kt">After</span><span class="o">.</span><span class="n">py</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">gplayer</span> <span class="n">a2</span><span class="p">))</span>
+
+<span class="c1">-- The composed path is still a lens: get and set through player . x</span>
+<span class="c1">-- satisfy the three equations.</span>
+<span class="n">prop_laws</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_laws</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">id</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genId</span>
+  <span class="n">lv</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="n">px</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="n">py</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="n">v1</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="n">v2</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genInt</span>
+  <span class="kr">let</span> <span class="n">l</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="n">playerX</span>
+      <span class="n">g</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Game</span> <span class="n">lv</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Player</span> <span class="n">id</span> <span class="n">px</span> <span class="n">py</span><span class="p">)</span>
+  <span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">get</span> <span class="n">l</span> <span class="n">g</span><span class="p">)</span> <span class="n">g</span> <span class="o">===</span> <span class="n">g</span>
+  <span class="kt">After</span><span class="o">.</span><span class="n">get</span> <span class="n">l</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="n">v1</span> <span class="n">g</span><span class="p">)</span> <span class="o">===</span> <span class="n">v1</span>
+  <span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="n">v2</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="n">v1</span> <span class="n">g</span><span class="p">)</span> <span class="o">===</span> <span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="n">v2</span> <span class="n">g</span>
+
+<span class="n">main</span> <span class="o">::</span> <span class="kt">IO</span> <span class="nb">()</span>
+<span class="n">main</span> <span class="o">=</span> <span class="kr">do</span>
+  <span class="n">ok</span> <span class="o">&lt;-</span> <span class="n">checkParallel</span> <span class="o">$</span> <span class="kt">Group</span> <span class="s">"Props"</span>
+    <span class="p">[</span> <span class="p">(</span><span class="s">"moveX/moveY: Before == After"</span><span class="p">,</span> <span class="n">prop_agrees</span><span class="p">)</span>
+    <span class="p">,</span> <span class="p">(</span><span class="s">"composed path lens player.x obeys the laws"</span><span class="p">,</span> <span class="n">prop_laws</span><span class="p">)</span>
+    <span class="p">]</span>
+  <span class="n">unless</span> <span class="n">ok</span> <span class="n">exitFailure</span></code></pre></figure>
+
+</div>
+</div>
+</details>
+
+<h3 id="3--file-tree-the-lens-inside-the-recursion">3 · File tree: the lens inside the recursion</h3>
+
+<p>The tree’s <code class="language-plaintext highlighter-rouge">size</code> field is updated in the same recursive pass that
+walks the children. The Before version writes it directly in the
+<code class="language-plaintext highlighter-rouge">copy</code>; the After version routes the write through a lens and leaves
+the recursion alone. This is the inverse picture from example 2: here
+the lens is <em>not</em> composed — there is one record type and one field —
+and the reason to use it is that the write is a named, checked step of
+the traversal rather than an anonymous copy. The second property checks
+the lens laws on generated nodes.</p>
+
+<figure class="rf-figure">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 200" role="img" aria-labelledby="d3-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="d3-title">Replacing a direct field write with a lens inside a recursive traversal. Before: bumpSizes(n, by) writes n.copy(size = n.size + by) then recurses over children. After: bumpSizes uses sizeLens.modify(_ + by)(n) to write the size and recurses over children unchanged; the recursion and the write are two independent steps and the write goes through the lens.</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="26">before</text>
+    <text x="428" y="26">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="36" width="388" height="128" rx="4" />
+    <rect x="428" y="36" width="336" height="128" rx="4" />
+  </g>
+  <g fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3">
+    <rect x="44" y="76" width="332" height="34" rx="3" />
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="58">bumpSizes(n: Node, by) =</text>
+    <text x="40" y="76">n.copy(</text>
+    <text x="52" y="94">size = n.size + by,</text>
+    <text x="52" y="112">children = children.map(bumpSizes(_, by)))</text>
+    <text x="52" y="140">field write spelled out</text>
+    <text x="440" y="58">bumpSizes(n: Node, by) =</text>
+    <text x="452" y="76">sizeLens.modify(_ + by)(</text>
+    <text x="464" y="94">n.copy(children = children.map(bumpSizes(_, by))))</text>
+    <text x="452" y="140">write through the lens,</text>
+    <text x="452" y="158">recursion unchanged</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1">
+    <circle cx="386" cy="118" r="7.5" />
+    <circle cx="428" cy="118" r="7.5" />
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle">
+    <text x="386" y="122">1</text>
+    <text x="428" y="122">1</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M406 118 H414" />
+  </g>
+  <g fill="currentColor">
+    <path d="M414 114.5 L422 118 L414 121.5 Z" />
+  </g>
+</svg>
+
+</figure>
+
+<div class="rf-pair">
+<div><h4>Before · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Grow the size of every node of a file tree by the same amount.</span>
+<span class="k">object</span> <span class="nc">Before</span><span class="k">:</span>
+  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Node</span><span class="o">(</span><span class="kt">name:</span> <span class="kt">String</span><span class="o">,</span> <span class="kt">size:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">children</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Node</span><span class="o">])</span>
+
+  <span class="k">def</span> <span class="nf">bumpSizes</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Node</span><span class="o">,</span> <span class="n">by</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Node</span> <span class="o">=</span>
+    <span class="nv">n</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span>
+      <span class="n">size</span> <span class="k">=</span> <span class="nv">n</span><span class="o">.</span><span class="py">size</span> <span class="o">+</span> <span class="n">by</span><span class="o">,</span>
+      <span class="n">children</span> <span class="k">=</span> <span class="nv">n</span><span class="o">.</span><span class="py">children</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="nf">bumpSizes</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">by</span><span class="o">)))</span></code></pre></figure>
+
+</div>
+<div><h4>Before · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Grow the size of every node of a file tree by the same amount.</span>
+<span class="kr">module</span> <span class="nn">Before</span> <span class="kr">where</span>
+
+<span class="kr">data</span> <span class="kt">Node</span> <span class="o">=</span> <span class="kt">Node</span> <span class="p">{</span> <span class="n">name</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">size</span> <span class="o">::</span> <span class="kt">Int</span><span class="p">,</span> <span class="n">children</span> <span class="o">::</span> <span class="p">[</span><span class="kt">Node</span><span class="p">]</span> <span class="p">}</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="n">bumpSizes</span> <span class="o">::</span> <span class="kt">Node</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Node</span>
+<span class="n">bumpSizes</span> <span class="n">n</span> <span class="n">by</span> <span class="o">=</span>
+  <span class="n">n</span> <span class="p">{</span> <span class="n">size</span> <span class="o">=</span> <span class="n">size</span> <span class="n">n</span> <span class="o">+</span> <span class="n">by</span>
+    <span class="p">,</span> <span class="n">children</span> <span class="o">=</span> <span class="n">map</span> <span class="p">(`</span><span class="n">bumpSizes</span><span class="p">`</span> <span class="n">by</span><span class="p">)</span> <span class="p">(</span><span class="n">children</span> <span class="n">n</span><span class="p">)</span>
+    <span class="p">}</span></code></pre></figure>
+
+</div>
+</div>
+
+<div class="rf-pair">
+<div><h4>After · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Same, with a lens on the size field: the write goes through the</span>
+<span class="c1">// lens; the recursion over children is unchanged.</span>
+<span class="k">object</span> <span class="nc">After</span><span class="k">:</span>
+  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Node</span><span class="o">(</span><span class="kt">name:</span> <span class="kt">String</span><span class="o">,</span> <span class="kt">size:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">children</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Node</span><span class="o">])</span>
+
+  <span class="k">case</span> <span class="k">class</span> <span class="nc">Lens</span><span class="o">[</span><span class="kt">S</span>, <span class="kt">A</span><span class="o">](</span><span class="n">get</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">,</span> <span class="n">set</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=&gt;</span> <span class="n">S</span><span class="o">)</span><span class="k">:</span>
+    <span class="kt">def</span> <span class="kt">modify</span><span class="o">(</span><span class="kt">f:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">S</span> <span class="o">=&gt;</span> <span class="n">S</span> <span class="k">=</span> <span class="n">s</span> <span class="k">=&gt;</span> <span class="nf">set</span><span class="o">(</span><span class="nf">f</span><span class="o">(</span><span class="nf">get</span><span class="o">(</span><span class="n">s</span><span class="o">)))(</span><span class="n">s</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">size</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Node</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">Lens</span><span class="o">[</span><span class="kt">Node</span>, <span class="kt">Int</span><span class="o">](</span><span class="nv">_</span><span class="o">.</span><span class="py">size</span><span class="o">,</span> <span class="n">v</span> <span class="k">=&gt;</span> <span class="n">n</span> <span class="k">=&gt;</span> <span class="nv">n</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">size</span> <span class="k">=</span> <span class="n">v</span><span class="o">))</span>
+
+  <span class="k">def</span> <span class="nf">bumpSizes</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Node</span><span class="o">,</span> <span class="n">by</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Node</span> <span class="o">=</span>
+    <span class="nv">size</span><span class="o">.</span><span class="py">modify</span><span class="o">(</span><span class="k">_</span> <span class="o">+</span> <span class="n">by</span><span class="o">)(</span>
+      <span class="nv">n</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">children</span> <span class="k">=</span> <span class="nv">n</span><span class="o">.</span><span class="py">children</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="nf">bumpSizes</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">by</span><span class="o">))))</span></code></pre></figure>
+
+</div>
+<div><h4>After · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Same, with a lens on the size field: the write goes through the</span>
+<span class="c1">-- lens; the recursion over children is unchanged.</span>
+<span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
+
+<span class="kr">data</span> <span class="kt">Node</span> <span class="o">=</span> <span class="kt">Node</span> <span class="p">{</span> <span class="n">name</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">size</span> <span class="o">::</span> <span class="kt">Int</span><span class="p">,</span> <span class="n">children</span> <span class="o">::</span> <span class="p">[</span><span class="kt">Node</span><span class="p">]</span> <span class="p">}</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="kr">data</span> <span class="kt">Lens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">get</span> <span class="o">::</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">,</span> <span class="n">set</span> <span class="o">::</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="p">}</span>
+
+<span class="n">modify</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="n">s</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span>
+<span class="n">modify</span> <span class="n">l</span> <span class="n">f</span> <span class="n">s</span> <span class="o">=</span> <span class="n">set</span> <span class="n">l</span> <span class="p">(</span><span class="n">f</span> <span class="p">(</span><span class="n">get</span> <span class="n">l</span> <span class="n">s</span><span class="p">))</span> <span class="n">s</span>
+
+<span class="n">sizeLens</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="kt">Node</span> <span class="kt">Int</span>
+<span class="n">sizeLens</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">get</span> <span class="o">=</span> <span class="n">size</span><span class="p">,</span> <span class="n">set</span> <span class="o">=</span> <span class="nf">\</span><span class="n">v</span> <span class="n">n</span> <span class="o">-&gt;</span> <span class="n">n</span> <span class="p">{</span> <span class="n">size</span> <span class="o">=</span> <span class="n">v</span> <span class="p">}</span> <span class="p">}</span>
+
+<span class="n">bumpSizes</span> <span class="o">::</span> <span class="kt">Node</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Node</span>
+<span class="n">bumpSizes</span> <span class="n">n</span> <span class="n">by</span> <span class="o">=</span>
+  <span class="n">modify</span> <span class="n">sizeLens</span> <span class="p">(</span><span class="o">+</span> <span class="n">by</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">n</span> <span class="p">{</span> <span class="n">children</span> <span class="o">=</span> <span class="n">map</span> <span class="p">(`</span><span class="n">bumpSizes</span><span class="p">`</span> <span class="n">by</span><span class="p">)</span> <span class="p">(</span><span class="n">children</span> <span class="n">n</span><span class="p">)</span> <span class="p">})</span></code></pre></figure>
+
+</div>
+</div>
+
+<p>A design choice is worth stating: example 3 uses one <em>total</em> lens whose
+focus is a single field, not a lens over “all files in the tree”. Every
+node has a <code class="language-plaintext highlighter-rouge">size</code>, so the lens is total, the property can test it on any
+node, and the recursion is unchanged. “All the files” is a traversal,
+not a lens — a different abstraction with its own laws — and the page
+stays within the lens equation.</p>
+
+<details class="rf-spec">
+<summary>The property: <code>Before.bumpSizes == After.bumpSizes</code> on generated trees, and the size lens obeys the laws</summary>
+<div class="rf-pair">
+<div><h4>Spec · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">//&gt; using scala 3.3.4</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-core:0.14.0</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-runner:0.14.0</span>
+<span class="k">import</span> <span class="nn">hedgehog.</span><span class="o">*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">core</span><span class="o">.*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">runner</span><span class="o">.*</span>
+
+<span class="k">object</span> <span class="nc">Props</span> <span class="k">extends</span> <span class="nc">Properties</span><span class="k">:</span>
+  <span class="kt">def</span> <span class="kt">tests:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Test</span><span class="o">]</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"bumpSizes: Before == After"</span><span class="o">,</span> <span class="n">agrees</span><span class="o">),</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"the size lens obeys get-put, put-get, put-put"</span><span class="o">,</span> <span class="n">laws</span><span class="o">),</span>
+  <span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">genName</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="k">&lt;-</span> <span class="nv">Gen</span><span class="o">.</span><span class="py">int</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">9</span><span class="o">))</span> <span class="k">yield</span> <span class="s">"n"</span> <span class="o">+</span> <span class="nv">n</span><span class="o">.</span><span class="py">toString</span>
+  <span class="k">val</span> <span class="nv">genSize</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="nv">Gen</span><span class="o">.</span><span class="py">int</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(-</span><span class="mi">20</span><span class="o">,</span> <span class="mi">20</span><span class="o">))</span>
+
+  <span class="k">def</span> <span class="nf">genNode</span><span class="o">(</span><span class="n">depth</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">Before.Node</span><span class="o">]</span> <span class="k">=</span>
+    <span class="k">val</span> <span class="nv">leaf</span> <span class="k">=</span>
+      <span class="k">for</span> <span class="n">n</span> <span class="k">&lt;-</span> <span class="n">genName</span><span class="o">;</span> <span class="n">s</span> <span class="k">&lt;-</span> <span class="n">genSize</span> <span class="k">yield</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Node</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">s</span><span class="o">,</span> <span class="nc">Nil</span><span class="o">)</span>
+    <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span> <span class="n">then</span> <span class="n">leaf</span>
+    <span class="k">else</span>
+      <span class="nv">Gen</span><span class="o">.</span><span class="py">choice1</span><span class="o">(</span>
+        <span class="n">leaf</span><span class="o">,</span>
+        <span class="k">for</span>
+          <span class="n">n</span>  <span class="k">&lt;-</span> <span class="n">genName</span>
+          <span class="n">s</span>  <span class="k">&lt;-</span> <span class="n">genSize</span>
+          <span class="n">cs</span> <span class="k">&lt;-</span> <span class="nf">genNode</span><span class="o">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="o">).</span><span class="py">list</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">3</span><span class="o">))</span>
+        <span class="k">yield</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Node</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">s</span><span class="o">,</span> <span class="n">cs</span><span class="o">)</span>
+        <span class="o">,</span>
+      <span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">toAfter</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Before.Node</span><span class="o">)</span><span class="k">:</span> <span class="kt">After.Node</span> <span class="o">=</span> <span class="n">n</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Node</span><span class="o">(</span><span class="n">nm</span><span class="o">,</span> <span class="n">s</span><span class="o">,</span> <span class="n">cs</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">After</span><span class="o">.</span><span class="py">Node</span><span class="o">(</span><span class="n">nm</span><span class="o">,</span> <span class="n">s</span><span class="o">,</span> <span class="nv">cs</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">toAfter</span><span class="o">))</span>
+
+  <span class="k">def</span> <span class="nf">same</span><span class="o">(</span><span class="n">b</span><span class="k">:</span> <span class="kt">Before.Node</span><span class="o">,</span> <span class="n">a</span><span class="k">:</span> <span class="kt">After.Node</span><span class="o">)</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">a</span><span class="o">)</span> <span class="k">match</span>
+    <span class="nf">case</span> <span class="o">(</span><span class="nv">Before</span><span class="o">.</span><span class="py">Node</span><span class="o">(</span><span class="n">n1</span><span class="o">,</span> <span class="n">s1</span><span class="o">,</span> <span class="n">c1</span><span class="o">),</span> <span class="nv">After</span><span class="o">.</span><span class="py">Node</span><span class="o">(</span><span class="n">n2</span><span class="o">,</span> <span class="n">s2</span><span class="o">,</span> <span class="n">c2</span><span class="o">))</span> <span class="k">=&gt;</span>
+      <span class="n">n1</span> <span class="o">==</span> <span class="n">n2</span> <span class="o">&amp;&amp;</span> <span class="n">s1</span> <span class="o">==</span> <span class="n">s2</span> <span class="o">&amp;&amp;</span> <span class="nv">c1</span><span class="o">.</span><span class="py">size</span> <span class="o">==</span> <span class="nv">c2</span><span class="o">.</span><span class="py">size</span> <span class="o">&amp;&amp;</span>
+        <span class="nv">c1</span><span class="o">.</span><span class="py">zip</span><span class="o">(</span><span class="n">c2</span><span class="o">).</span><span class="py">forall</span><span class="o">((</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nf">same</span><span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">))</span>
+
+  <span class="k">def</span> <span class="nf">agrees</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span>
+      <span class="n">n</span>  <span class="k">&lt;-</span> <span class="nf">genNode</span><span class="o">(</span><span class="mi">3</span><span class="o">).</span><span class="py">forAll</span>
+      <span class="n">by</span> <span class="k">&lt;-</span> <span class="nv">genSize</span><span class="o">.</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="k">val</span> <span class="nv">b</span> <span class="k">=</span> <span class="nv">Before</span><span class="o">.</span><span class="py">bumpSizes</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">by</span><span class="o">)</span>
+      <span class="k">val</span> <span class="nv">a</span> <span class="k">=</span> <span class="nv">After</span><span class="o">.</span><span class="py">bumpSizes</span><span class="o">(</span><span class="nf">toAfter</span><span class="o">(</span><span class="n">n</span><span class="o">),</span> <span class="n">by</span><span class="o">)</span>
+      <span class="nf">same</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">a</span><span class="o">)</span> <span class="o">====</span> <span class="kc">true</span>
+
+  <span class="k">def</span> <span class="nf">laws</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span>
+      <span class="n">n</span>  <span class="k">&lt;-</span> <span class="nf">genNode</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="py">forAll</span>
+      <span class="n">v1</span> <span class="k">&lt;-</span> <span class="nv">genSize</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">v2</span> <span class="k">&lt;-</span> <span class="nv">genSize</span><span class="o">.</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="k">val</span> <span class="nv">l</span> <span class="k">=</span> <span class="nv">After</span><span class="o">.</span><span class="py">size</span>
+      <span class="k">val</span> <span class="nv">m</span> <span class="k">=</span> <span class="nf">toAfter</span><span class="o">(</span><span class="n">n</span><span class="o">)</span>
+      <span class="nv">l</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="n">v1</span><span class="o">)(</span><span class="n">m</span><span class="o">))</span> <span class="o">====</span> <span class="n">v1</span> <span class="n">and</span>
+        <span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="nv">l</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="n">m</span><span class="o">))(</span><span class="n">m</span><span class="o">)</span> <span class="o">====</span> <span class="n">m</span> <span class="n">and</span>
+        <span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="n">v2</span><span class="o">)(</span><span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="n">v1</span><span class="o">)(</span><span class="n">m</span><span class="o">))</span> <span class="o">====</span> <span class="nv">l</span><span class="o">.</span><span class="py">set</span><span class="o">(</span><span class="n">v2</span><span class="o">)(</span><span class="n">m</span><span class="o">)</span>
+
+<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span>
+  <span class="k">val</span> <span class="nv">results</span> <span class="k">=</span> <span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">.</span><span class="py">map</span> <span class="o">{</span> <span class="n">t</span> <span class="k">=&gt;</span>
+    <span class="k">val</span> <span class="nv">r</span> <span class="k">=</span> <span class="nv">Property</span><span class="o">.</span><span class="py">check</span><span class="o">(</span><span class="nv">t</span><span class="o">.</span><span class="py">withConfig</span><span class="o">(</span><span class="nv">PropertyConfig</span><span class="o">.</span><span class="py">default</span><span class="o">),</span>
+      <span class="nv">t</span><span class="o">.</span><span class="py">result</span><span class="o">,</span> <span class="nv">Seed</span><span class="o">.</span><span class="py">fromTime</span><span class="o">())</span>
+    <span class="nf">println</span><span class="o">(</span><span class="nv">Test</span><span class="o">.</span><span class="py">renderReport</span><span class="o">(</span>
+      <span class="s">"Props"</span><span class="o">,</span> <span class="n">t</span><span class="o">,</span> <span class="n">r</span><span class="o">,</span> <span class="n">ansiCodesSupported</span> <span class="k">=</span> <span class="kc">false</span><span class="o">))</span>
+    <span class="nv">r</span><span class="o">.</span><span class="py">status</span>
+  <span class="o">}</span>
+  <span class="k">if</span> <span class="o">!</span><span class="nv">results</span><span class="o">.</span><span class="py">forall</span><span class="o">(</span><span class="k">_</span> <span class="o">==</span> <span class="nv">Status</span><span class="o">.</span><span class="py">ok</span><span class="o">)</span> <span class="n">then</span> <span class="nv">sys</span><span class="o">.</span><span class="py">exit</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>Spec · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="cp">{-# LANGUAGE OverloadedStrings #-}</span>
+<span class="kr">module</span> <span class="nn">Main</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Control.Monad</span> <span class="p">(</span><span class="nf">unless</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">System.Exit</span> <span class="p">(</span><span class="nf">exitFailure</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Hedgehog</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Gen</span> <span class="k">as</span> <span class="n">Gen</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Range</span> <span class="k">as</span> <span class="n">Range</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Before</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">After</span>
+
+<span class="n">genName</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">String</span>
+<span class="n">genName</span> <span class="o">=</span> <span class="p">(</span><span class="s">"n"</span> <span class="o">&lt;&gt;</span><span class="p">)</span> <span class="o">.</span> <span class="n">show</span> <span class="o">&lt;$&gt;</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="mi">0</span> <span class="mi">9</span><span class="p">)</span>
+
+<span class="n">genSize</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">Int</span>
+<span class="n">genSize</span> <span class="o">=</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">)</span> <span class="mi">20</span><span class="p">)</span>
+
+<span class="n">genNode</span> <span class="o">::</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Gen</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Node</span>
+<span class="n">genNode</span> <span class="n">depth</span> <span class="o">=</span>
+  <span class="kr">let</span> <span class="n">leaf</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Node</span> <span class="o">&lt;$&gt;</span> <span class="n">genName</span> <span class="o">&lt;*&gt;</span> <span class="n">genSize</span> <span class="o">&lt;*&gt;</span> <span class="n">pure</span> <span class="kt">[]</span>
+  <span class="kr">in</span> <span class="kr">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span> <span class="kr">then</span> <span class="n">leaf</span>
+     <span class="kr">else</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">choice</span>
+       <span class="p">[</span> <span class="n">leaf</span>
+       <span class="p">,</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Node</span> <span class="o">&lt;$&gt;</span> <span class="n">genName</span> <span class="o">&lt;*&gt;</span> <span class="n">genSize</span>
+           <span class="o">&lt;*&gt;</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">list</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="mi">0</span> <span class="mi">3</span><span class="p">)</span> <span class="p">(</span><span class="n">genNode</span> <span class="p">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+       <span class="p">]</span>
+
+<span class="n">toAfter</span> <span class="o">::</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Node</span> <span class="o">-&gt;</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Node</span>
+<span class="n">toAfter</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">Node</span> <span class="n">n</span> <span class="n">s</span> <span class="n">cs</span><span class="p">)</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Node</span> <span class="n">n</span> <span class="n">s</span> <span class="p">(</span><span class="n">map</span> <span class="n">toAfter</span> <span class="n">cs</span><span class="p">)</span>
+
+<span class="c1">-- toAfter maps a whole tree faithfully, so After's result can be</span>
+<span class="c1">-- compared with the converted Before result.</span>
+<span class="n">prop_agrees</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_agrees</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">n</span>  <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="p">(</span><span class="n">genNode</span> <span class="mi">3</span><span class="p">)</span>
+  <span class="n">by</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genSize</span>
+  <span class="kt">After</span><span class="o">.</span><span class="n">bumpSizes</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">n</span><span class="p">)</span> <span class="n">by</span> <span class="o">===</span> <span class="n">toAfter</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">bumpSizes</span> <span class="n">n</span> <span class="n">by</span><span class="p">)</span>
+
+<span class="n">prop_laws</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_laws</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">n</span>  <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="p">(</span><span class="n">genNode</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="n">v1</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genSize</span>
+  <span class="n">v2</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genSize</span>
+  <span class="kr">let</span> <span class="n">l</span>   <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="n">sizeLens</span>
+      <span class="n">m</span>   <span class="o">=</span> <span class="n">toAfter</span> <span class="n">n</span>
+  <span class="kt">After</span><span class="o">.</span><span class="n">get</span> <span class="n">l</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="n">v1</span> <span class="n">m</span><span class="p">)</span> <span class="o">===</span> <span class="n">v1</span>
+  <span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">get</span> <span class="n">l</span> <span class="n">m</span><span class="p">)</span> <span class="n">m</span> <span class="o">===</span> <span class="n">m</span>
+  <span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="n">v2</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="n">v1</span> <span class="n">m</span><span class="p">)</span> <span class="o">===</span> <span class="kt">After</span><span class="o">.</span><span class="n">set</span> <span class="n">l</span> <span class="n">v2</span> <span class="n">m</span>
+
+<span class="n">main</span> <span class="o">::</span> <span class="kt">IO</span> <span class="nb">()</span>
+<span class="n">main</span> <span class="o">=</span> <span class="kr">do</span>
+  <span class="n">ok</span> <span class="o">&lt;-</span> <span class="n">checkParallel</span> <span class="o">$</span> <span class="kt">Group</span> <span class="s">"Props"</span>
+    <span class="p">[</span> <span class="p">(</span><span class="s">"bumpSizes: Before == After"</span><span class="p">,</span> <span class="n">prop_agrees</span><span class="p">)</span>
+    <span class="p">,</span> <span class="p">(</span><span class="s">"size lens obeys the laws on generated nodes"</span><span class="p">,</span> <span class="n">prop_laws</span><span class="p">)</span>
+    <span class="p">]</span>
+  <span class="n">unless</span> <span class="n">ok</span> <span class="n">exitFailure</span></code></pre></figure>
+
+</div>
+</div>
+</details>
+
+<h2 id="pitfalls">Pitfalls</h2>
+
+<p>The equation has hypotheses, and each is one of the constructive
+criteria. Where a hypothesis fails, replacing a field with a lens
+changes the program. In a language with referential transparency the OO
+precondition does not become easier to satisfy; it disappears, and the
+move becomes an equation. The structures that make that true are
+gathered in the footnote at the end of this section.</p>
+
+<ul>
+  <li><strong>Partial lenses.</strong> A lens whose <code class="language-plaintext highlighter-rouge">get</code> is not defined on part of the
+source type — reading a field out of a sum type where one branch does
+not carry it — must <code class="language-plaintext highlighter-rouge">error</code>/<code class="language-plaintext highlighter-rouge">sys.error</code> on that region, and the laws
+can only be checked where the lens is defined. Totality is exactly
+the condition that makes a lens a lens everywhere; prefer a record
+shape where every value has the field, or use a prism/traversal for
+the partial case.</li>
+  <li><strong>Laziness and evaluation count.</strong> A lens’s <code class="language-plaintext highlighter-rouge">set</code> is lazy in the new
+value in Haskell — <code class="language-plaintext highlighter-rouge">set l (f s) s'</code> does not force <code class="language-plaintext highlighter-rouge">f s</code> unless the
+result needs it — and <code class="language-plaintext highlighter-rouge">modify f = set l . f . get l</code> can force <code class="language-plaintext highlighter-rouge">f</code>
+earlier than a direct field write would. Where the program is lazy
+about an untouched field (a bonus never read, an id never shown),
+<code class="language-plaintext highlighter-rouge">undefined</code> in that field is a probe: before and after must both
+tolerate it. In Scala a <code class="language-plaintext highlighter-rouge">def</code> recomputes and a <code class="language-plaintext highlighter-rouge">val</code> shares; a lens
+stored as a <code class="language-plaintext highlighter-rouge">val</code> builds its functions once.</li>
+  <li><strong>Strictness.</strong> A <code class="language-plaintext highlighter-rouge">modify</code> reads the focus, applies a function and
+writes it back; if the focus is bottom, the read is forced and the
+result differs from a direct write that never looked. Totality, no
+<code class="language-plaintext highlighter-rouge">undefined</code> and no partial functions, is exactly the condition under
+which this cannot arise. Example 1 probes it with <code class="language-plaintext highlighter-rouge">undefined</code> in the
+untouched field.</li>
+  <li><strong>Composition direction.</strong> <code class="language-plaintext highlighter-rouge">compose outer inner</code> focuses <code class="language-plaintext highlighter-rouge">inner</code>
+<em>inside</em> <code class="language-plaintext highlighter-rouge">outer</code>; the reader writes <code class="language-plaintext highlighter-rouge">inner</code> after <code class="language-plaintext highlighter-rouge">outer</code>, and
+getting the order backwards is a type error, not a runtime bug. Two
+lenses with the same source do not compose at all — there is no
+single focus — which is what stops the “compose a pair” mistake from
+even compiling.</li>
+  <li><strong>The laws as a contract.</strong> A <code class="language-plaintext highlighter-rouge">(get, set)</code> pair is a lens only when
+the three laws hold; a pair that violates PutPut is a lens in name
+only. Any consumer of a lens — including the ones in examples 2 and 3
+— relies on them, so the property that checks them is not decoration.</li>
+</ul>
+
+<p>In each case the fix is the same: restore the hypothesis, by keeping
+the lens total, by using a <code class="language-plaintext highlighter-rouge">val</code> where sharing matters, and by testing
+the laws; or admit that this is not a refactoring and test it as a
+change.</p>
+
+<details class="rf-spec">
+<summary>The functional reading</summary>
+<div>
+
+    <p>A lens is a focus with a reader and a writer. In a referentially
+transparent language a record <code class="language-plaintext highlighter-rouge">s</code> with field <code class="language-plaintext highlighter-rouge">a</code> gives a lens whose
+<code class="language-plaintext highlighter-rouge">get</code> is the field accessor and whose <code class="language-plaintext highlighter-rouge">set</code> is the copy-update; the two
+are one value because the field is a projection, not a location. Nested
+records compose because a projection of a projection is a projection:
+<code class="language-plaintext highlighter-rouge">compose outer inner</code> selects <code class="language-plaintext highlighter-rouge">inner</code> inside <code class="language-plaintext highlighter-rouge">outer</code>, and the
+read-modify-write <code class="language-plaintext highlighter-rouge">modify</code> is <code class="language-plaintext highlighter-rouge">set</code> after <code class="language-plaintext highlighter-rouge">get</code> after <code class="language-plaintext highlighter-rouge">f</code>.</p>
+
+    <p>This is not a new idea dressed up. Foster, Greenwald, Moore, Pierce and
+Schmitt introduced the <em>very well-behaved lens</em> laws (GetPut, PutGet,
+PutPut) and proved that their combinators — composition, map, recursion
+— preserve them, which made it possible to assemble large bidirectional
+transformations from small, verified lenses [<a href="#ref-4">4</a>]. O’Connor showed
+lenses are the coalgebras for the costate comonad, the categorical
+shape of “a structure with one hole”, and conjectured the equivalence
+of the store and functor encodings [<a href="#ref-6">6</a>]; Gibbons and Johnson proved
+the correspondence [<a href="#ref-7">7</a>]. Van Laarhoven’s representation, a lens as a
+polymorphic function <code class="language-plaintext highlighter-rouge">(a -&gt; f a) -&gt; (s -&gt; f s)</code> for every functor <code class="language-plaintext highlighter-rouge">f</code>,
+is what the <em>lens</em> library builds on [<a href="#ref-8">8</a>], [<a href="#ref-9">9</a>]; Pickering, Gibbons and
+Wu’s <em>profunctor optics</em> shows the same idea scales to prisms and
+traversals by generalising the arrow [<a href="#ref-10">10</a>]. Monocle gives Scala the
+same library treatment [<a href="#ref-12">12</a>].</p>
+
+    <p>That is the point. With referential transparency the OO precondition —
+no direct writes — does not become easier to satisfy; it disappears,
+because the writer is a pure function and the type checker enforces the
+corridor. Replacing a field with a lens stops being something you hope
+preserved behaviour and becomes an equation you wrote down.</p>
+
+  </div>
+</details>
+
+<h2 id="verification">Verification</h2>
+
+<p>Because the move is an equation, its correctness is a property: for all
+inputs <em>x</em> in the domain of the entry point, <code class="language-plaintext highlighter-rouge">Before x == After x</code>. That
+is a one-line property in the sense Claessen and Hughes introduced with
+QuickCheck, where a generator produces inputs and the framework searches
+for a counterexample and shrinks it to a minimal one [<a href="#ref-13">13</a>]. The catalogue
+states every entry this way, in Scala and in Haskell, with hedgehog on
+both sides [<a href="#ref-14">14</a>]. Hedgehog is used because its shrinking is integrated
+into the generator, so a shrunk counterexample obeys the same invariants
+as a generated one and the minimal failing input it reports is a real
+input of the program, not an artefact of a separate shrinker. The lens
+laws are second properties — the equation the move is checked against,
+stated directly.</p>
+
+<p>A property is only worth having if it can fail, so each spec above was
+mutation-checked: change <code class="language-plaintext highlighter-rouge">After</code> so it is no longer equivalent — flip a
+sign, swap a boundary, drop a case — confirm the property reports and
+shrinks a counterexample, then restore <code class="language-plaintext highlighter-rouge">After</code>. A property that does
+not fail under mutation is testing the generator, not the refactoring.
+The lens examples are especially well protected: the laws are stated
+for the <em>lens itself</em>, so a setter that drops the other fields fails
+the laws before it ever reaches the equality property.</p>
+
+<p>To run everything on this page yourself, from a checkout of
+<a href="https://github.com/Constructive-Programming/website">the site repository</a>:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sh pages/refactorings/replace-mutable-fields-with-lenses/run.sh
+</code></pre></div></div>
+
+<p>It needs <a href="https://scala-cli.virtuslab.org/">scala-cli</a> and either GHC
+with hedgehog installed or Docker, and ends with <code class="language-plaintext highlighter-rouge">all properties passed</code>.</p>
+
+<h2 id="references">References</h2>
+
+<ol>
+<li id="ref-1">Martin Fowler. <em>Refactoring: Improving the Design of Existing Code</em>. Addison-Wesley, 1999. Chapter on self-encapsulation and the <em>Encapsulate Field</em> catalogue entry. <a href="https://martinfowler.com/books/refactoring.html">https://martinfowler.com/books/refactoring.html</a></li>
+<li id="ref-2">Martin Fowler. <em>Encapsulate Variable</em> (formerly <em>Encapsulate Field</em>). Refactoring.com, online edition. <a href="https://refactoring.com/catalog/encapsulateField.html">https://refactoring.com/catalog/encapsulateField.html</a></li>
+<li id="ref-3">Martin Fowler. <em>Remove Setting Method</em>. Refactoring.com, online edition. <a href="https://refactoring.com/catalog/removeSettingMethod.html">https://refactoring.com/catalog/removeSettingMethod.html</a></li>
+<li id="ref-4">J. Nathan Foster, Michael B. Greenwald, Jonathan T. Moore, Benjamin C. Pierce and Alan Schmitt. &ldquo;Combinators for Bidirectional Tree Transformations: A Linguistic Approach to the View-Update Problem&rdquo;. <em>ACM Transactions on Programming Languages and Systems</em> 29(3):17, 2007 (also POPL 2005). <a href="https://doi.org/10.1145/1232420.1232424">https://doi.org/10.1145/1232420.1232424</a></li>
+<li id="ref-5">Edward Kmett and contributors. <em>lens: Lenses, Folds and Traversals</em>. The library documentation states the three lens laws (get-put, put-get, put-put) that a lens must satisfy. <a href="https://hackage.haskell.org/package/lens">https://hackage.haskell.org/package/lens</a></li>
+<li id="ref-6">Russell O&rsquo;Connor. &ldquo;Functor is to Lens as Applicative is to Biplate: Introducing Multiplate&rdquo;. In <em>Proceedings of the ACM SIGPLAN Workshop on Generic Programming (WGP 2011)</em>, pp. 25&ndash;36. <a href="https://arxiv.org/abs/1103.2841">https://arxiv.org/abs/1103.2841</a> (also the costate-comonad characterisation, arXiv version)</li>
+<li id="ref-7">Jeremy Gibbons and Michael Johnson. &ldquo;Relating Algebraic and Coalgebraic Descriptions of Lenses&rdquo;. <em>Electronic Communications of the EASST</em> 49:1&ndash;16, 2012 (Workshop on Bidirectional Transformations 2012). <a href="https://doi.org/10.14279/tuj.eceasst.49.726">https://doi.org/10.14279/tuj.eceasst.49.726</a></li>
+<li id="ref-8">Twan van Laarhoven. &ldquo;Talk on Lenses&rdquo;. Slides, Radboud University Nijmegen, 17 May 2011. Introduced the functor-based (van Laarhoven) representation. <a href="https://www.twanvl.nl/blog/news/2011-05-19-lenses-talk">https://www.twanvl.nl/blog/news/2011-05-19-lenses-talk</a></li>
+<li id="ref-9">Edward Kmett. <em>Control.Lens</em>. Hackage package documentation for the <em>lens</em> library. <a href="https://hackage.haskell.org/package/lens/docs/Control-Lens.html">https://hackage.haskell.org/package/lens/docs/Control-Lens.html</a></li>
+<li id="ref-10">Matthew Pickering, Jeremy Gibbons and Nicolas Wu. &ldquo;Profunctor Optics: Modular Data Accessors&rdquo;. <em>The Art, Science, and Engineering of Programming</em> 1(2):7, 2017. <a href="https://doi.org/10.22152/programming-journal.org/2017/1/7">https://doi.org/10.22152/programming-journal.org/2017/1/7</a></li>
+<li id="ref-11">Mirko Stocker. <em>Scala Refactoring</em>. Master&rsquo;s thesis, HSR Hochschule f&uuml;r Technik Rapperswil, 2010. Catalogues pure-function accessor refactorings including field encapsulation. <a href="https://eprints.ost.ch/id/eprint/286/">https://eprints.ost.ch/id/eprint/286/</a></li>
+<li id="ref-12">Julien Truffaut and contributors. <em>Monocle: Optics Library for Scala</em>. <a href="https://www.optics.dev/Monocle/">https://www.optics.dev/Monocle/</a></li>
+<li id="ref-13">Koen Claessen and John Hughes. &ldquo;QuickCheck: a lightweight tool for random testing of Haskell programs&rdquo;. In <em>Proceedings of the ACM SIGPLAN International Conference on Functional Programming (ICFP 2000)</em>, pp. 268&ndash;279. <a href="https://doi.org/10.1145/351240.351266">https://doi.org/10.1145/351240.351266</a></li>
+<li id="ref-14">Jacob Stanley and contributors. <em>Hedgehog: release with confidence, state-of-the-art property testing</em>. <a href="https://github.com/hedgehogqa/haskell-hedgehog">https://github.com/hedgehogqa/haskell-hedgehog</a> and <a href="https://github.com/hedgehogqa/scala-hedgehog">https://github.com/hedgehogqa/scala-hedgehog</a></li>
+</ol>
+
+    </section>
+    <!-- Category and Tag list -->
+    <div class="tag-category-container">
+        <!-- Category list -->
+        
+        
+
+
+
+  <div class="category-list"></div>
+
+
+
+        <!-- Tag list for portfolio -->
+        
+        
+
+
+
+  <div class="tag-list" data-testid="tag-list">
+    <ul>
+      
+        <li class="meta">Tags</li>
+      
+
+      
+        <li><a class="button" data-testid="tag-link" href="/pr-preview/pr-13/tags#refactorings">
+          <p><i class="fa-tag" aria-hidden="true"></i>refactorings</p>
+        </a></li>
+      
+        <li><a class="button" data-testid="tag-link" href="/pr-preview/pr-13/tags#replace-mutable-fields-with-lenses">
+          <p><i class="fa-tag" aria-hidden="true"></i>replace-mutable-fields-with-lenses</p>
+        </a></li>
+      
+    </ul>
+  </div>
+
+
+    </div>
+</article>
+
+    </main>
+    
+    <footer class="site-footer"> <p class="text"> Copyright Constructive Programming, 2026 </p> <p class="text footer-legal">Constructive Programming · E&amp;O insurance available on request.</p> <div class="footer-icons"> <ul> <li> <a href="/pr-preview/pr-13/feed.xml" title="Follow RSS feed" aria-label="RSS feed" target="_blank" rel="noopener"> <svg class="cp-social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20 5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1Z"/> </svg> </a> </li> <li> <a href="https://github.com/Constructive-Programming" title="Follow on Github" aria-label="Github" target="_blank" rel="noopener"><svg class="cp-social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/> </svg></a> </li> <li> <a href="https://www.linkedin.com/in/rodolfohansen" title="Follow on Linkedin" aria-label="Linkedin" target="_blank" rel="noopener"><svg class="cp-social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.063 2.063 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/> </svg></a> </li> <li> <a href="mailto:consulting@constructive.dev" title="Follow on Mail" aria-label="Mail" target="_blank" rel="noopener"><svg class="cp-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"> <rect x="3" y="5" width="18" height="14" rx="2"/> <path d="m3 7 9 6 9-6"/> </svg></a> </li> <li> <a href="https://medium.com/@rodolfohansen" title="Follow on Medium" aria-label="Medium" target="_blank" rel="noopener"><svg class="cp-social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M13.54 12c0 3.04-2.42 5.5-5.42 5.5S2.7 15.04 2.7 12s2.42-5.5 5.42-5.5 5.42 2.46 5.42 5.5zm5.95 0c0 2.86-1.21 5.18-2.71 5.18s-2.71-2.32-2.71-5.18 1.21-5.18 2.71-5.18 2.71 2.32 2.71 5.18zM24 12c0 2.56-.43 4.64-.95 4.64s-.95-2.08-.95-4.64.43-4.64.95-4.64S24 9.44 24 12z"/> </svg></a> </li> </ul> </div> </footer>
+  </body>
+</html>
