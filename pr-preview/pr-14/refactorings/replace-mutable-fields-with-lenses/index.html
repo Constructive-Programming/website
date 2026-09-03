@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.5, maximum-scale=5"> <!-- Theme Mode --> <script> const darkBtn = "Dark"; const lightBtn = "Light"; const isAutoTheme = true; const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; if (isAutoTheme) { document.documentElement.setAttribute('data-theme', sessionStorage.getItem('theme') ?? preferredTheme); } else { document.documentElement.setAttribute('data-theme', "auto"); } </script> <!-- Globals consumed by main.min.js. We don't use the cookie/GA features but the script references these variables unguarded; declaring them as empty strings makes main.min.js no-op those branches and still attach its DOMContentLoaded listeners. --> <script> const cookieName = 'cookie-notice-dismissed-https://www.constructive.dev'; const isCookieConsent = ''; const analyticsName = ''; const analyticsNameGA4 = ''; </script> <!-- Theme JS — KaTeX init + theme-toggle + navbar toggle. --> <script defer src="/pr-preview/pr-14/assets/js/main.min.js"></script> <!-- Local stylesheet — drives everything: type scale, layout, grid, cards, buttons. No external CSS framework. --> <link rel="stylesheet" href="/pr-preview/pr-14/assets/css/main.css"> <!-- Favicon set — SVG primary, ICO fallback, apple-touch for iOS. --> <link rel="icon" type="image/svg+xml" href="/pr-preview/pr-14/assets/img/favicon.svg"> <link rel="alternate icon" type="image/x-icon" href="/pr-preview/pr-14/assets/img/favicon.ico"> <link rel="apple-touch-icon" sizes="180x180" href="/pr-preview/pr-14/assets/img/apple-touch-icon.png"> <!-- RSS auto-discovery --> <link rel="alternate" type="application/rss+xml" title="Constructive Programming" href="https://www.constructive.dev/pr-preview/pr-14/feed.xml"> <!-- KaTeX 0.16.38 --> <script defer src="/pr-preview/pr-14/assets/js/vendor/katex.min.js"></script> <script defer src="/pr-preview/pr-14/assets/js/vendor/katex.auto-render.min.js" onload="renderMathInElement(document.body);"></script> <!-- Mermaid 11.13.0 --> <!-- Simple-Jekyll-Search 2.1.3 --> <script src="/pr-preview/pr-14/assets/js/vendor/simple-jekyll-search.min.js" type="text/javascript"></script> <!-- Open Graph + Twitter --> <meta property="og:image" content="https://www.constructive.dev/pr-preview/pr-14/assets/img/og-image.png"> <meta name="twitter:image" content="https://www.constructive.dev/pr-preview/pr-14/assets/img/og-image.png"> <meta name="twitter:card" content="summary_large_image"> <meta property="og:type" content="website" /> <!-- Begin Jekyll SEO tag v2.9.0 --> <title>Replace Mutable Fields with Lenses | Constructive Programming</title> <meta name="generator" content="Jekyll v4.4.1" /> <meta property="og:title" content="Replace Mutable Fields with Lenses" /> <meta property="og:locale" content="en_US" /> <meta name="description" content="Software consultancy for platform teams: AI-accelerated delivery inside type-driven guardrails. Architecture reviews, embedded senior engineers (Scala, Rust, TypeScript), and agent-native development workflows." /> <meta name="twitter:description" property="og:description" content="Software consultancy for platform teams: AI-accelerated delivery inside type-driven guardrails. Architecture reviews, embedded senior engineers (Scala, Rust, TypeScript), and agent-native development workflows." /> <link rel="canonical" href="https://www.constructive.dev/pr-preview/pr-14/refactorings/replace-mutable-fields-with-lenses/" /> <meta property="og:url" content="https://www.constructive.dev/pr-preview/pr-14/refactorings/replace-mutable-fields-with-lenses/" /> <meta property="og:site_name" content="Constructive Programming" /> <meta property="og:type" content="website" /> <meta name="twitter:card" content="summary" /> <meta name="twitter:title" content="Replace Mutable Fields with Lenses" /> <script type="application/ld+json"> {"@context":"https://schema.org","@type":"WebPage","description":"Software consultancy for platform teams: AI-accelerated delivery inside type-driven guardrails. Architecture reviews, embedded senior engineers (Scala, Rust, TypeScript), and agent-native development workflows.","headline":"Replace Mutable Fields with Lenses","url":"https://www.constructive.dev/pr-preview/pr-14/refactorings/replace-mutable-fields-with-lenses/"}</script> <!-- End Jekyll SEO tag --> </head>
+  <body>
+    
+    <header class="site-header"> <!-- Logo and title --> <div class="branding"> <a class="site-title" aria-label="Constructive Programming" href="/pr-preview/pr-14/"> Constructive Programming </a> </div> <!-- Toggle menu --> <nav class="clear"> <a aria-label="Open menu" id="pull" class="toggle" href="#"> <svg class="cp-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <rect x="4" y="6" width="16" height="2" rx="1"/> <rect x="4" y="11" width="16" height="2" rx="1"/> <rect x="4" y="16" width="16" height="2" rx="1"/> </svg> </a> <!-- Menu --> <ul class="hide"> <li class="separator"> | </li> <li> <a class="clear" aria-label="About" title="About" href="/pr-preview/pr-14/about/"><span class="navbar-label">About</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Engagements" title="Engagements" href="/pr-preview/pr-14/engagements/"><span class="navbar-label">Engagements</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Libraries" title="Libraries" href="/pr-preview/pr-14/libraries/"><span class="navbar-label">Libraries</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Refactorings" title="Refactorings" href="/pr-preview/pr-14/refactorings/"><span class="navbar-label">Refactorings</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Search" title="Search" href="/pr-preview/pr-14/search/"><i class="navbar-icon fa-search" aria-hidden="true"></i><span class="navbar-label navbar-label-with-icon">Search</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Tags" title="Tags" href="/pr-preview/pr-14/tags/"><i class="navbar-icon fa-tags" aria-hidden="true"></i><span class="navbar-label navbar-label-with-icon">Tags</span> </a> </li> <li class="separator"> | </li> <li><a id="theme-toggle" title="Dark" aria-label="Dark" onclick="themeToggle()"></a></li> </ul> </nav> </header>
+    <main class="content">
+      
+<article >
+    <header id="main" style="background-image: url('')">
+        <div class="title-padder">
+            <h1 id="Replace+Mutable+Fields+with+Lenses" class="title subtitle-as-header">Replace mutable fields with lenses: package how to reach a field and what to do with it as one optic value — read becomes get, write becomes set or modify; inline the lens, and a projection no one composes becomes a field again</h1>
+            
+        </div>
+    </header>
+    <section class="post-content">
+        <p class="rf-crumb"><a href="/pr-preview/pr-14/refactorings/">← The refactoring catalogue</a> · 2 of 35</p>
+
+<p>A mutable field is a place where a class’s invariants can be broken:
+any method can read it, any method can write it, and nothing stops a
+write from putting the object into a state the other methods did not
+anticipate. The object-oriented ladder up this smell is well worn —
+Fowler’s <em>Encapsulate Variable</em> (the catalogue entry that used to be
+<em>Encapsulate Field</em>, and before that <em>Self-Encapsulate Field</em>) hides
+the field behind accessor methods [<a href="#ref-1">1</a>], [<a href="#ref-2">2</a>], and <em>Remove Setting
+Method</em> then deletes the setter once the field no longer needs to be
+written from outside the class [<a href="#ref-3">3</a>]. The field is still a field; it is
+just reached through a corridor.</p>
+
+<p>The functional reading starts at the same smell and goes further out.
+A field of an immutable record is a <em>projection</em> — a way to reach
+into a value — and the useful thing about the world of optics is that
+these projections <em>compose</em>. A lens reaches one field of a record, a
+prism one branch of a sum, a traversal every element of a container,
+and the projection you need for a job is built by chaining smaller
+ones: <code class="language-plaintext highlighter-rouge">prism .andThen lens</code>, <code class="language-plaintext highlighter-rouge">each .andThen prism .andThen lens</code>.
+That separation is the whole point — it splits <em>how do I get to field
+A</em> from <em>what should I do once I have it</em> — so the same tiny optic is
+reused on one node, on every node of a tree, and against a branch of
+a sum inside a list, without being rewritten. Replacing a mutable
+field with a lens means making the record immutable and routing every
+read through <code class="language-plaintext highlighter-rouge">get</code> and every write through <code class="language-plaintext highlighter-rouge">set</code> (or <code class="language-plaintext highlighter-rouge">modify</code>, which
+reads, applies a pure function and writes in one step). The state
+transition is a value again, and the optic combinators are lawful by
+construction — the contract that makes a rewrite a refactoring is
+built in, not hoped for — so correctness comes for free; the
+libraries ship law-solvers that confirm any optic you write by hand
+[<a href="#ref-4">4</a>], [<a href="#ref-11">11</a>].</p>
+
+<p>The inverse direction is justified when the decoupling does not earn
+its keep: a lens that is never composed, a projection whose separation
+of <em>how</em> from <em>what</em> no one exploits, or — the strongest smell — a
+codebase with no cross-domain boundaries, where the whole record
+travels everywhere and only the target of the projection would ever
+need to pass across a seam. Inlining the lens — replacing <code class="language-plaintext highlighter-rouge">get</code>,
+<code class="language-plaintext highlighter-rouge">set</code> and <code class="language-plaintext highlighter-rouge">modify</code> at their use sites with direct field access —
+removes indirection that no longer names anything. The catalogue
+presents the two directions as one equation, readable both ways;
+which way you go records a judgement about whether the field is part
+of a <em>path</em> or a <em>leaf</em>. The <a href="https://eo.constructive.dev/cookbook">eo cookbook</a>
+is a worked, tested reference for the optics side of this: three jobs
+optics do best — navigate structures, decouple modules, thread
+effects — each recipe runnable against the library.</p>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>Reach for the lens when access to a field needs to be <em>decoupled from
+its manipulation</em>. The smell is multiple long methods that do too
+much — the complexity of reaching the values is mixed up with the
+code for the changes you want to make, and each operation re-derives
+its own path. A lens separates the two: how you get to a value and
+what you do once you have it stop being one entangled method. The
+optics version of the corridor is a <em>value</em>, so it can be passed
+around, stored, and composed into paths that reach several levels
+down without ever repeating the intermediate records; and a function
+that needs “every <code class="language-plaintext highlighter-rouge">Instant</code> in whatever you hand me” can call the
+optic instead of the type. When the invariant itself matters — a
+balance that must never go negative, a size that must bracket its
+children — the pure writer makes the transition a value the type
+system and the tests can see, and a <em>bad</em> write is a failed check
+rather than a corrupted object.</p>
+
+<p>Reach for the inverse when the lens is speculative generality, or when
+there is nothing for the decoupling to mediate. The smell that drives
+Inline is the mirror image: a field whose updates are all one level
+deep, a lens composed nowhere, a get/set pair whose writer is
+<code class="language-plaintext highlighter-rouge">const</code>-like and whose reader is the identity — and no cross-domain
+boundaries in sight, so the full structure may pass through every seam
+and nothing is ever isolated to the target of the projection. The
+abstraction costs a reader a detour — what is <code class="language-plaintext highlighter-rouge">set v₂ (set v₁ s)</code>
+doing when the program only ever calls <code class="language-plaintext highlighter-rouge">set</code> once? — and it costs the
+compiler nothing it can deduce. When all the code does with the field
+is read it once, or write it once, a plain field or a pair of
+functions is clearer.</p>
+
+<h2 id="the-move">The move</h2>
+
+<p>Fowler’s mechanics are short. <em>Encapsulate Variable</em>: create a
+function that reads the field, create one that writes it, replace
+every read with a call to the reader and every write with a call to
+the writer, and test [<a href="#ref-2">2</a>]; the precondition is that nothing reaches the
+field directly. <em>Remove Setting Method</em>: once the field can be
+initialised and never needs to be reassigned, delete the setter and
+initialise at construction [<a href="#ref-3">3</a>]. Read together they are the OO route to
+what the lens packages: reads through a named getter, writes through a
+named setter, and no bare <code class="language-plaintext highlighter-rouge">field = ...</code> anywhere. Stocker’s Scala
+refactoring catalogue has the same move — turning a mutable field into
+a pure accessor pair moves the <em>writes</em>, and that is the whole
+analysis [<a href="#ref-10">10</a>].</p>
+
+<p>In the functional reading the move is mechanical. Make the record
+immutable. Define <code class="language-plaintext highlighter-rouge">get</code> as the field accessor and <code class="language-plaintext highlighter-rouge">set</code> as a function
+returning a copy with the field replaced; package them as a lens
+value. Replace reads with <code class="language-plaintext highlighter-rouge">get</code>, writes with <code class="language-plaintext highlighter-rouge">set</code>, read-modify-write
+with <code class="language-plaintext highlighter-rouge">modify</code>. Where a field sits inside other records, compose the
+lenses along the path; where it sits under a branch of a sum, compose
+a prism first; where the field is one of many, compose a traversal.
+The OO precondition — no direct access — is replaced by a type: the
+only way to reach the field is through the optic, and the type
+checker enforces it. In practice the optic for a field or branch is
+often <em>auto-derivable</em> from the type — a library macro or generator
+(<code class="language-plaintext highlighter-rouge">eo</code>’s <code class="language-plaintext highlighter-rouge">lens</code>/<code class="language-plaintext highlighter-rouge">prism</code>, Monocle’s optics, <code class="language-plaintext highlighter-rouge">lens</code>’s Template Haskell)
+writes the “how to reach” for you, and you keep the “what to do”
+[<a href="#ref-7">7</a>], [<a href="#ref-11">11</a>].</p>
+
+<h2 id="the-functional-reading">The functional reading</h2>
+
+<p>An optic is a value that knows how to reach a <em>focus</em> inside a source
+and how to rebuild the source around a new focus. The families differ
+in how many foci they address: a lens reaches exactly one field of a
+product, a prism one branch of a sum, a traversal every element of a
+container. They share one shape — see, modify, rebuild — which is what
+makes them <em>compose</em>: <code class="language-plaintext highlighter-rouge">prism .andThen lens</code> says “that branch, then
+that field”, and <code class="language-plaintext highlighter-rouge">each .andThen prism .andThen lens</code> says “every
+element, that branch, that field”. The rewrite itself is a pure
+function on the focus: how you get there is a value, what you do there
+is a function, and the two are independent. This is the optics view of
+the same ladder Fowler climbs — the corridor of accessor methods
+becomes a composable value, and the precondition becomes a type.</p>
+
+<p>The theoretical backbone is the same one that made lenses lawful,
+not just convenient. Foster, Greenwald, Moore, Pierce and Schmitt
+defined the well-behaved lens families and proved their combinators —
+composition, map, recursion — preserve the laws, which is where
+“lawful by construction” comes from [<a href="#ref-4">4</a>]. O’Connor, and then Gibbons
+and Johnson, gave the categorical reading — lenses are the coalgebras
+for the store comonad — which is why the different encodings coincide
+[<a href="#ref-5">5</a>], [<a href="#ref-6">6</a>]. Van Laarhoven’s representation made the encoding
+practical as a functor-polymorphic function, which is what Kmett’s
+<em>lens</em> library builds on [<a href="#ref-7">7</a>], [<a href="#ref-8">8</a>]; Pickering, Gibbons and Wu’s
+<em>profunctor optics</em> shows the same idea scales to prisms and
+traversals [<a href="#ref-9">9</a>]. The <a href="https://eo.constructive.dev">eo library</a> is our
+own working treatment: optics derived from the type with one
+<code class="language-plaintext highlighter-rouge">.andThen</code> surface, and a <a href="https://eo.constructive.dev/cookbook">cookbook</a>
+of runnable recipes organised by the three jobs optics do best —
+navigating structures, decoupling modules, and threading effects. The
+three examples below follow its “contingent fields”, “whole trees”
+and “arbitrary structure” recipes.</p>
+
+<h2 id="to-and-from">To and from</h2>
+
+<figure class="rf-figure">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 196" role="img" aria-labelledby="koan-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="koan-title">Replace mutable fields with lenses / replace lenses with mutable fields. Left: a record field read and written directly, spelled out at every call site. Right: the same field as a lens value packaging get :: s -&gt; a and set :: a -&gt; s -&gt; s, so every read is get, every write is set or modify. The arrow to the right is replace (package get and set as one composable value); the arrow to the left is inline (drop the lens and access the field directly). The three lens laws — get (set v s) = v, set (get s) s = s, set v2 (set v1 s) = set v2 s — are the equation the move is checked against.</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="28">before</text>
+    <text x="424" y="28">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="40" width="200" height="104" rx="4" />
+    <rect x="424" y="40" width="200" height="104" rx="4" />
+  </g>
+  <g fill="currentColor" font-size="14" text-anchor="middle">
+    <text x="116" y="66">field <tspan font-style="italic" font-weight="700">balance</tspan></text>
+    <text x="524" y="62">balanceLens =</text>
+    <text x="524" y="84">Lens { get, set }</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".9">
+    <text x="116" y="92">read: <tspan font-style="italic">a.balance</tspan></text>
+    <text x="116" y="110">write: <tspan font-style="italic">copy</tspan> with balance</text>
+    <text x="116" y="132">every call site spells the</text>
+    <text x="116" y="146">field out again</text>
+    <text x="524" y="108">read: <tspan font-weight="700">get</tspan> balanceLens</text>
+    <text x="524" y="128">write: <tspan font-weight="700">set</tspan> / <tspan font-weight="700">modify</tspan></text>
+    <text x="524" y="148">lens composes along paths</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M232 76 H398" />
+    <path d="M408 116 H242" />
+  </g>
+  <g fill="currentColor">
+    <path d="M398 72.5 L406 76 L398 79.5 Z" />
+    <path d="M242 112.5 L234 116 L242 119.5 Z" />
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle">
+    <text x="320" y="62">replace (package get + set into a lens)</text>
+    <text x="320" y="132">inline (drop the lens, access the field)</text>
+  </g>
+  <text x="320" y="176" fill="currentColor" font-size="12" text-anchor="middle" opacity=".75"><tspan font-style="italic">get</tspan> (<tspan font-style="italic">set v s</tspan>) = <tspan font-style="italic">v</tspan> &#183; <tspan font-style="italic">set</tspan> (<tspan font-style="italic">get s</tspan>) <tspan font-style="italic">s</tspan> = <tspan font-style="italic">s</tspan> &#183; <tspan font-style="italic">set v&#8322;</tspan> (<tspan font-style="italic">set v&#8321; s</tspan>) = <tspan font-style="italic">set v&#8322; s</tspan></text>
+</svg>
+
+<figcaption>The koan. One equation, read in two directions: replace
+(package the reader and pure writer of a field as an optic value —
+the "how to reach" and the "what to do") to the right, inline (drop
+the optic, access the field directly) to the left. The move is
+lawful by construction: the optic families are derived from the types
+and compose, and the libraries ship solvers that check the ones you
+write by hand.</figcaption>
+</figure>
+
+<p>The catalogue lists each refactoring in both directions because the two
+moves are one equation read left to right and right to left. Replace a
+field with a lens: define <code class="language-plaintext highlighter-rouge">get</code> and <code class="language-plaintext highlighter-rouge">set</code> for the field, replace every
+read with <code class="language-plaintext highlighter-rouge">get</code>, every write with <code class="language-plaintext highlighter-rouge">set</code> or <code class="language-plaintext highlighter-rouge">modify</code>, and where the
+field is nested compose the lenses. Inline a lens: replace <code class="language-plaintext highlighter-rouge">get</code>,
+<code class="language-plaintext highlighter-rouge">set</code> and <code class="language-plaintext highlighter-rouge">modify</code> at their use sites with direct access, and delete
+the optic. Both directions are checked by the same property: for all
+generated inputs, the before-program and the after-program agree on
+the entry point.</p>
+
+<h2 id="three-examples">Three examples</h2>
+
+<p>Each example is the same program twice, <code class="language-plaintext highlighter-rouge">Before</code> and <code class="language-plaintext highlighter-rouge">After</code>, in Scala 3
+and in Haskell. The optic building blocks — a lens, a prism, a
+traversal, and the compositions between them — and the hedgehog spec
+runner live in the entry’s <code class="language-plaintext highlighter-rouge">shared/</code> directory: compiled by <code class="language-plaintext highlighter-rouge">run.sh</code>,
+never shown on the page, so each example is the move itself. The entry
+point keeps its name and its type, the optic is the only difference,
+and a hedgehog property verifies that both versions agree on every
+generated input. The three are eo’s “navigate structures” recipes, in
+increasing depth of nesting.</p>
+
+<h3 id="1--a-single-node-prism-and-lens-composed">1 · A single node: prism and lens composed</h3>
+
+<p>A variable’s name in one node of an expression tree. The Before
+version is a hand-written match that rebuilds the hit branch and lets
+every other shape pass. The After version is one composed optic —
+<code class="language-plaintext highlighter-rouge">prism .andThen lens</code>: the prism decides whether the value is a <code class="language-plaintext highlighter-rouge">Var</code>
+(the hit), the lens edits the <code class="language-plaintext highlighter-rouge">name</code> inside it, and every miss passes
+through untouched. The <em>how</em> and the <em>what</em> are separate values; the
+second property checks that the hit is uppercased and every miss
+passes through.</p>
+
+<figure class="rf-figure">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 200" role="img" aria-labelledby="d1-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="d1-title">Replacing a hand-written match with a composed prism and lens. Before: upperVarName(e) matches Var(n, r), rebuilds it, and passes every other shape through; the dotted region is the match and rebuild. After: varName = prism(varP).andThen(lens(nameL)) — the prism decides whether the value is a Var, the lens edits its name, and one over(varName, upper) applies the rewrite; the miss passes through untouched.</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="26">before</text>
+    <text x="428" y="26">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="36" width="388" height="128" rx="4" />
+    <rect x="428" y="36" width="336" height="128" rx="4" />
+  </g>
+  <g fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3">
+    <rect x="44" y="62" width="332" height="34" rx="3" />
+    <rect x="44" y="112" width="332" height="26" rx="3" />
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="50">upperVarName(e) = e match</text>
+    <text x="40" y="70">case Var(n, r) =&gt; Var(n.toUpper, r)</text>
+    <text x="40" y="88">case other =&gt; other</text>
+    <text x="52" y="108">match + rebuild</text>
+    <text x="52" y="126">pass-through</text>
+    <text x="440" y="50">varName = varP .andThen nameL</text>
+    <text x="452" y="70">over(varName, _.toUpperCase):</text>
+    <text x="464" y="88">prism decides the hit (Var)</text>
+    <text x="464" y="106">lens edits the name</text>
+    <text x="464" y="124">miss passes through</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1">
+    <circle cx="386" cy="132" r="7.5" />
+    <circle cx="428" cy="132" r="7.5" />
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle">
+    <text x="386" y="136">1</text>
+    <text x="428" y="136">1</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M406 132 H414" />
+  </g>
+  <g fill="currentColor">
+    <path d="M414 128.5 L422 132 L414 135.5 Z" />
+  </g>
+</svg>
+
+</figure>
+
+<div class="rf-pair">
+<div><h4>Before · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Uppercase the variable of one Var node: a hand-written match</span>
+<span class="c1">// that rebuilds the hit branch and lets every other shape pass.</span>
+<span class="k">object</span> <span class="nc">Before</span><span class="k">:</span>
+  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Var</span><span class="o">(</span><span class="kt">name:</span> <span class="kt">String</span><span class="o">,</span> <span class="kt">ref:</span> <span class="kt">Int</span><span class="o">)</span>
+  <span class="n">enum</span> <span class="nc">Expr</span><span class="k">:</span>
+    <span class="kt">case</span> <span class="kt">EVar</span><span class="o">(</span><span class="kt">v:</span> <span class="kt">Var</span><span class="o">)</span>
+    <span class="kt">case</span> <span class="kt">EApp</span><span class="o">(</span><span class="kt">f:</span> <span class="kt">Expr</span><span class="o">,</span> <span class="kt">x:</span> <span class="kt">Expr</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">ELam</span><span class="o">(</span><span class="n">bind</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">body</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span>
+
+  <span class="k">import</span> <span class="nn">Expr.</span><span class="o">*</span>
+
+  <span class="k">def</span> <span class="nf">upperVarName</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="n">e</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nc">EVar</span><span class="o">(</span><span class="n">v</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">EVar</span><span class="o">(</span><span class="nv">v</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">name</span> <span class="k">=</span> <span class="nv">v</span><span class="o">.</span><span class="py">name</span><span class="o">.</span><span class="py">toUpperCase</span><span class="o">))</span>
+    <span class="k">case</span> <span class="n">other</span>   <span class="k">=&gt;</span> <span class="n">other</span></code></pre></figure>
+
+</div>
+<div><h4>Before · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Uppercase the variable of one Var node: a hand-written match</span>
+<span class="c1">-- that rebuilds the hit branch and lets every other shape pass.</span>
+<span class="kr">module</span> <span class="nn">Before</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Data.Char</span> <span class="p">(</span><span class="nf">toUpper</span><span class="p">)</span>
+
+<span class="kr">data</span> <span class="kt">Var</span>   <span class="o">=</span> <span class="kt">Var</span>   <span class="p">{</span> <span class="n">vName</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">vRef</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+<span class="kr">data</span> <span class="kt">Expr</span>  <span class="o">=</span> <span class="kt">EVar</span> <span class="kt">Var</span> <span class="o">|</span> <span class="kt">EApp</span> <span class="kt">Expr</span> <span class="kt">Expr</span> <span class="o">|</span> <span class="kt">ELam</span> <span class="kt">String</span> <span class="kt">Expr</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="n">upperVarName</span> <span class="o">::</span> <span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">Expr</span>
+<span class="n">upperVarName</span> <span class="p">(</span><span class="kt">EVar</span> <span class="n">v</span><span class="p">)</span> <span class="o">=</span> <span class="kt">EVar</span> <span class="n">v</span> <span class="p">{</span> <span class="n">vName</span> <span class="o">=</span> <span class="n">map</span> <span class="n">toUpper</span> <span class="p">(</span><span class="n">vName</span> <span class="n">v</span><span class="p">)</span> <span class="p">}</span>
+<span class="n">upperVarName</span> <span class="n">e</span>        <span class="o">=</span> <span class="n">e</span></code></pre></figure>
+
+</div>
+</div>
+
+<div class="rf-pair">
+<div><h4>After · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Same, as one composed optic: the prism matches the Var branch,</span>
+<span class="c1">// the lens edits its name, every other shape passes through.</span>
+<span class="k">object</span> <span class="nc">After</span><span class="k">:</span>
+  <span class="kt">import</span> <span class="kt">Optics.*</span>
+
+  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Var</span><span class="o">(</span><span class="kt">name:</span> <span class="kt">String</span><span class="o">,</span> <span class="kt">ref:</span> <span class="kt">Int</span><span class="o">)</span>
+  <span class="n">enum</span> <span class="nc">Expr</span><span class="k">:</span>
+    <span class="kt">case</span> <span class="kt">EVar</span><span class="o">(</span><span class="kt">v:</span> <span class="kt">Var</span><span class="o">)</span>
+    <span class="kt">case</span> <span class="kt">EApp</span><span class="o">(</span><span class="kt">f:</span> <span class="kt">Expr</span><span class="o">,</span> <span class="kt">x:</span> <span class="kt">Expr</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">ELam</span><span class="o">(</span><span class="n">bind</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">body</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span>
+
+  <span class="k">import</span> <span class="nn">Expr.</span><span class="o">*</span>
+
+  <span class="k">val</span> <span class="nv">varP</span><span class="k">:</span> <span class="kt">Prism</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">Var</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">Prism</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">Var</span><span class="o">](</span>
+      <span class="o">{</span> <span class="k">case</span> <span class="nc">EVar</span><span class="o">(</span><span class="n">v</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">(</span><span class="n">v</span><span class="o">);</span> <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="nc">None</span> <span class="o">},</span>
+      <span class="nc">EVar</span><span class="o">(</span><span class="k">_</span><span class="o">),</span>
+    <span class="o">)</span>
+  <span class="k">val</span> <span class="nv">nameL</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Var</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">Lens</span><span class="o">[</span><span class="kt">Var</span>, <span class="kt">String</span><span class="o">](</span><span class="nv">_</span><span class="o">.</span><span class="py">name</span><span class="o">,</span> <span class="o">(</span><span class="n">v</span><span class="o">,</span> <span class="n">n</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">v</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">name</span> <span class="k">=</span> <span class="n">n</span><span class="o">))</span>
+  <span class="k">val</span> <span class="nv">varName</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nf">compose</span><span class="o">(</span><span class="n">varP</span><span class="o">,</span> <span class="n">nameL</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">upperVarName</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="nf">over</span><span class="o">(</span><span class="n">varName</span><span class="o">,</span> <span class="nv">_</span><span class="o">.</span><span class="py">toUpperCase</span><span class="o">)(</span><span class="n">e</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>After · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Same, as one composed optic: the prism matches the Var branch,</span>
+<span class="c1">-- the lens edits its name, every other shape passes through.</span>
+<span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Data.Char</span> <span class="p">(</span><span class="nf">toUpper</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Optics</span> <span class="p">(</span><span class="kt">Lens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Prism</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">PartialLens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="nf">composeO</span><span class="p">,</span> <span class="nf">over</span><span class="p">)</span>
+
+<span class="kr">data</span> <span class="kt">Var</span>   <span class="o">=</span> <span class="kt">Var</span>   <span class="p">{</span> <span class="n">vName</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">vRef</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+<span class="kr">data</span> <span class="kt">Expr</span>  <span class="o">=</span> <span class="kt">EVar</span> <span class="kt">Var</span> <span class="o">|</span> <span class="kt">EApp</span> <span class="kt">Expr</span> <span class="kt">Expr</span> <span class="o">|</span> <span class="kt">ELam</span> <span class="kt">String</span> <span class="kt">Expr</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="n">varP</span> <span class="o">::</span> <span class="kt">Prism</span> <span class="kt">Expr</span> <span class="kt">Var</span>
+<span class="n">varP</span> <span class="o">=</span> <span class="kt">Prism</span>
+  <span class="p">{</span> <span class="n">preview</span> <span class="o">=</span> <span class="nf">\</span><span class="n">e</span> <span class="o">-&gt;</span> <span class="kr">case</span> <span class="n">e</span> <span class="kr">of</span> <span class="kt">EVar</span> <span class="n">v</span> <span class="o">-&gt;</span> <span class="kt">Just</span> <span class="n">v</span><span class="p">;</span> <span class="kr">_</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+  <span class="p">,</span> <span class="n">review</span>  <span class="o">=</span> <span class="kt">EVar</span>
+  <span class="p">}</span>
+
+<span class="n">nameL</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="kt">Var</span> <span class="kt">String</span>
+<span class="n">nameL</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">view</span> <span class="o">=</span> <span class="n">vName</span><span class="p">,</span> <span class="n">set</span> <span class="o">=</span> <span class="nf">\</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">v</span> <span class="p">{</span> <span class="n">vName</span> <span class="o">=</span> <span class="n">n</span> <span class="p">}</span> <span class="p">}</span>
+
+<span class="n">varName</span> <span class="o">::</span> <span class="kt">PartialLens</span> <span class="kt">Expr</span> <span class="kt">String</span>
+<span class="n">varName</span> <span class="o">=</span> <span class="n">composeO</span> <span class="n">varP</span> <span class="n">nameL</span>
+
+<span class="n">upperVarName</span> <span class="o">::</span> <span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">Expr</span>
+<span class="n">upperVarName</span> <span class="o">=</span> <span class="n">over</span> <span class="n">varName</span> <span class="p">(</span><span class="n">map</span> <span class="n">toUpper</span><span class="p">)</span></code></pre></figure>
+
+</div>
+</div>
+
+<details class="rf-spec">
+<summary>The property: <code>Before.upperVarName == After.upperVarName</code> on generated trees, and the hit/miss behaviour</summary>
+<div class="rf-pair">
+<div><h4>Spec · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">//&gt; using scala 3.3.4</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-core:0.14.0</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-runner:0.14.0</span>
+<span class="k">import</span> <span class="nn">hedgehog.</span><span class="o">*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">core</span><span class="o">.*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">runner</span><span class="o">.*</span>
+
+<span class="k">object</span> <span class="nc">Props</span> <span class="k">extends</span> <span class="nc">Properties</span><span class="k">:</span>
+  <span class="kt">def</span> <span class="kt">tests:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Test</span><span class="o">]</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"upperVarName: Before == After"</span><span class="o">,</span> <span class="n">agrees</span><span class="o">),</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"the hit is uppercased, misses pass through"</span><span class="o">,</span> <span class="n">hitAndMiss</span><span class="o">),</span>
+  <span class="o">)</span>
+
+  <span class="c1">// A neutral tree, so one generated input feeds both Expr types.</span>
+  <span class="n">enum</span> <span class="n">T</span><span class="k">:</span>
+    <span class="kt">case</span> <span class="kt">TVar</span><span class="o">(</span><span class="kt">name:</span> <span class="kt">String</span><span class="o">,</span> <span class="kt">ref:</span> <span class="kt">Int</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">TApp</span><span class="o">(</span><span class="n">f</span><span class="k">:</span> <span class="kt">T</span><span class="o">,</span> <span class="n">x</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">TLam</span><span class="o">(</span><span class="n">bind</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">body</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">genName</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nv">Gen</span><span class="o">.</span><span class="py">alpha</span><span class="o">.</span><span class="py">list</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">4</span><span class="o">)).</span><span class="py">map</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">mkString</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nf">genT</span><span class="o">(</span><span class="n">depth</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">T</span><span class="o">]</span> <span class="k">=</span>
+    <span class="k">val</span> <span class="nv">leaf</span> <span class="k">=</span>
+      <span class="k">for</span> <span class="n">n</span> <span class="k">&lt;-</span> <span class="n">genName</span><span class="o">;</span> <span class="n">r</span> <span class="k">&lt;-</span> <span class="nv">Gen</span><span class="o">.</span><span class="py">int</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(-</span><span class="mi">10</span><span class="o">,</span> <span class="mi">10</span><span class="o">))</span>
+      <span class="k">yield</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">r</span><span class="o">)</span>
+    <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span> <span class="n">then</span> <span class="n">leaf</span>
+    <span class="k">else</span>
+      <span class="nv">Gen</span><span class="o">.</span><span class="py">choice1</span><span class="o">(</span>
+        <span class="n">leaf</span><span class="o">,</span>
+        <span class="k">for</span>
+          <span class="n">f</span> <span class="k">&lt;-</span> <span class="nf">genT</span><span class="o">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span>
+          <span class="n">x</span> <span class="k">&lt;-</span> <span class="nf">genT</span><span class="o">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span>
+        <span class="k">yield</span> <span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">x</span><span class="o">),</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="k">&lt;-</span> <span class="n">genName</span><span class="o">;</span> <span class="n">body</span> <span class="k">&lt;-</span> <span class="nf">genT</span><span class="o">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span> <span class="k">yield</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">body</span><span class="o">),</span>
+      <span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">toBefore</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span><span class="k">:</span> <span class="kt">Before.Expr</span> <span class="o">=</span> <span class="n">t</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">r</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EVar</span><span class="o">(</span><span class="nv">Before</span><span class="o">.</span><span class="py">Var</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">r</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">x</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EApp</span><span class="o">(</span><span class="nf">toBefore</span><span class="o">(</span><span class="n">f</span><span class="o">),</span> <span class="nf">toBefore</span><span class="o">(</span><span class="n">x</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">e</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="nf">toBefore</span><span class="o">(</span><span class="n">e</span><span class="o">))</span>
+  <span class="k">def</span> <span class="nf">fromBefore</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Before.Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">T</span> <span class="o">=</span> <span class="n">e</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EVar</span><span class="o">(</span><span class="n">v</span><span class="o">)</span>      <span class="k">=&gt;</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="nv">v</span><span class="o">.</span><span class="py">name</span><span class="o">,</span> <span class="nv">v</span><span class="o">.</span><span class="py">ref</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EApp</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">x</span><span class="o">)</span>  <span class="k">=&gt;</span>
+      <span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="nf">fromBefore</span><span class="o">(</span><span class="n">f</span><span class="o">),</span> <span class="nf">fromBefore</span><span class="o">(</span><span class="n">x</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">e</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="nf">fromBefore</span><span class="o">(</span><span class="n">e</span><span class="o">))</span>
+  <span class="k">def</span> <span class="nf">toAfter</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span><span class="k">:</span> <span class="kt">After.Expr</span> <span class="o">=</span> <span class="n">t</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">r</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EVar</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">Var</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">r</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">x</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EApp</span><span class="o">(</span><span class="nf">toAfter</span><span class="o">(</span><span class="n">f</span><span class="o">),</span> <span class="nf">toAfter</span><span class="o">(</span><span class="n">x</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">e</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="nf">toAfter</span><span class="o">(</span><span class="n">e</span><span class="o">))</span>
+  <span class="k">def</span> <span class="nf">fromAfter</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">After.Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">T</span> <span class="o">=</span> <span class="n">e</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EVar</span><span class="o">(</span><span class="n">v</span><span class="o">)</span>     <span class="k">=&gt;</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="nv">v</span><span class="o">.</span><span class="py">name</span><span class="o">,</span> <span class="nv">v</span><span class="o">.</span><span class="py">ref</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EApp</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">x</span><span class="o">)</span>  <span class="k">=&gt;</span> <span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="nf">fromAfter</span><span class="o">(</span><span class="n">f</span><span class="o">),</span> <span class="nf">fromAfter</span><span class="o">(</span><span class="n">x</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">e</span><span class="o">)</span>  <span class="k">=&gt;</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="nf">fromAfter</span><span class="o">(</span><span class="n">e</span><span class="o">))</span>
+
+  <span class="k">def</span> <span class="nf">agrees</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="k">&lt;-</span> <span class="nf">genT</span><span class="o">(</span><span class="mi">4</span><span class="o">).</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="nf">fromBefore</span><span class="o">(</span><span class="nv">Before</span><span class="o">.</span><span class="py">upperVarName</span><span class="o">(</span><span class="nf">toBefore</span><span class="o">(</span><span class="n">t</span><span class="o">)))</span>
+        <span class="o">====</span> <span class="nf">fromAfter</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">upperVarName</span><span class="o">(</span><span class="nf">toAfter</span><span class="o">(</span><span class="n">t</span><span class="o">)))</span>
+
+  <span class="k">def</span> <span class="nf">hitAndMiss</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span>
+      <span class="n">n</span> <span class="k">&lt;-</span> <span class="nv">genName</span><span class="o">.</span><span class="py">forAll</span>
+      <span class="n">t</span> <span class="k">&lt;-</span> <span class="nf">genT</span><span class="o">(</span><span class="mi">3</span><span class="o">).</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="k">val</span> <span class="nv">hit</span> <span class="k">=</span> <span class="nv">After</span><span class="o">.</span><span class="py">upperVarName</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EVar</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">Var</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="mi">0</span><span class="o">)))</span>
+        <span class="o">====</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EVar</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">Var</span><span class="o">(</span><span class="nv">n</span><span class="o">.</span><span class="py">toUpperCase</span><span class="o">,</span> <span class="mi">0</span><span class="o">))</span>
+      <span class="k">val</span> <span class="nv">miss</span> <span class="k">=</span>
+        <span class="k">if</span> <span class="nf">tNoVars</span><span class="o">(</span><span class="n">t</span><span class="o">)</span> <span class="n">then</span>
+          <span class="nf">fromAfter</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">upperVarName</span><span class="o">(</span><span class="nf">toAfter</span><span class="o">(</span><span class="n">t</span><span class="o">)))</span> <span class="o">====</span> <span class="n">t</span>
+        <span class="k">else</span> <span class="nv">Result</span><span class="o">.</span><span class="py">success</span>
+      <span class="n">hit</span> <span class="n">and</span> <span class="n">miss</span>
+
+  <span class="k">def</span> <span class="nf">tNoVars</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="n">t</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="k">_</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="kc">false</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">x</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="nf">tNoVars</span><span class="o">(</span><span class="n">f</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nf">tNoVars</span><span class="o">(</span><span class="n">x</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="nf">tNoVars</span><span class="o">(</span><span class="n">b</span><span class="o">)</span>
+<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nv">SpecRunner</span><span class="o">.</span><span class="py">run</span><span class="o">(</span><span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>Spec · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="cp">{-# LANGUAGE OverloadedStrings #-}</span>
+<span class="kr">module</span> <span class="nn">Main</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Control.Monad</span> <span class="p">(</span><span class="nf">unless</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">System.Exit</span> <span class="p">(</span><span class="nf">exitFailure</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Data.Char</span> <span class="p">(</span><span class="nf">toUpper</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Hedgehog</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Gen</span> <span class="k">as</span> <span class="n">Gen</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Range</span> <span class="k">as</span> <span class="n">Range</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Before</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">After</span>
+
+<span class="c1">-- A neutral tree, so one generated input feeds both Expr types.</span>
+<span class="kr">data</span> <span class="kt">T</span> <span class="o">=</span> <span class="kt">TVar</span> <span class="kt">String</span> <span class="kt">Int</span> <span class="o">|</span> <span class="kt">TApp</span> <span class="kt">T</span> <span class="kt">T</span> <span class="o">|</span> <span class="kt">TLam</span> <span class="kt">String</span> <span class="kt">T</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="n">genName</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">String</span>
+<span class="n">genName</span> <span class="o">=</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">string</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="mi">0</span> <span class="mi">4</span><span class="p">)</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">alpha</span>
+
+<span class="n">genT</span> <span class="o">::</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Gen</span> <span class="kt">T</span>
+<span class="n">genT</span> <span class="mi">0</span> <span class="o">=</span> <span class="kt">TVar</span> <span class="o">&lt;$&gt;</span> <span class="n">genName</span> <span class="o">&lt;*&gt;</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">)</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">genT</span> <span class="n">depth</span> <span class="o">=</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">choice</span>
+  <span class="p">[</span> <span class="kt">TVar</span> <span class="o">&lt;$&gt;</span> <span class="n">genName</span> <span class="o">&lt;*&gt;</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">)</span> <span class="mi">10</span><span class="p">)</span>
+  <span class="p">,</span> <span class="kt">TApp</span> <span class="o">&lt;$&gt;</span> <span class="n">genT</span> <span class="p">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;*&gt;</span> <span class="n">genT</span> <span class="p">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="p">,</span> <span class="kt">TLam</span> <span class="o">&lt;$&gt;</span> <span class="n">genName</span> <span class="o">&lt;*&gt;</span> <span class="n">genT</span> <span class="p">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="p">]</span>
+
+<span class="n">toBefore</span> <span class="o">::</span> <span class="kt">T</span> <span class="o">-&gt;</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Expr</span>
+<span class="n">toBefore</span> <span class="p">(</span><span class="kt">TVar</span> <span class="n">n</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">EVar</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">Var</span> <span class="n">n</span> <span class="n">r</span><span class="p">)</span>
+<span class="n">toBefore</span> <span class="p">(</span><span class="kt">TApp</span> <span class="n">f</span> <span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">EApp</span> <span class="p">(</span><span class="n">toBefore</span> <span class="n">f</span><span class="p">)</span> <span class="p">(</span><span class="n">toBefore</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">toBefore</span> <span class="p">(</span><span class="kt">TLam</span> <span class="n">b</span> <span class="n">e</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">ELam</span> <span class="n">b</span> <span class="p">(</span><span class="n">toBefore</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="n">fromBefore</span> <span class="o">::</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">T</span>
+<span class="n">fromBefore</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">EVar</span> <span class="n">v</span><span class="p">)</span>  <span class="o">=</span> <span class="kt">TVar</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">vName</span> <span class="n">v</span><span class="p">)</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">vRef</span> <span class="n">v</span><span class="p">)</span>
+<span class="n">fromBefore</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">EApp</span> <span class="n">f</span> <span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="kt">TApp</span> <span class="p">(</span><span class="n">fromBefore</span> <span class="n">f</span><span class="p">)</span> <span class="p">(</span><span class="n">fromBefore</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">fromBefore</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">ELam</span> <span class="n">b</span> <span class="n">e</span><span class="p">)</span> <span class="o">=</span> <span class="kt">TLam</span> <span class="n">b</span> <span class="p">(</span><span class="n">fromBefore</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="n">toAfter</span> <span class="o">::</span> <span class="kt">T</span> <span class="o">-&gt;</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Expr</span>
+<span class="n">toAfter</span> <span class="p">(</span><span class="kt">TVar</span> <span class="n">n</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">EVar</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Var</span> <span class="n">n</span> <span class="n">r</span><span class="p">)</span>
+<span class="n">toAfter</span> <span class="p">(</span><span class="kt">TApp</span> <span class="n">f</span> <span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">EApp</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">f</span><span class="p">)</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">toAfter</span> <span class="p">(</span><span class="kt">TLam</span> <span class="n">b</span> <span class="n">e</span><span class="p">)</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">ELam</span> <span class="n">b</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="n">fromAfter</span> <span class="o">::</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">T</span>
+<span class="n">fromAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">EVar</span> <span class="n">v</span><span class="p">)</span>   <span class="o">=</span> <span class="kt">TVar</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">vName</span> <span class="n">v</span><span class="p">)</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">vRef</span> <span class="n">v</span><span class="p">)</span>
+<span class="n">fromAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">EApp</span> <span class="n">f</span> <span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="kt">TApp</span> <span class="p">(</span><span class="n">fromAfter</span> <span class="n">f</span><span class="p">)</span> <span class="p">(</span><span class="n">fromAfter</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">fromAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">ELam</span> <span class="n">b</span> <span class="n">e</span><span class="p">)</span> <span class="o">=</span> <span class="kt">TLam</span> <span class="n">b</span> <span class="p">(</span><span class="n">fromAfter</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="n">prop_agrees</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_agrees</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">t</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="p">(</span><span class="n">genT</span> <span class="mi">4</span><span class="p">)</span>
+  <span class="n">fromBefore</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">upperVarName</span> <span class="p">(</span><span class="n">toBefore</span> <span class="n">t</span><span class="p">))</span>
+    <span class="o">===</span> <span class="n">fromAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">upperVarName</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">t</span><span class="p">))</span>
+
+<span class="n">noVars</span> <span class="o">::</span> <span class="kt">T</span> <span class="o">-&gt;</span> <span class="kt">Bool</span>
+<span class="n">noVars</span> <span class="p">(</span><span class="kt">TVar</span> <span class="kr">_</span> <span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="kt">False</span>
+<span class="n">noVars</span> <span class="p">(</span><span class="kt">TApp</span> <span class="n">f</span> <span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="n">noVars</span> <span class="n">f</span> <span class="o">&amp;&amp;</span> <span class="n">noVars</span> <span class="n">x</span>
+<span class="n">noVars</span> <span class="p">(</span><span class="kt">TLam</span> <span class="kr">_</span> <span class="n">e</span><span class="p">)</span> <span class="o">=</span> <span class="n">noVars</span> <span class="n">e</span>
+
+<span class="n">prop_hit_and_miss</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_hit_and_miss</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">n</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genName</span>
+  <span class="n">t</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="p">(</span><span class="n">genT</span> <span class="mi">3</span><span class="p">)</span>
+  <span class="kt">After</span><span class="o">.</span><span class="n">upperVarName</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">EVar</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Var</span> <span class="n">n</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="o">===</span> <span class="kt">After</span><span class="o">.</span><span class="kt">EVar</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Var</span> <span class="p">(</span><span class="n">map</span> <span class="n">toUpper</span> <span class="n">n</span><span class="p">)</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="kr">if</span> <span class="n">noVars</span> <span class="n">t</span>
+    <span class="kr">then</span> <span class="n">fromAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">upperVarName</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">t</span><span class="p">))</span> <span class="o">===</span> <span class="n">t</span>
+    <span class="kr">else</span> <span class="n">success</span>
+
+<span class="n">main</span> <span class="o">::</span> <span class="kt">IO</span> <span class="nb">()</span>
+<span class="n">main</span> <span class="o">=</span> <span class="kr">do</span>
+  <span class="n">ok</span> <span class="o">&lt;-</span> <span class="n">checkParallel</span> <span class="o">$</span> <span class="kt">Group</span> <span class="s">"Props"</span>
+    <span class="p">[</span> <span class="p">(</span><span class="s">"upperVarName: Before == After"</span><span class="p">,</span> <span class="n">prop_agrees</span><span class="p">)</span>
+    <span class="p">,</span> <span class="p">(</span><span class="s">"the hit is uppercased, misses pass through"</span><span class="p">,</span> <span class="n">prop_hit_and_miss</span><span class="p">)</span>
+    <span class="p">]</span>
+  <span class="n">unless</span> <span class="n">ok</span> <span class="n">exitFailure</span></code></pre></figure>
+
+</div>
+</div>
+</details>
+
+<h3 id="2--every-node-of-a-tree-the-same-optic-deeper-nesting">2 · Every node of a tree: the same optic, deeper nesting</h3>
+
+<p>Now the same edit is applied at <em>every</em> node of the tree — the nesting
+is what makes the hand-written version hurt. The Before version is a
+recursive walk that rebuilds a hit by hand at each level of the
+recursion; add a level to the tree and the rebuild appears again. The
+The After version reuses the <em>same</em> <code class="language-plaintext highlighter-rouge">varName</code> optic from example 1,
+and the walk comes from <code class="language-plaintext highlighter-rouge">Plated</code> — the recursion of the type as a
+value, declared once (which fields are the sub-terms) and reused
+<code class="language-plaintext highlighter-rouge">everywhere</code>. The lens says “how to reach a variable name”; the
+<code class="language-plaintext highlighter-rouge">Plated</code> instance says “where the tree recurses”; and the walk applies
+the optic at every node. This is eo’s “visit across whole trees”
+recipe — one <code class="language-plaintext highlighter-rouge">Plated</code> instance and one <code class="language-plaintext highlighter-rouge">everywhere</code>, rather than a
+hand-written recursive rebuild.</p>
+
+<figure class="rf-figure">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 216" role="img" aria-labelledby="d2-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="d2-title">Replacing a recursive match with one optic reused at every node. Before: renameAll recurses over the tree and matches+rebuilds Var at each node by hand. After: everywhere(over(varName, upper)) — the same varName optic from example 1 applied at every node, bottom-up; the walk decides where, the optic decides how.</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="26">before</text>
+    <text x="428" y="26">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="36" width="388" height="136" rx="4" />
+    <rect x="428" y="36" width="336" height="136" rx="4" />
+  </g>
+  <g fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3">
+    <rect x="44" y="104" width="176" height="24" rx="3" />
+    <rect x="210" y="128" width="176" height="24" rx="3" />
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="56">renameAll(e) =</text>
+    <text x="40" y="72">e match</text>
+    <text x="52" y="88">EVar(v) =&gt; EVar(v.copy(name = upper))</text>
+    <text x="52" y="104">EApp(f, x) =&gt; EApp(renameAll(f),</text>
+    <text x="64" y="120">renameAll(x))</text>
+    <text x="52" y="134">ELam(b, bd) =&gt; ELam(b, renameAll(bd))</text>
+    <text x="52" y="156">the rebuild appears at</text>
+    <text x="52" y="170">every depth</text>
+    <text x="440" y="56">everywhere(over(varName, upper))</text>
+    <text x="452" y="72">walk decides where:</text>
+    <text x="464" y="88">every node, bottom-up</text>
+    <text x="452" y="108">varName decides how:</text>
+    <text x="464" y="124">prism then lens, from ex. 1</text>
+    <text x="452" y="148">one optic, reused</text>
+    <text x="452" y="164">at every depth</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1">
+    <circle cx="386" cy="166" r="7.5" />
+    <circle cx="428" cy="166" r="7.5" />
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle">
+    <text x="386" y="170">1</text>
+    <text x="428" y="170">1</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M406 166 H414" />
+  </g>
+  <g fill="currentColor">
+    <path d="M414 162.5 L422 166 L414 169.5 Z" />
+  </g>
+</svg>
+
+</figure>
+
+<div class="rf-pair">
+<div><h4>Before · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Uppercase the variable of every Var node: a recursive walk that</span>
+<span class="c1">// rebuilds each hit by hand.</span>
+<span class="k">object</span> <span class="nc">Before</span><span class="k">:</span>
+  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Var</span><span class="o">(</span><span class="kt">name:</span> <span class="kt">String</span><span class="o">,</span> <span class="kt">ref:</span> <span class="kt">Int</span><span class="o">)</span>
+  <span class="n">enum</span> <span class="nc">Expr</span><span class="k">:</span>
+    <span class="kt">case</span> <span class="kt">EVar</span><span class="o">(</span><span class="kt">v:</span> <span class="kt">Var</span><span class="o">)</span>
+    <span class="kt">case</span> <span class="kt">EApp</span><span class="o">(</span><span class="kt">f:</span> <span class="kt">Expr</span><span class="o">,</span> <span class="kt">x:</span> <span class="kt">Expr</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">ELam</span><span class="o">(</span><span class="n">bind</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">body</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span>
+
+  <span class="k">import</span> <span class="nn">Expr.</span><span class="o">*</span>
+
+  <span class="k">def</span> <span class="nf">renameAll</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="n">e</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nc">EVar</span><span class="o">(</span><span class="n">v</span><span class="o">)</span>     <span class="k">=&gt;</span> <span class="nc">EVar</span><span class="o">(</span><span class="nv">v</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">name</span> <span class="k">=</span> <span class="nv">v</span><span class="o">.</span><span class="py">name</span><span class="o">.</span><span class="py">toUpperCase</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nc">EApp</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">x</span><span class="o">)</span>  <span class="k">=&gt;</span> <span class="nc">EApp</span><span class="o">(</span><span class="nf">renameAll</span><span class="o">(</span><span class="n">f</span><span class="o">),</span> <span class="nf">renameAll</span><span class="o">(</span><span class="n">x</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nc">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">bd</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="nf">renameAll</span><span class="o">(</span><span class="n">bd</span><span class="o">))</span></code></pre></figure>
+
+</div>
+<div><h4>Before · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Uppercase the variable of every Var node: a recursive walk that</span>
+<span class="c1">-- rebuilds each hit by hand.</span>
+<span class="kr">module</span> <span class="nn">Before</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Data.Char</span> <span class="p">(</span><span class="nf">toUpper</span><span class="p">)</span>
+
+<span class="kr">data</span> <span class="kt">Var</span>  <span class="o">=</span> <span class="kt">Var</span>  <span class="p">{</span> <span class="n">vName</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">vRef</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+<span class="kr">data</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="kt">EVar</span> <span class="kt">Var</span> <span class="o">|</span> <span class="kt">EApp</span> <span class="kt">Expr</span> <span class="kt">Expr</span> <span class="o">|</span> <span class="kt">ELam</span> <span class="kt">String</span> <span class="kt">Expr</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="n">renameAll</span> <span class="o">::</span> <span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">Expr</span>
+<span class="n">renameAll</span> <span class="p">(</span><span class="kt">EVar</span> <span class="n">v</span><span class="p">)</span>     <span class="o">=</span> <span class="kt">EVar</span> <span class="n">v</span> <span class="p">{</span> <span class="n">vName</span> <span class="o">=</span> <span class="n">map</span> <span class="n">toUpper</span> <span class="p">(</span><span class="n">vName</span> <span class="n">v</span><span class="p">)</span> <span class="p">}</span>
+<span class="n">renameAll</span> <span class="p">(</span><span class="kt">EApp</span> <span class="n">f</span> <span class="n">x</span><span class="p">)</span>   <span class="o">=</span> <span class="kt">EApp</span> <span class="p">(</span><span class="n">renameAll</span> <span class="n">f</span><span class="p">)</span> <span class="p">(</span><span class="n">renameAll</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">renameAll</span> <span class="p">(</span><span class="kt">ELam</span> <span class="n">b</span> <span class="n">bd</span><span class="p">)</span>  <span class="o">=</span> <span class="kt">ELam</span> <span class="n">b</span> <span class="p">(</span><span class="n">renameAll</span> <span class="n">bd</span><span class="p">)</span></code></pre></figure>
+
+</div>
+</div>
+
+<div class="rf-pair">
+<div><h4>After · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Same, with the single varName optic applied at every node: the walk</span>
+<span class="c1">// comes from Plated (which fields recurse), not from the example.</span>
+<span class="k">object</span> <span class="nc">After</span><span class="k">:</span>
+  <span class="kt">import</span> <span class="kt">Optics.*</span>
+
+  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Var</span><span class="o">(</span><span class="kt">name:</span> <span class="kt">String</span><span class="o">,</span> <span class="kt">ref:</span> <span class="kt">Int</span><span class="o">)</span>
+  <span class="n">enum</span> <span class="nc">Expr</span><span class="k">:</span>
+    <span class="kt">case</span> <span class="kt">EVar</span><span class="o">(</span><span class="kt">v:</span> <span class="kt">Var</span><span class="o">)</span>
+    <span class="kt">case</span> <span class="kt">EApp</span><span class="o">(</span><span class="kt">f:</span> <span class="kt">Expr</span><span class="o">,</span> <span class="kt">x:</span> <span class="kt">Expr</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">ELam</span><span class="o">(</span><span class="n">bind</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">body</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span>
+
+  <span class="k">import</span> <span class="nn">Expr.</span><span class="o">*</span>
+
+  <span class="n">given</span> <span class="nc">Plated</span><span class="o">[</span><span class="kt">Expr</span><span class="o">]</span> <span class="k">with</span>
+    <span class="k">def</span> <span class="nf">descend</span><span class="o">(</span><span class="n">f</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=&gt;</span> <span class="nc">Expr</span><span class="o">)(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="n">e</span> <span class="k">match</span>
+      <span class="k">case</span> <span class="nc">EApp</span><span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span>  <span class="k">=&gt;</span> <span class="nc">EApp</span><span class="o">(</span><span class="nf">f</span><span class="o">(</span><span class="n">a</span><span class="o">),</span> <span class="nf">f</span><span class="o">(</span><span class="n">b</span><span class="o">))</span>
+      <span class="k">case</span> <span class="nc">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">bd</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="nf">f</span><span class="o">(</span><span class="n">bd</span><span class="o">))</span>
+      <span class="k">case</span> <span class="n">e</span>           <span class="k">=&gt;</span> <span class="n">e</span>
+
+  <span class="k">val</span> <span class="nv">varP</span><span class="k">:</span> <span class="kt">Prism</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">Var</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">Prism</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">Var</span><span class="o">](</span>
+      <span class="o">{</span> <span class="k">case</span> <span class="nc">EVar</span><span class="o">(</span><span class="n">v</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">(</span><span class="n">v</span><span class="o">);</span> <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="nc">None</span> <span class="o">},</span>
+      <span class="nc">EVar</span><span class="o">(</span><span class="k">_</span><span class="o">),</span>
+    <span class="o">)</span>
+  <span class="k">val</span> <span class="nv">nameL</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Var</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">Lens</span><span class="o">[</span><span class="kt">Var</span>, <span class="kt">String</span><span class="o">](</span><span class="nv">_</span><span class="o">.</span><span class="py">name</span><span class="o">,</span> <span class="o">(</span><span class="n">v</span><span class="o">,</span> <span class="n">n</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">v</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">name</span> <span class="k">=</span> <span class="n">n</span><span class="o">))</span>
+  <span class="k">val</span> <span class="nv">varName</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">Expr</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nf">compose</span><span class="o">(</span><span class="n">varP</span><span class="o">,</span> <span class="n">nameL</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">renameAll</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=</span>
+    <span class="n">summon</span><span class="o">[</span><span class="kt">Plated</span><span class="o">[</span><span class="kt">Expr</span><span class="o">]].</span><span class="py">everywhere</span><span class="o">(</span><span class="nf">over</span><span class="o">(</span><span class="n">varName</span><span class="o">,</span> <span class="nv">_</span><span class="o">.</span><span class="py">toUpperCase</span><span class="o">))(</span><span class="n">e</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>After · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Same, with the same varName optic applied at every node: the walk</span>
+<span class="c1">-- comes from Plated (which fields recurse), not from the example.</span>
+<span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Data.Char</span> <span class="p">(</span><span class="nf">toUpper</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Optics</span>
+  <span class="p">(</span> <span class="kt">Lens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Prism</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">PartialLens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Plated</span><span class="p">(</span><span class="o">..</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nf">composeO</span><span class="p">,</span> <span class="nf">over</span><span class="p">,</span> <span class="nf">everywhere</span>
+  <span class="p">)</span>
+
+<span class="kr">data</span> <span class="kt">Var</span> <span class="o">=</span> <span class="kt">Var</span> <span class="p">{</span> <span class="n">vName</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">vRef</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+<span class="kr">data</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="kt">EVar</span> <span class="kt">Var</span> <span class="o">|</span> <span class="kt">EApp</span> <span class="kt">Expr</span> <span class="kt">Expr</span> <span class="o">|</span> <span class="kt">ELam</span> <span class="kt">String</span> <span class="kt">Expr</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="kr">instance</span> <span class="kt">Plated</span> <span class="kt">Expr</span> <span class="kr">where</span>
+  <span class="n">descend</span> <span class="n">f</span> <span class="p">(</span><span class="kt">EApp</span> <span class="n">a</span> <span class="n">b</span><span class="p">)</span>   <span class="o">=</span> <span class="kt">EApp</span> <span class="p">(</span><span class="n">f</span> <span class="n">a</span><span class="p">)</span> <span class="p">(</span><span class="n">f</span> <span class="n">b</span><span class="p">)</span>
+  <span class="n">descend</span> <span class="n">f</span> <span class="p">(</span><span class="kt">ELam</span> <span class="n">b</span> <span class="n">bd</span><span class="p">)</span>  <span class="o">=</span> <span class="kt">ELam</span> <span class="n">b</span> <span class="p">(</span><span class="n">f</span> <span class="n">bd</span><span class="p">)</span>
+  <span class="n">descend</span> <span class="kr">_</span> <span class="n">e</span>            <span class="o">=</span> <span class="n">e</span>
+
+<span class="n">varP</span> <span class="o">::</span> <span class="kt">Prism</span> <span class="kt">Expr</span> <span class="kt">Var</span>
+<span class="n">varP</span> <span class="o">=</span> <span class="kt">Prism</span>
+  <span class="p">{</span> <span class="n">preview</span> <span class="o">=</span> <span class="nf">\</span><span class="n">e</span> <span class="o">-&gt;</span> <span class="kr">case</span> <span class="n">e</span> <span class="kr">of</span> <span class="kt">EVar</span> <span class="n">v</span> <span class="o">-&gt;</span> <span class="kt">Just</span> <span class="n">v</span><span class="p">;</span> <span class="kr">_</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+  <span class="p">,</span> <span class="n">review</span>  <span class="o">=</span> <span class="kt">EVar</span>
+  <span class="p">}</span>
+
+<span class="n">nameL</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="kt">Var</span> <span class="kt">String</span>
+<span class="n">nameL</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">view</span> <span class="o">=</span> <span class="n">vName</span><span class="p">,</span> <span class="n">set</span> <span class="o">=</span> <span class="nf">\</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">v</span> <span class="p">{</span> <span class="n">vName</span> <span class="o">=</span> <span class="n">n</span> <span class="p">}</span> <span class="p">}</span>
+
+<span class="n">varName</span> <span class="o">::</span> <span class="kt">PartialLens</span> <span class="kt">Expr</span> <span class="kt">String</span>
+<span class="n">varName</span> <span class="o">=</span> <span class="n">composeO</span> <span class="n">varP</span> <span class="n">nameL</span>
+
+<span class="n">renameAll</span> <span class="o">::</span> <span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">Expr</span>
+<span class="n">renameAll</span> <span class="o">=</span> <span class="n">everywhere</span> <span class="p">(</span><span class="n">over</span> <span class="n">varName</span> <span class="p">(</span><span class="n">map</span> <span class="n">toUpper</span><span class="p">))</span></code></pre></figure>
+
+</div>
+</div>
+
+<details class="rf-spec">
+<summary>The property: <code>Before.renameAll == After.renameAll</code> on generated trees, and every name is uppercased afterwards</summary>
+<div class="rf-pair">
+<div><h4>Spec · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">//&gt; using scala 3.3.4</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-core:0.14.0</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-runner:0.14.0</span>
+<span class="k">import</span> <span class="nn">hedgehog.</span><span class="o">*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">core</span><span class="o">.*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">runner</span><span class="o">.*</span>
+
+<span class="k">object</span> <span class="nc">Props</span> <span class="k">extends</span> <span class="nc">Properties</span><span class="k">:</span>
+  <span class="kt">def</span> <span class="kt">tests:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Test</span><span class="o">]</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"renameAll: Before == After"</span><span class="o">,</span> <span class="n">agrees</span><span class="o">),</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"every Var name is uppercased after the walk"</span><span class="o">,</span> <span class="n">allUpper</span><span class="o">),</span>
+  <span class="o">)</span>
+
+  <span class="c1">// A neutral tree, so one generated input feeds both Expr types.</span>
+  <span class="n">enum</span> <span class="n">T</span><span class="k">:</span>
+    <span class="kt">case</span> <span class="kt">TVar</span><span class="o">(</span><span class="kt">name:</span> <span class="kt">String</span><span class="o">,</span> <span class="kt">ref:</span> <span class="kt">Int</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">TApp</span><span class="o">(</span><span class="n">f</span><span class="k">:</span> <span class="kt">T</span><span class="o">,</span> <span class="n">x</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">TLam</span><span class="o">(</span><span class="n">bind</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">body</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">genName</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nv">Gen</span><span class="o">.</span><span class="py">alpha</span><span class="o">.</span><span class="py">list</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">4</span><span class="o">)).</span><span class="py">map</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">mkString</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nf">genT</span><span class="o">(</span><span class="n">depth</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">T</span><span class="o">]</span> <span class="k">=</span>
+    <span class="k">val</span> <span class="nv">leaf</span> <span class="k">=</span>
+      <span class="k">for</span> <span class="n">n</span> <span class="k">&lt;-</span> <span class="n">genName</span><span class="o">;</span> <span class="n">r</span> <span class="k">&lt;-</span> <span class="nv">Gen</span><span class="o">.</span><span class="py">int</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(-</span><span class="mi">10</span><span class="o">,</span> <span class="mi">10</span><span class="o">))</span>
+      <span class="k">yield</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">r</span><span class="o">)</span>
+    <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span> <span class="n">then</span> <span class="n">leaf</span>
+    <span class="k">else</span>
+      <span class="nv">Gen</span><span class="o">.</span><span class="py">choice1</span><span class="o">(</span>
+        <span class="n">leaf</span><span class="o">,</span>
+        <span class="k">for</span>
+          <span class="n">f</span> <span class="k">&lt;-</span> <span class="nf">genT</span><span class="o">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span>
+          <span class="n">x</span> <span class="k">&lt;-</span> <span class="nf">genT</span><span class="o">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span>
+        <span class="k">yield</span> <span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">x</span><span class="o">),</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="k">&lt;-</span> <span class="n">genName</span><span class="o">;</span> <span class="n">body</span> <span class="k">&lt;-</span> <span class="nf">genT</span><span class="o">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span> <span class="k">yield</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">body</span><span class="o">),</span>
+      <span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">toBefore</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span><span class="k">:</span> <span class="kt">Before.Expr</span> <span class="o">=</span> <span class="n">t</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">r</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EVar</span><span class="o">(</span><span class="nv">Before</span><span class="o">.</span><span class="py">Var</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">r</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">x</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EApp</span><span class="o">(</span><span class="nf">toBefore</span><span class="o">(</span><span class="n">f</span><span class="o">),</span> <span class="nf">toBefore</span><span class="o">(</span><span class="n">x</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">e</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="nf">toBefore</span><span class="o">(</span><span class="n">e</span><span class="o">))</span>
+  <span class="k">def</span> <span class="nf">fromBefore</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Before.Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">T</span> <span class="o">=</span> <span class="n">e</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EVar</span><span class="o">(</span><span class="n">v</span><span class="o">)</span>     <span class="k">=&gt;</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="nv">v</span><span class="o">.</span><span class="py">name</span><span class="o">,</span> <span class="nv">v</span><span class="o">.</span><span class="py">ref</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EApp</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">x</span><span class="o">)</span>  <span class="k">=&gt;</span> <span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="nf">fromBefore</span><span class="o">(</span><span class="n">f</span><span class="o">),</span> <span class="nf">fromBefore</span><span class="o">(</span><span class="n">x</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">e</span><span class="o">)</span>  <span class="k">=&gt;</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="nf">fromBefore</span><span class="o">(</span><span class="n">e</span><span class="o">))</span>
+  <span class="k">def</span> <span class="nf">toAfter</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span><span class="k">:</span> <span class="kt">After.Expr</span> <span class="o">=</span> <span class="n">t</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">r</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EVar</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">Var</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="n">r</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">x</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EApp</span><span class="o">(</span><span class="nf">toAfter</span><span class="o">(</span><span class="n">f</span><span class="o">),</span> <span class="nf">toAfter</span><span class="o">(</span><span class="n">x</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">e</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="nf">toAfter</span><span class="o">(</span><span class="n">e</span><span class="o">))</span>
+  <span class="k">def</span> <span class="nf">fromAfter</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">After.Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">T</span> <span class="o">=</span> <span class="n">e</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EVar</span><span class="o">(</span><span class="n">v</span><span class="o">)</span>     <span class="k">=&gt;</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="nv">v</span><span class="o">.</span><span class="py">name</span><span class="o">,</span> <span class="nv">v</span><span class="o">.</span><span class="py">ref</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">EApp</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">x</span><span class="o">)</span>  <span class="k">=&gt;</span> <span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="nf">fromAfter</span><span class="o">(</span><span class="n">f</span><span class="o">),</span> <span class="nf">fromAfter</span><span class="o">(</span><span class="n">x</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">ELam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">e</span><span class="o">)</span>  <span class="k">=&gt;</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="nf">fromAfter</span><span class="o">(</span><span class="n">e</span><span class="o">))</span>
+
+  <span class="k">def</span> <span class="nf">agrees</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="k">&lt;-</span> <span class="nf">genT</span><span class="o">(</span><span class="mi">4</span><span class="o">).</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="nf">fromBefore</span><span class="o">(</span><span class="nv">Before</span><span class="o">.</span><span class="py">renameAll</span><span class="o">(</span><span class="nf">toBefore</span><span class="o">(</span><span class="n">t</span><span class="o">)))</span>
+        <span class="o">====</span> <span class="nf">fromAfter</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">renameAll</span><span class="o">(</span><span class="nf">toAfter</span><span class="o">(</span><span class="n">t</span><span class="o">)))</span>
+
+  <span class="k">def</span> <span class="nf">allUpper</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="k">&lt;-</span> <span class="nf">genT</span><span class="o">(</span><span class="mi">4</span><span class="o">).</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="k">val</span> <span class="nv">renamed</span> <span class="k">=</span> <span class="nf">fromAfter</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">renameAll</span><span class="o">(</span><span class="nf">toAfter</span><span class="o">(</span><span class="n">t</span><span class="o">)))</span>
+      <span class="o">(</span><span class="nf">allNamesUpper</span><span class="o">(</span><span class="n">renamed</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nf">refsUnchanged</span><span class="o">(</span><span class="n">renamed</span><span class="o">,</span> <span class="n">t</span><span class="o">))</span> <span class="o">====</span> <span class="kc">true</span>
+
+  <span class="k">def</span> <span class="nf">allNamesUpper</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="n">t</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="k">_</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="n">n</span> <span class="o">==</span> <span class="nv">n</span><span class="o">.</span><span class="py">toUpperCase</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">x</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="nf">allNamesUpper</span><span class="o">(</span><span class="n">f</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nf">allNamesUpper</span><span class="o">(</span><span class="n">x</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span>   <span class="k">=&gt;</span> <span class="nf">allNamesUpper</span><span class="o">(</span><span class="n">b</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nf">refsUnchanged</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">T</span><span class="o">,</span> <span class="n">b</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span> <span class="k">match</span>
+    <span class="nf">case</span> <span class="o">(</span><span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">r1</span><span class="o">),</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">r2</span><span class="o">))</span> <span class="k">=&gt;</span> <span class="n">r1</span> <span class="o">==</span> <span class="n">r2</span>
+    <span class="nf">case</span> <span class="o">(</span><span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="n">f1</span><span class="o">,</span> <span class="n">x1</span><span class="o">),</span> <span class="nv">T</span><span class="o">.</span><span class="py">TApp</span><span class="o">(</span><span class="n">f2</span><span class="o">,</span> <span class="n">x2</span><span class="o">))</span> <span class="k">=&gt;</span>
+      <span class="nf">refsUnchanged</span><span class="o">(</span><span class="n">f1</span><span class="o">,</span> <span class="n">f2</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nf">refsUnchanged</span><span class="o">(</span><span class="n">x1</span><span class="o">,</span> <span class="n">x2</span><span class="o">)</span>
+    <span class="nf">case</span> <span class="o">(</span><span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">b1</span><span class="o">),</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLam</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">b2</span><span class="o">))</span> <span class="k">=&gt;</span> <span class="nf">refsUnchanged</span><span class="o">(</span><span class="n">b1</span><span class="o">,</span> <span class="n">b2</span><span class="o">)</span>
+    <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="kc">false</span>
+<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nv">SpecRunner</span><span class="o">.</span><span class="py">run</span><span class="o">(</span><span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>Spec · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="cp">{-# LANGUAGE OverloadedStrings #-}</span>
+<span class="kr">module</span> <span class="nn">Main</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Control.Monad</span> <span class="p">(</span><span class="nf">unless</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">System.Exit</span> <span class="p">(</span><span class="nf">exitFailure</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Data.Char</span> <span class="p">(</span><span class="nf">isUpper</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Hedgehog</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Gen</span> <span class="k">as</span> <span class="n">Gen</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Range</span> <span class="k">as</span> <span class="n">Range</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Before</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">After</span>
+
+<span class="c1">-- A neutral tree, so one generated input feeds both Expr types.</span>
+<span class="kr">data</span> <span class="kt">T</span> <span class="o">=</span> <span class="kt">TVar</span> <span class="kt">String</span> <span class="kt">Int</span> <span class="o">|</span> <span class="kt">TApp</span> <span class="kt">T</span> <span class="kt">T</span> <span class="o">|</span> <span class="kt">TLam</span> <span class="kt">String</span> <span class="kt">T</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="n">genName</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">String</span>
+<span class="n">genName</span> <span class="o">=</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">string</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="mi">0</span> <span class="mi">4</span><span class="p">)</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">alpha</span>
+
+<span class="n">genT</span> <span class="o">::</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Gen</span> <span class="kt">T</span>
+<span class="n">genT</span> <span class="n">depth</span> <span class="o">=</span>
+  <span class="kr">let</span> <span class="n">leaf</span> <span class="o">=</span> <span class="kt">TVar</span> <span class="o">&lt;$&gt;</span> <span class="n">genName</span> <span class="o">&lt;*&gt;</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">)</span> <span class="mi">10</span><span class="p">)</span>
+  <span class="kr">in</span> <span class="kr">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span> <span class="kr">then</span> <span class="n">leaf</span>
+     <span class="kr">else</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">choice</span>
+       <span class="p">[</span> <span class="n">leaf</span>
+       <span class="p">,</span> <span class="kt">TApp</span> <span class="o">&lt;$&gt;</span> <span class="n">genT</span> <span class="p">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;*&gt;</span> <span class="n">genT</span> <span class="p">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+       <span class="p">,</span> <span class="kt">TLam</span> <span class="o">&lt;$&gt;</span> <span class="n">genName</span> <span class="o">&lt;*&gt;</span> <span class="n">genT</span> <span class="p">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+       <span class="p">]</span>
+
+<span class="n">toBefore</span> <span class="o">::</span> <span class="kt">T</span> <span class="o">-&gt;</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Expr</span>
+<span class="n">toBefore</span> <span class="p">(</span><span class="kt">TVar</span> <span class="n">n</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">EVar</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">Var</span> <span class="n">n</span> <span class="n">r</span><span class="p">)</span>
+<span class="n">toBefore</span> <span class="p">(</span><span class="kt">TApp</span> <span class="n">f</span> <span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">EApp</span> <span class="p">(</span><span class="n">toBefore</span> <span class="n">f</span><span class="p">)</span> <span class="p">(</span><span class="n">toBefore</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">toBefore</span> <span class="p">(</span><span class="kt">TLam</span> <span class="n">b</span> <span class="n">e</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">ELam</span> <span class="n">b</span> <span class="p">(</span><span class="n">toBefore</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="n">fromBefore</span> <span class="o">::</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">T</span>
+<span class="n">fromBefore</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">EVar</span> <span class="n">v</span><span class="p">)</span>  <span class="o">=</span> <span class="kt">TVar</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">vName</span> <span class="n">v</span><span class="p">)</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">vRef</span> <span class="n">v</span><span class="p">)</span>
+<span class="n">fromBefore</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">EApp</span> <span class="n">f</span> <span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="kt">TApp</span> <span class="p">(</span><span class="n">fromBefore</span> <span class="n">f</span><span class="p">)</span> <span class="p">(</span><span class="n">fromBefore</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">fromBefore</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">ELam</span> <span class="n">b</span> <span class="n">e</span><span class="p">)</span> <span class="o">=</span> <span class="kt">TLam</span> <span class="n">b</span> <span class="p">(</span><span class="n">fromBefore</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="n">toAfter</span> <span class="o">::</span> <span class="kt">T</span> <span class="o">-&gt;</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Expr</span>
+<span class="n">toAfter</span> <span class="p">(</span><span class="kt">TVar</span> <span class="n">n</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">EVar</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Var</span> <span class="n">n</span> <span class="n">r</span><span class="p">)</span>
+<span class="n">toAfter</span> <span class="p">(</span><span class="kt">TApp</span> <span class="n">f</span> <span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">EApp</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">f</span><span class="p">)</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">toAfter</span> <span class="p">(</span><span class="kt">TLam</span> <span class="n">b</span> <span class="n">e</span><span class="p">)</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">ELam</span> <span class="n">b</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="n">fromAfter</span> <span class="o">::</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">T</span>
+<span class="n">fromAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">EVar</span> <span class="n">v</span><span class="p">)</span>  <span class="o">=</span> <span class="kt">TVar</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">vName</span> <span class="n">v</span><span class="p">)</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">vRef</span> <span class="n">v</span><span class="p">)</span>
+<span class="n">fromAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">EApp</span> <span class="n">f</span> <span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="kt">TApp</span> <span class="p">(</span><span class="n">fromAfter</span> <span class="n">f</span><span class="p">)</span> <span class="p">(</span><span class="n">fromAfter</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">fromAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">ELam</span> <span class="n">b</span> <span class="n">e</span><span class="p">)</span> <span class="o">=</span> <span class="kt">TLam</span> <span class="n">b</span> <span class="p">(</span><span class="n">fromAfter</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="n">prop_agrees</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_agrees</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">t</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="p">(</span><span class="n">genT</span> <span class="mi">4</span><span class="p">)</span>
+  <span class="n">fromBefore</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">renameAll</span> <span class="p">(</span><span class="n">toBefore</span> <span class="n">t</span><span class="p">))</span>
+    <span class="o">===</span> <span class="n">fromAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">renameAll</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">t</span><span class="p">))</span>
+
+<span class="n">allNamesUpper</span> <span class="o">::</span> <span class="kt">T</span> <span class="o">-&gt;</span> <span class="kt">Bool</span>
+<span class="n">allNamesUpper</span> <span class="p">(</span><span class="kt">TVar</span> <span class="n">n</span> <span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">all</span> <span class="n">isUpper</span> <span class="n">n</span>
+<span class="n">allNamesUpper</span> <span class="p">(</span><span class="kt">TApp</span> <span class="n">f</span> <span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="n">allNamesUpper</span> <span class="n">f</span> <span class="o">&amp;&amp;</span> <span class="n">allNamesUpper</span> <span class="n">x</span>
+<span class="n">allNamesUpper</span> <span class="p">(</span><span class="kt">TLam</span> <span class="kr">_</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="n">allNamesUpper</span> <span class="n">b</span>
+
+<span class="n">refsUnchanged</span> <span class="o">::</span> <span class="kt">T</span> <span class="o">-&gt;</span> <span class="kt">T</span> <span class="o">-&gt;</span> <span class="kt">Bool</span>
+<span class="n">refsUnchanged</span> <span class="p">(</span><span class="kt">TVar</span> <span class="kr">_</span> <span class="n">r1</span><span class="p">)</span> <span class="p">(</span><span class="kt">TVar</span> <span class="kr">_</span> <span class="n">r2</span><span class="p">)</span> <span class="o">=</span> <span class="n">r1</span> <span class="o">==</span> <span class="n">r2</span>
+<span class="n">refsUnchanged</span> <span class="p">(</span><span class="kt">TApp</span> <span class="n">f1</span> <span class="n">x1</span><span class="p">)</span> <span class="p">(</span><span class="kt">TApp</span> <span class="n">f2</span> <span class="n">x2</span><span class="p">)</span> <span class="o">=</span>
+  <span class="n">refsUnchanged</span> <span class="n">f1</span> <span class="n">f2</span> <span class="o">&amp;&amp;</span> <span class="n">refsUnchanged</span> <span class="n">x1</span> <span class="n">x2</span>
+<span class="n">refsUnchanged</span> <span class="p">(</span><span class="kt">TLam</span> <span class="kr">_</span> <span class="n">b1</span><span class="p">)</span> <span class="p">(</span><span class="kt">TLam</span> <span class="kr">_</span> <span class="n">b2</span><span class="p">)</span> <span class="o">=</span> <span class="n">refsUnchanged</span> <span class="n">b1</span> <span class="n">b2</span>
+<span class="n">refsUnchanged</span> <span class="kr">_</span> <span class="kr">_</span> <span class="o">=</span> <span class="kt">False</span>
+
+<span class="n">prop_all_upper</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_all_upper</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">t</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="p">(</span><span class="n">genT</span> <span class="mi">4</span><span class="p">)</span>
+  <span class="kr">let</span> <span class="n">renamed</span> <span class="o">=</span> <span class="n">fromAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">renameAll</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">t</span><span class="p">))</span>
+  <span class="n">allNamesUpper</span> <span class="n">renamed</span> <span class="o">===</span> <span class="kt">True</span>
+  <span class="n">refsUnchanged</span> <span class="n">renamed</span> <span class="n">t</span> <span class="o">===</span> <span class="kt">True</span>
+
+<span class="n">main</span> <span class="o">::</span> <span class="kt">IO</span> <span class="nb">()</span>
+<span class="n">main</span> <span class="o">=</span> <span class="kr">do</span>
+  <span class="n">ok</span> <span class="o">&lt;-</span> <span class="n">checkParallel</span> <span class="o">$</span> <span class="kt">Group</span> <span class="s">"Props"</span>
+    <span class="p">[</span> <span class="p">(</span><span class="s">"renameAll: Before == After"</span><span class="p">,</span> <span class="n">prop_agrees</span><span class="p">)</span>
+    <span class="p">,</span> <span class="p">(</span><span class="s">"every Var name is uppercased, refs unchanged"</span><span class="p">,</span> <span class="n">prop_all_upper</span><span class="p">)</span>
+    <span class="p">]</span>
+  <span class="n">unless</span> <span class="n">ok</span> <span class="n">exitFailure</span></code></pre></figure>
+
+</div>
+</div>
+</details>
+
+<h3 id="3--a-sparse-walk-over-a-list-traversal-prism-and-lens">3 · A sparse walk over a list: traversal, prism and lens</h3>
+
+<p>A batch of results, some succeeded and some failed; bump only the
+successes. The Before version is a <code class="language-plaintext highlighter-rouge">map</code> carrying the branch test and
+the rebuild in the same step. The After version is one composed optic
+— <code class="language-plaintext highlighter-rouge">each .andThen prism .andThen lens</code>: the traversal reaches every
+element, the prism selects the succeeded branch, the lens edits its
+value, and every failed element passes through untouched. This is eo’s
+<a href="https://eo.constructive.dev/cookbook#visit-through-arbitrary-structure">cookbook recipe “visit through arbitrary structure”</a>,
+which notes that this sparse walk is the shape a hand-rolled loop gets
+wrong — the container and the branch test fight over who owns the
+loop; composed optics keep the two apart.</p>
+
+<figure class="rf-figure">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 216" role="img" aria-labelledby="d3-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="d3-title">Replacing a map-with-match with a composed traversal, prism and lens. Before: bumpSucceeded maps with a branch test and rebuild in the same step. After: each .andThen succeeded .andThen value — the traversal reaches every element, the prism selects the succeeded branch, the lens edits its value; failures pass through untouched.</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="26">before</text>
+    <text x="428" y="26">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="36" width="388" height="136" rx="4" />
+    <rect x="428" y="36" width="336" height="136" rx="4" />
+  </g>
+  <g fill="rgba(128,128,128,.12)" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3">
+    <rect x="44" y="100" width="332" height="26" rx="3" />
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="56">bumpSucceeded(xs) =</text>
+    <text x="40" y="72">xs.map { case Succeeded(ok) =&gt;</text>
+    <text x="52" y="88">Succeeded(ok.copy(value = ok.value + 1))</text>
+    <text x="52" y="104">case f @ Failed(_) =&gt; f }</text>
+    <text x="52" y="126">branch test and rebuild</text>
+    <text x="52" y="140">in the same step</text>
+    <text x="440" y="56">each .andThen succeeded</text>
+    <text x="452" y="72">.andThen value</text>
+    <text x="440" y="92">every element,</text>
+    <text x="452" y="108">succeeded branch,</text>
+    <text x="452" y="124">edit its value</text>
+    <text x="440" y="144">failures pass through</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".8">
+    <text x="220" y="166">traversal over the list</text>
+    <text x="596" y="166">composed optic</text>
+  </g>
+</svg>
+
+</figure>
+
+<div class="rf-pair">
+<div><h4>Before · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Bump only the successes of a batch: a hand-written map carrying</span>
+<span class="c1">// the branch test and the rebuild in the same step.</span>
+<span class="k">object</span> <span class="nc">Before</span><span class="k">:</span>
+  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Ok</span><span class="o">(</span><span class="kt">value:</span> <span class="kt">Int</span><span class="o">)</span>
+  <span class="kt">enum</span> <span class="kt">Result:</span>
+    <span class="kt">case</span> <span class="kt">Succeeded</span><span class="o">(</span><span class="kt">v:</span> <span class="kt">Ok</span><span class="o">)</span>
+    <span class="kt">case</span> <span class="kt">Failed</span><span class="o">(</span><span class="kt">msg:</span> <span class="kt">String</span><span class="o">)</span>
+
+  <span class="kt">import</span> <span class="kt">Result.*</span>
+
+  <span class="kt">def</span> <span class="kt">bumpSucceeded</span><span class="o">(</span><span class="kt">xs:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Result</span><span class="o">])</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Result</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nv">xs</span><span class="o">.</span><span class="py">map</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">Succeeded</span><span class="o">(</span><span class="n">ok</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Succeeded</span><span class="o">(</span><span class="nv">ok</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">value</span> <span class="k">=</span> <span class="nv">ok</span><span class="o">.</span><span class="py">value</span> <span class="o">+</span> <span class="mi">1</span><span class="o">))</span>
+      <span class="k">case</span> <span class="n">f</span> <span class="k">@</span> <span class="nc">Failed</span><span class="o">(</span><span class="k">_</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">f</span>
+    <span class="o">}</span></code></pre></figure>
+
+</div>
+<div><h4>Before · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Bump only the successes of a batch: a hand-written map carrying</span>
+<span class="c1">-- the branch test and the rebuild in the same step.</span>
+<span class="kr">module</span> <span class="nn">Before</span> <span class="kr">where</span>
+
+<span class="kr">data</span> <span class="kt">Ok</span>     <span class="o">=</span> <span class="kt">Ok</span>     <span class="p">{</span> <span class="n">okValue</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+<span class="kr">data</span> <span class="kt">Result</span> <span class="o">=</span> <span class="kt">Succeeded</span> <span class="kt">Ok</span> <span class="o">|</span> <span class="kt">Failed</span> <span class="kt">String</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="n">bumpSucceeded</span> <span class="o">::</span> <span class="p">[</span><span class="kt">Result</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">Result</span><span class="p">]</span>
+<span class="n">bumpSucceeded</span> <span class="o">=</span> <span class="n">map</span> <span class="n">step</span>
+  <span class="kr">where</span>
+    <span class="n">step</span> <span class="p">(</span><span class="kt">Succeeded</span> <span class="n">ok</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Succeeded</span> <span class="n">ok</span> <span class="p">{</span> <span class="n">okValue</span> <span class="o">=</span> <span class="n">okValue</span> <span class="n">ok</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">}</span>
+    <span class="n">step</span> <span class="n">f</span><span class="o">@</span><span class="p">(</span><span class="kt">Failed</span> <span class="kr">_</span><span class="p">)</span>   <span class="o">=</span> <span class="n">f</span></code></pre></figure>
+
+</div>
+</div>
+
+<div class="rf-pair">
+<div><h4>After · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Same, with a small traversal composed with a prism and a lens:</span>
+<span class="c1">// reach every element, match the succeeded branch, edit its value.</span>
+<span class="k">object</span> <span class="nc">After</span><span class="k">:</span>
+  <span class="kt">import</span> <span class="kt">Optics.*</span>
+
+  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Ok</span><span class="o">(</span><span class="kt">value:</span> <span class="kt">Int</span><span class="o">)</span>
+  <span class="kt">enum</span> <span class="kt">Result:</span>
+    <span class="kt">case</span> <span class="kt">Succeeded</span><span class="o">(</span><span class="kt">v:</span> <span class="kt">Ok</span><span class="o">)</span>
+    <span class="kt">case</span> <span class="kt">Failed</span><span class="o">(</span><span class="kt">msg:</span> <span class="kt">String</span><span class="o">)</span>
+
+  <span class="kt">import</span> <span class="kt">Result.*</span>
+
+  <span class="kt">val</span> <span class="kt">succeededP:</span> <span class="kt">Prism</span><span class="o">[</span><span class="kt">Result</span>, <span class="kt">Ok</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">Prism</span><span class="o">[</span><span class="kt">Result</span>, <span class="kt">Ok</span><span class="o">](</span>
+      <span class="o">{</span> <span class="k">case</span> <span class="nc">Succeeded</span><span class="o">(</span><span class="n">v</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">(</span><span class="n">v</span><span class="o">);</span> <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="nc">None</span> <span class="o">},</span>
+      <span class="nc">Succeeded</span><span class="o">(</span><span class="k">_</span><span class="o">),</span>
+    <span class="o">)</span>
+  <span class="k">val</span> <span class="nv">valueL</span><span class="k">:</span> <span class="kt">Lens</span><span class="o">[</span><span class="kt">Ok</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nc">Lens</span><span class="o">[</span><span class="kt">Ok</span>, <span class="kt">Int</span><span class="o">](</span><span class="nv">_</span><span class="o">.</span><span class="py">value</span><span class="o">,</span> <span class="o">(</span><span class="n">ok</span><span class="o">,</span> <span class="n">v</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">ok</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">value</span> <span class="k">=</span> <span class="n">v</span><span class="o">))</span>
+  <span class="k">val</span> <span class="nv">okVal</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">Result</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="nf">compose</span><span class="o">(</span><span class="n">succeededP</span><span class="o">,</span> <span class="n">valueL</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">eachSucceeded</span><span class="k">:</span> <span class="kt">PartialLens</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Result</span><span class="o">]</span>, <span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="nf">each</span><span class="o">(</span><span class="n">okVal</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">bumpSucceeded</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Result</span><span class="o">])</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Result</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nf">over</span><span class="o">(</span><span class="n">eachSucceeded</span><span class="o">,</span> <span class="k">_</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)(</span><span class="n">xs</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>After · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Same, with a small traversal composed with a prism and a lens:</span>
+<span class="c1">-- reach every element, match the succeeded branch, edit its value.</span>
+<span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Optics</span> <span class="p">(</span><span class="kt">Lens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Prism</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">PartialLens</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="nf">composeO</span><span class="p">,</span> <span class="nf">each</span><span class="p">,</span> <span class="nf">over</span><span class="p">)</span>
+
+<span class="kr">data</span> <span class="kt">Ok</span>     <span class="o">=</span> <span class="kt">Ok</span>     <span class="p">{</span> <span class="n">okValue</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+<span class="kr">data</span> <span class="kt">Result</span> <span class="o">=</span> <span class="kt">Succeeded</span> <span class="kt">Ok</span> <span class="o">|</span> <span class="kt">Failed</span> <span class="kt">String</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="n">succeededP</span> <span class="o">::</span> <span class="kt">Prism</span> <span class="kt">Result</span> <span class="kt">Ok</span>
+<span class="n">succeededP</span> <span class="o">=</span> <span class="kt">Prism</span>
+  <span class="p">{</span> <span class="n">preview</span> <span class="o">=</span> <span class="nf">\</span><span class="n">r</span> <span class="o">-&gt;</span> <span class="kr">case</span> <span class="n">r</span> <span class="kr">of</span> <span class="kt">Succeeded</span> <span class="n">ok</span> <span class="o">-&gt;</span> <span class="kt">Just</span> <span class="n">ok</span><span class="p">;</span> <span class="kr">_</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+  <span class="p">,</span> <span class="n">review</span>  <span class="o">=</span> <span class="kt">Succeeded</span>
+  <span class="p">}</span>
+
+<span class="n">valueL</span> <span class="o">::</span> <span class="kt">Lens</span> <span class="kt">Ok</span> <span class="kt">Int</span>
+<span class="n">valueL</span> <span class="o">=</span> <span class="kt">Lens</span> <span class="p">{</span> <span class="n">view</span> <span class="o">=</span> <span class="n">okValue</span><span class="p">,</span> <span class="n">set</span> <span class="o">=</span> <span class="nf">\</span><span class="p">(</span><span class="n">ok</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ok</span> <span class="p">{</span> <span class="n">okValue</span> <span class="o">=</span> <span class="n">v</span> <span class="p">}</span> <span class="p">}</span>
+
+<span class="n">okVal</span> <span class="o">::</span> <span class="kt">PartialLens</span> <span class="kt">Result</span> <span class="kt">Int</span>
+<span class="n">okVal</span> <span class="o">=</span> <span class="n">composeO</span> <span class="n">succeededP</span> <span class="n">valueL</span>
+
+<span class="n">eachSucceeded</span> <span class="o">::</span> <span class="kt">PartialLens</span> <span class="p">[</span><span class="kt">Result</span><span class="p">]</span> <span class="kt">Int</span>
+<span class="n">eachSucceeded</span> <span class="o">=</span> <span class="n">each</span> <span class="n">okVal</span>
+
+<span class="n">bumpSucceeded</span> <span class="o">::</span> <span class="p">[</span><span class="kt">Result</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">Result</span><span class="p">]</span>
+<span class="n">bumpSucceeded</span> <span class="o">=</span> <span class="n">over</span> <span class="n">eachSucceeded</span> <span class="p">(</span><span class="o">+</span> <span class="mi">1</span><span class="p">)</span></code></pre></figure>
+
+</div>
+</div>
+
+<details class="rf-spec">
+<summary>The property: <code>Before.bumpSucceeded == After.bumpSucceeded</code> on generated batches, and only successes are bumped</summary>
+<div class="rf-pair">
+<div><h4>Spec · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">//&gt; using scala 3.3.4</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-core:0.14.0</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-runner:0.14.0</span>
+<span class="k">import</span> <span class="nn">hedgehog.</span><span class="o">*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">core</span><span class="o">.*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">runner</span><span class="o">.*</span>
+
+<span class="k">object</span> <span class="nc">Props</span> <span class="k">extends</span> <span class="nc">Properties</span><span class="k">:</span>
+  <span class="kt">def</span> <span class="kt">tests:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Test</span><span class="o">]</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"bumpSucceeded: Before == After"</span><span class="o">,</span> <span class="n">agrees</span><span class="o">),</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"only successes are bumped, messages pass through"</span><span class="o">,</span>
+      <span class="n">onlySucceeded</span><span class="o">),</span>
+  <span class="o">)</span>
+
+  <span class="c1">// A neutral list, so one generated input feeds both Result types.</span>
+  <span class="n">enum</span> <span class="n">R</span><span class="k">:</span>
+    <span class="kt">case</span> <span class="kt">Succeeded</span><span class="o">(</span><span class="kt">value:</span> <span class="kt">Int</span><span class="o">)</span>
+    <span class="kt">case</span> <span class="kt">Failed</span><span class="o">(</span><span class="kt">msg:</span> <span class="kt">String</span><span class="o">)</span>
+
+  <span class="kt">val</span> <span class="kt">genValue:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="nv">Gen</span><span class="o">.</span><span class="py">int</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(-</span><span class="mi">100</span><span class="o">,</span> <span class="mi">100</span><span class="o">))</span>
+  <span class="k">val</span> <span class="nv">genMsg</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nv">Gen</span><span class="o">.</span><span class="py">alpha</span><span class="o">.</span><span class="py">list</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">6</span><span class="o">)).</span><span class="py">map</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">mkString</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nf">genR</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">R</span><span class="o">]</span> <span class="k">=</span>
+    <span class="nv">Gen</span><span class="o">.</span><span class="py">choice1</span><span class="o">(</span>
+      <span class="nv">genValue</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="nv">R</span><span class="o">.</span><span class="py">Succeeded</span><span class="o">(</span><span class="k">_</span><span class="o">)),</span>
+      <span class="nv">genMsg</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="nv">R</span><span class="o">.</span><span class="py">Failed</span><span class="o">(</span><span class="k">_</span><span class="o">)),</span>
+    <span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">toBefore</span><span class="o">(</span><span class="n">r</span><span class="k">:</span> <span class="kt">R</span><span class="o">)</span><span class="k">:</span> <span class="kt">Before.Result</span> <span class="o">=</span> <span class="n">r</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">R</span><span class="o">.</span><span class="py">Succeeded</span><span class="o">(</span><span class="n">v</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Result</span><span class="o">.</span><span class="py">Succeeded</span><span class="o">(</span><span class="nv">Before</span><span class="o">.</span><span class="py">Ok</span><span class="o">(</span><span class="n">v</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nv">R</span><span class="o">.</span><span class="py">Failed</span><span class="o">(</span><span class="n">m</span><span class="o">)</span>    <span class="k">=&gt;</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Result</span><span class="o">.</span><span class="py">Failed</span><span class="o">(</span><span class="n">m</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nf">fromBefore</span><span class="o">(</span><span class="n">r</span><span class="k">:</span> <span class="kt">Before.Result</span><span class="o">)</span><span class="k">:</span> <span class="kt">R</span> <span class="o">=</span> <span class="n">r</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Result</span><span class="o">.</span><span class="py">Succeeded</span><span class="o">(</span><span class="n">ok</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">R</span><span class="o">.</span><span class="py">Succeeded</span><span class="o">(</span><span class="nv">ok</span><span class="o">.</span><span class="py">value</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Result</span><span class="o">.</span><span class="py">Failed</span><span class="o">(</span><span class="n">m</span><span class="o">)</span>     <span class="k">=&gt;</span> <span class="nv">R</span><span class="o">.</span><span class="py">Failed</span><span class="o">(</span><span class="n">m</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nf">toAfter</span><span class="o">(</span><span class="n">r</span><span class="k">:</span> <span class="kt">R</span><span class="o">)</span><span class="k">:</span> <span class="kt">After.Result</span> <span class="o">=</span> <span class="n">r</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">R</span><span class="o">.</span><span class="py">Succeeded</span><span class="o">(</span><span class="n">v</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">After</span><span class="o">.</span><span class="py">Result</span><span class="o">.</span><span class="py">Succeeded</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">Ok</span><span class="o">(</span><span class="n">v</span><span class="o">))</span>
+    <span class="k">case</span> <span class="nv">R</span><span class="o">.</span><span class="py">Failed</span><span class="o">(</span><span class="n">m</span><span class="o">)</span>    <span class="k">=&gt;</span> <span class="nv">After</span><span class="o">.</span><span class="py">Result</span><span class="o">.</span><span class="py">Failed</span><span class="o">(</span><span class="n">m</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nf">fromAfter</span><span class="o">(</span><span class="n">r</span><span class="k">:</span> <span class="kt">After.Result</span><span class="o">)</span><span class="k">:</span> <span class="kt">R</span> <span class="o">=</span> <span class="n">r</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">After</span><span class="o">.</span><span class="py">Result</span><span class="o">.</span><span class="py">Succeeded</span><span class="o">(</span><span class="n">ok</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">R</span><span class="o">.</span><span class="py">Succeeded</span><span class="o">(</span><span class="nv">ok</span><span class="o">.</span><span class="py">value</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">After</span><span class="o">.</span><span class="py">Result</span><span class="o">.</span><span class="py">Failed</span><span class="o">(</span><span class="n">m</span><span class="o">)</span>     <span class="k">=&gt;</span> <span class="nv">R</span><span class="o">.</span><span class="py">Failed</span><span class="o">(</span><span class="n">m</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">agrees</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span> <span class="n">xs</span> <span class="k">&lt;-</span> <span class="nv">genR</span><span class="o">.</span><span class="py">list</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">10</span><span class="o">)).</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="nv">Before</span><span class="o">.</span><span class="py">bumpSucceeded</span><span class="o">(</span><span class="nv">xs</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">toBefore</span><span class="o">)).</span><span class="py">map</span><span class="o">(</span><span class="n">fromBefore</span><span class="o">)</span>
+        <span class="o">====</span> <span class="nv">After</span><span class="o">.</span><span class="py">bumpSucceeded</span><span class="o">(</span><span class="nv">xs</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">toAfter</span><span class="o">)).</span><span class="py">map</span><span class="o">(</span><span class="n">fromAfter</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">onlySucceeded</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span> <span class="n">xs</span> <span class="k">&lt;-</span> <span class="nv">genR</span><span class="o">.</span><span class="py">list</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">10</span><span class="o">)).</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="k">val</span> <span class="nv">bumped</span> <span class="k">=</span>
+        <span class="nv">After</span><span class="o">.</span><span class="py">bumpSucceeded</span><span class="o">(</span><span class="nv">xs</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">toAfter</span><span class="o">)).</span><span class="py">map</span><span class="o">(</span><span class="n">fromAfter</span><span class="o">)</span>
+      <span class="nv">bumped</span><span class="o">.</span><span class="py">zip</span><span class="o">(</span><span class="n">xs</span><span class="o">).</span><span class="py">forall</span> <span class="o">{</span>
+        <span class="nf">case</span> <span class="o">(</span><span class="nv">R</span><span class="o">.</span><span class="py">Succeeded</span><span class="o">(</span><span class="n">v1</span><span class="o">),</span> <span class="nv">R</span><span class="o">.</span><span class="py">Succeeded</span><span class="o">(</span><span class="n">v0</span><span class="o">))</span> <span class="k">=&gt;</span> <span class="n">v1</span> <span class="o">==</span> <span class="n">v0</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="nf">case</span> <span class="o">(</span><span class="nv">R</span><span class="o">.</span><span class="py">Failed</span><span class="o">(</span><span class="n">m1</span><span class="o">),</span> <span class="nv">R</span><span class="o">.</span><span class="py">Failed</span><span class="o">(</span><span class="n">m0</span><span class="o">))</span>       <span class="k">=&gt;</span> <span class="n">m1</span> <span class="o">==</span> <span class="n">m0</span>
+        <span class="k">case</span> <span class="k">_</span>                                  <span class="k">=&gt;</span> <span class="kc">false</span>
+      <span class="o">}</span> <span class="o">====</span> <span class="kc">true</span>
+<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nv">SpecRunner</span><span class="o">.</span><span class="py">run</span><span class="o">(</span><span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>Spec · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="cp">{-# LANGUAGE OverloadedStrings #-}</span>
+<span class="kr">module</span> <span class="nn">Main</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Control.Monad</span> <span class="p">(</span><span class="nf">unless</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">System.Exit</span> <span class="p">(</span><span class="nf">exitFailure</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Hedgehog</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Gen</span> <span class="k">as</span> <span class="n">Gen</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Range</span> <span class="k">as</span> <span class="n">Range</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Before</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">After</span>
+
+<span class="c1">-- A neutral list element, so one generated input feeds both types.</span>
+<span class="kr">data</span> <span class="kt">R</span> <span class="o">=</span> <span class="kt">Succeeded</span> <span class="kt">Int</span> <span class="o">|</span> <span class="kt">Failed</span> <span class="kt">String</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="n">genValue</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">Int</span>
+<span class="n">genValue</span> <span class="o">=</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span> <span class="mi">100</span><span class="p">)</span>
+
+<span class="n">genMsg</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">String</span>
+<span class="n">genMsg</span> <span class="o">=</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">string</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="mi">0</span> <span class="mi">6</span><span class="p">)</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">alpha</span>
+
+<span class="n">genR</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">R</span>
+<span class="n">genR</span> <span class="o">=</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">choice</span>
+  <span class="p">[</span> <span class="kt">Succeeded</span> <span class="o">&lt;$&gt;</span> <span class="n">genValue</span>
+  <span class="p">,</span> <span class="kt">Failed</span> <span class="o">&lt;$&gt;</span> <span class="n">genMsg</span>
+  <span class="p">]</span>
+
+<span class="n">toBefore</span> <span class="o">::</span> <span class="kt">R</span> <span class="o">-&gt;</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Result</span>
+<span class="n">toBefore</span> <span class="p">(</span><span class="kt">Succeeded</span> <span class="n">v</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Succeeded</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">Ok</span> <span class="n">v</span><span class="p">)</span>
+<span class="n">toBefore</span> <span class="p">(</span><span class="kt">Failed</span> <span class="n">m</span><span class="p">)</span>    <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Failed</span> <span class="n">m</span>
+
+<span class="n">fromBefore</span> <span class="o">::</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Result</span> <span class="o">-&gt;</span> <span class="kt">R</span>
+<span class="n">fromBefore</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">Succeeded</span> <span class="n">ok</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Succeeded</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">okValue</span> <span class="n">ok</span><span class="p">)</span>
+<span class="n">fromBefore</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">Failed</span> <span class="n">m</span><span class="p">)</span>     <span class="o">=</span> <span class="kt">Failed</span> <span class="n">m</span>
+
+<span class="n">toAfter</span> <span class="o">::</span> <span class="kt">R</span> <span class="o">-&gt;</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Result</span>
+<span class="n">toAfter</span> <span class="p">(</span><span class="kt">Succeeded</span> <span class="n">v</span><span class="p">)</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Succeeded</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Ok</span> <span class="n">v</span><span class="p">)</span>
+<span class="n">toAfter</span> <span class="p">(</span><span class="kt">Failed</span> <span class="n">m</span><span class="p">)</span>    <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Failed</span> <span class="n">m</span>
+
+<span class="n">fromAfter</span> <span class="o">::</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Result</span> <span class="o">-&gt;</span> <span class="kt">R</span>
+<span class="n">fromAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Succeeded</span> <span class="n">ok</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Succeeded</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">okValue</span> <span class="n">ok</span><span class="p">)</span>
+<span class="n">fromAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Failed</span> <span class="n">m</span><span class="p">)</span>     <span class="o">=</span> <span class="kt">Failed</span> <span class="n">m</span>
+
+<span class="n">prop_agrees</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_agrees</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">xs</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="p">(</span><span class="kt">Gen</span><span class="o">.</span><span class="n">list</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="mi">0</span> <span class="mi">10</span><span class="p">)</span> <span class="n">genR</span><span class="p">)</span>
+  <span class="n">map</span> <span class="n">fromBefore</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">bumpSucceeded</span> <span class="p">(</span><span class="n">map</span> <span class="n">toBefore</span> <span class="n">xs</span><span class="p">))</span>
+    <span class="o">===</span> <span class="n">map</span> <span class="n">fromAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">bumpSucceeded</span> <span class="p">(</span><span class="n">map</span> <span class="n">toAfter</span> <span class="n">xs</span><span class="p">))</span>
+
+<span class="n">prop_only_succeeded</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_only_succeeded</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">xs</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="p">(</span><span class="kt">Gen</span><span class="o">.</span><span class="n">list</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="mi">0</span> <span class="mi">10</span><span class="p">)</span> <span class="n">genR</span><span class="p">)</span>
+  <span class="kr">let</span> <span class="n">bumped</span> <span class="o">=</span> <span class="n">map</span> <span class="n">fromAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">bumpSucceeded</span> <span class="p">(</span><span class="n">map</span> <span class="n">toAfter</span> <span class="n">xs</span><span class="p">))</span>
+  <span class="n">and</span> <span class="p">(</span><span class="n">zipWith</span> <span class="n">check</span> <span class="n">bumped</span> <span class="n">xs</span><span class="p">)</span> <span class="o">===</span> <span class="kt">True</span>
+  <span class="kr">where</span>
+    <span class="n">check</span> <span class="p">(</span><span class="kt">Succeeded</span> <span class="n">v1</span><span class="p">)</span> <span class="p">(</span><span class="kt">Succeeded</span> <span class="n">v0</span><span class="p">)</span> <span class="o">=</span> <span class="n">v1</span> <span class="o">==</span> <span class="n">v0</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">check</span> <span class="p">(</span><span class="kt">Failed</span> <span class="n">m1</span><span class="p">)</span>    <span class="p">(</span><span class="kt">Failed</span> <span class="n">m0</span><span class="p">)</span>    <span class="o">=</span> <span class="n">m1</span> <span class="o">==</span> <span class="n">m0</span>
+    <span class="n">check</span> <span class="kr">_</span> <span class="kr">_</span>                           <span class="o">=</span> <span class="kt">False</span>
+
+<span class="n">main</span> <span class="o">::</span> <span class="kt">IO</span> <span class="nb">()</span>
+<span class="n">main</span> <span class="o">=</span> <span class="kr">do</span>
+  <span class="n">ok</span> <span class="o">&lt;-</span> <span class="n">checkParallel</span> <span class="o">$</span> <span class="kt">Group</span> <span class="s">"Props"</span>
+    <span class="p">[</span> <span class="p">(</span><span class="s">"bumpSucceeded: Before == After"</span><span class="p">,</span> <span class="n">prop_agrees</span><span class="p">)</span>
+    <span class="p">,</span> <span class="p">(</span><span class="s">"only successes bumped, messages pass through"</span><span class="p">,</span>
+      <span class="n">prop_only_succeeded</span><span class="p">)</span>
+    <span class="p">]</span>
+  <span class="n">unless</span> <span class="n">ok</span> <span class="n">exitFailure</span></code></pre></figure>
+
+</div>
+</div>
+</details>
+
+<h2 id="pitfalls">Pitfalls</h2>
+
+<p>The real pitfalls of this move are the ones that come from carrying
+machinery that does not earn its keep, or from rebuilding more than
+the focus.</p>
+
+<ul>
+  <li><strong>Accidental complexity.</strong> An optic is worth its indirection when
+the path composes or varies; a lens for a leaf field that only one
+caller reads and one writes is a detour — a plain field says the
+same thing. The same for a traversal where a plain <code class="language-plaintext highlighter-rouge">map</code> with an
+explicit match would do: if the container and the branch never
+change, the two-in-one loop is clearer. This is the inverse side of
+the equation; it is also the most common way the move goes wrong.</li>
+  <li><strong>Rebuilding more than the focus.</strong> When you write an optic by
+hand, the writer must rebuild only what was matched or selected. A
+prism’s <code class="language-plaintext highlighter-rouge">review</code> that reconstructs a value with the wrong fields,
+or a <code class="language-plaintext highlighter-rouge">set</code> that touches a neighbouring field, silently changes the
+program — the composition is only as good as the instances you
+compose, which is why the law-solvers in Verification matter.</li>
+  <li><strong>Laziness and evaluation count.</strong> <code class="language-plaintext highlighter-rouge">modify</code> reads the focus,
+applies a function and writes it back. In Haskell the setter is
+lazy in the new value, and rewriting one element of a traversal
+must not force the others; in Scala a <code class="language-plaintext highlighter-rouge">def</code> recomputes and a <code class="language-plaintext highlighter-rouge">val</code>
+shares, so where a lens is stored and how it is applied changes how
+often its functions run.</li>
+  <li><strong>Choosing the wrong family.</strong> A lens addresses exactly one field,
+a prism one branch, a traversal many. “Focus a pair of fields” or
+“edit a field that may be absent” are different families (an affine
+traversal, a prism), and composing optics whose foci do not line up
+is a type error, not a runtime bug — the types reject the onesided
+composition, so the mistake shows up at compile time rather than in
+production.</li>
+</ul>
+
+<p>In each case the fix is the same: choose the smallest optic that says
+the path, derive it from the type when you can, and check the ones you
+write by hand.</p>
+
+<h2 id="verification">Verification</h2>
+
+<p>Because the move is an equation, its correctness is a property: for all
+inputs <em>x</em> in the domain of the entry point, <code class="language-plaintext highlighter-rouge">Before x == After x</code>. That
+is a one-line property in the sense Claessen and Hughes introduced with
+QuickCheck, where a generator produces inputs and the framework searches
+for a counterexample and shrinks it to a minimal one [<a href="#ref-13">13</a>]. The catalogue
+states every entry this way, in Scala and in Haskell, with hedgehog on
+both sides [<a href="#ref-14">14</a>]. Hedgehog is used because its shrinking is integrated
+into the generator, so a shrunk counterexample obeys the same invariants
+as a generated one and the minimal failing input it reports is a real
+input of the program, not an artefact of a separate shrinker.</p>
+
+<p>A property is only worth having if it can fail, so each spec above was
+mutation-checked: change <code class="language-plaintext highlighter-rouge">After</code> so it is no longer equivalent — a sign
+flip, a wrong target — confirm the property reports and shrinks a
+counterexample, then restore <code class="language-plaintext highlighter-rouge">After</code>. A property that does not fail
+under mutation is testing the generator, not the refactoring.</p>
+
+<p>The optics themselves need no per-example law properties, because they
+are lawful by construction — but the libraries ship <em>law-solvers</em> for
+the instances you do write by hand, so you do not have to re-derive
+the rules. <a href="https://eo.constructive.dev">eo</a> ships <code class="language-plaintext highlighter-rouge">cats-eo-laws</code> with
+<code class="language-plaintext highlighter-rouge">FooTests</code>/<code class="language-plaintext highlighter-rouge">FooLaws</code> for every optic family, Monocle ships
+<code class="language-plaintext highlighter-rouge">monocle-law</code> with <code class="language-plaintext highlighter-rouge">LensLaws</code> and <code class="language-plaintext highlighter-rouge">PrismLaws</code> [<a href="#ref-11">11</a>], and for Haskell
+<code class="language-plaintext highlighter-rouge">genvalidity-hspec-optics</code> provides <code class="language-plaintext highlighter-rouge">lensSpec</code> and <code class="language-plaintext highlighter-rouge">prismSpec</code>
+one-liners [<a href="#ref-12">12</a>]. The property checks the refactoring; the solvers
+check the optics you wrote to do it.</p>
+
+<p>To run everything on this page yourself, from a checkout of
+<a href="https://github.com/Constructive-Programming/website">the site repository</a>:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sh pages/refactorings/replace-mutable-fields-with-lenses/run.sh
+</code></pre></div></div>
+
+<p>It needs <a href="https://scala-cli.virtuslab.org/">scala-cli</a> and either GHC
+with hedgehog installed or Docker, and ends with <code class="language-plaintext highlighter-rouge">all properties passed</code>.</p>
+
+<h2 id="references">References</h2>
+
+<ol>
+<li id="ref-1">Martin Fowler. <em>Refactoring: Improving the Design of Existing Code</em>. Addison-Wesley, 1999. <a href="https://martinfowler.com/books/refactoring.html">https://martinfowler.com/books/refactoring.html</a></li>
+<li id="ref-2">Martin Fowler. <em>Encapsulate Variable</em> (formerly <em>Encapsulate Field</em>, before that <em>Self-Encapsulate Field</em>). Refactoring.com, online edition. <a href="https://refactoring.com/catalog/encapsulateField.html">https://refactoring.com/catalog/encapsulateField.html</a></li>
+<li id="ref-3">Martin Fowler. <em>Remove Setting Method</em>. Refactoring.com, online edition. <a href="https://refactoring.com/catalog/removeSettingMethod.html">https://refactoring.com/catalog/removeSettingMethod.html</a></li>
+<li id="ref-4">J. Nathan Foster, Michael B. Greenwald, Jonathan T. Moore, Benjamin C. Pierce and Alan Schmitt. &ldquo;Combinators for Bidirectional Tree Transformations: A Linguistic Approach to the View-Update Problem&rdquo;. <em>ACM Transactions on Programming Languages and Systems</em> 29(3):17, 2007. <a href="https://doi.org/10.1145/1232420.1232424">https://doi.org/10.1145/1232420.1232424</a></li>
+<li id="ref-5">Russell O&rsquo;Connor. &ldquo;Functor is to Lens as Applicative is to Biplate: Introducing Multiplate&rdquo;. In <em>Proceedings of the ACM SIGPLAN Workshop on Generic Programming (WGP 2011)</em>, pp. 25&ndash;36. <a href="https://arxiv.org/abs/1103.2841">https://arxiv.org/abs/1103.2841</a></li>
+<li id="ref-6">Jeremy Gibbons and Michael Johnson. &ldquo;Relating Algebraic and Coalgebraic Descriptions of Lenses&rdquo;. <em>Electronic Communications of the EASST</em> 49:1&ndash;16, 2012 (Workshop on Bidirectional Transformations 2012). <a href="https://doi.org/10.14279/tuj.eceasst.49.726">https://doi.org/10.14279/tuj.eceasst.49.726</a></li>
+<li id="ref-7">Twan van Laarhoven. &ldquo;Talk on Lenses&rdquo;. Slides, Radboud University Nijmegen, 17 May 2011. <a href="https://www.twanvl.nl/blog/news/2011-05-19-lenses-talk">https://www.twanvl.nl/blog/news/2011-05-19-lenses-talk</a></li>
+<li id="ref-8">Edward Kmett. <em>lens: Lenses, Folds and Traversals</em>, and <em>Control.Lens</em> documentation. <a href="https://hackage.haskell.org/package/lens">https://hackage.haskell.org/package/lens</a></li>
+<li id="ref-9">Matthew Pickering, Jeremy Gibbons and Nicolas Wu. &ldquo;Profunctor Optics: Modular Data Accessors&rdquo;. <em>The Art, Science, and Engineering of Programming</em> 1(2):7, 2017. <a href="https://doi.org/10.22152/programming-journal.org/2017/1/7">https://doi.org/10.22152/programming-journal.org/2017/1/7</a></li>
+<li id="ref-10">Mirko Stocker. <em>Scala Refactoring</em>. Master&rsquo;s thesis, HSR Hochschule f&uuml;r Technik Rapperswil, 2010. <a href="https://eprints.ost.ch/id/eprint/286/">https://eprints.ost.ch/id/eprint/286/</a></li>
+<li id="ref-11">Julien Truffaut and contributors. <em>Monocle: Optics Library for Scala</em> (including <code>monocle-law</code>). <a href="https://www.optics.dev/Monocle/">https://www.optics.dev/Monocle/</a></li>
+<li id="ref-12">Constructive Programming. <em>eo: optics library and cookbook for Scala 3</em>. <a href="https://eo.constructive.dev">https://eo.constructive.dev</a> (<a href="https://eo.constructive.dev/cookbook">cookbook</a>)</li>
+<li id="ref-13">Koen Claessen and John Hughes. &ldquo;QuickCheck: a lightweight tool for random testing of Haskell programs&rdquo;. In <em>Proceedings of the ACM SIGPLAN International Conference on Functional Programming (ICFP 2000)</em>, pp. 268&ndash;279. <a href="https://doi.org/10.1145/351240.351266">https://doi.org/10.1145/351240.351266</a></li>
+<li id="ref-14">Jacob Stanley and contributors. <em>Hedgehog: release with confidence, state-of-the-art property testing</em>. <a href="https://github.com/hedgehogqa/haskell-hedgehog">https://github.com/hedgehogqa/haskell-hedgehog</a> and <a href="https://github.com/hedgehogqa/scala-hedgehog">https://github.com/hedgehogqa/scala-hedgehog</a></li>
+</ol>
+
+    </section>
+    <!-- Category and Tag list -->
+    <div class="tag-category-container">
+        <!-- Category list -->
+        
+        
+
+
+
+  <div class="category-list"></div>
+
+
+
+        <!-- Tag list for portfolio -->
+        
+        
+
+
+
+  <div class="tag-list" data-testid="tag-list">
+    <ul>
+      
+        <li class="meta">Tags</li>
+      
+
+      
+        <li><a class="button" data-testid="tag-link" href="/pr-preview/pr-14/tags#refactorings">
+          <p><i class="fa-tag" aria-hidden="true"></i>refactorings</p>
+        </a></li>
+      
+        <li><a class="button" data-testid="tag-link" href="/pr-preview/pr-14/tags#replace-mutable-fields-with-lenses">
+          <p><i class="fa-tag" aria-hidden="true"></i>replace-mutable-fields-with-lenses</p>
+        </a></li>
+      
+    </ul>
+  </div>
+
+
+    </div>
+</article>
+
+    </main>
+    
+    <footer class="site-footer"> <p class="text"> Copyright Constructive Programming, 2026 </p> <p class="text footer-legal">Constructive Programming · E&amp;O insurance available on request.</p> <div class="footer-icons"> <ul> <li> <a href="/pr-preview/pr-14/feed.xml" title="Follow RSS feed" aria-label="RSS feed" target="_blank" rel="noopener"> <svg class="cp-social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20 5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1Z"/> </svg> </a> </li> <li> <a href="https://github.com/Constructive-Programming" title="Follow on Github" aria-label="Github" target="_blank" rel="noopener"><svg class="cp-social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/> </svg></a> </li> <li> <a href="https://www.linkedin.com/in/rodolfohansen" title="Follow on Linkedin" aria-label="Linkedin" target="_blank" rel="noopener"><svg class="cp-social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.063 2.063 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/> </svg></a> </li> <li> <a href="mailto:consulting@constructive.dev" title="Follow on Mail" aria-label="Mail" target="_blank" rel="noopener"><svg class="cp-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"> <rect x="3" y="5" width="18" height="14" rx="2"/> <path d="m3 7 9 6 9-6"/> </svg></a> </li> <li> <a href="https://medium.com/@rodolfohansen" title="Follow on Medium" aria-label="Medium" target="_blank" rel="noopener"><svg class="cp-social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M13.54 12c0 3.04-2.42 5.5-5.42 5.5S2.7 15.04 2.7 12s2.42-5.5 5.42-5.5 5.42 2.46 5.42 5.5zm5.95 0c0 2.86-1.21 5.18-2.71 5.18s-2.71-2.32-2.71-5.18 1.21-5.18 2.71-5.18 2.71 2.32 2.71 5.18zM24 12c0 2.56-.43 4.64-.95 4.64s-.95-2.08-.95-4.64.43-4.64.95-4.64S24 9.44 24 12z"/> </svg></a> </li> </ul> </div> </footer>
+  </body>
+</html>
