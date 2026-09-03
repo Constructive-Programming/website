@@ -63,13 +63,10 @@ PreCommit:
     requires_files: true
     command: ['bundle', 'exec', 'mdl']
 
-  # Spelling (previously codespell; still codespell, invoked through the
-  # Ruby harness — see .git-hooks/pre_commit/codespell.rb). Install it with
-  # `pip install codespell`.
-  Codespell:
+  # Spelling with spellr (Ruby, replaces codespell — see
+  # .git-hooks/pre_commit/spellr.rb). Wordlist: .spellr_wordlists/.
+  Spellr:
     enabled: true
-    required_executable: codespell
-    install_command: 'pip install codespell'
     requires_files: true
 
   # Refactoring sample sources must stay within the 72-char pane width

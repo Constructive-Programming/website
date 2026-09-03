@@ -7,4 +7,5 @@ group :development do
   # scripts/lint.sh (see .overcommit.yml).
   gem "overcommit", "~> 0.68"
   gem "mdl", "~> 0.13"
+  gem "spellr", "~> 0.12"
 end

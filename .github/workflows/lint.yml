@@ -20,9 +20,6 @@ jobs:
           ruby-version: "3.3"
           bundler-cache: true
 
-      # codespell is the one non-Ruby tool in the suite; install directly.
-      - run: pip install codespell
-
       - name: Run the lint suite
         run: scripts/lint.sh
 

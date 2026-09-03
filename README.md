@@ -18,12 +18,11 @@ theme, deployed to GitHub Pages from the `gh-pages` branch.
   ```sh
   bundle install
   bundle exec overcommit --install
-  # only required for the spell check:
-  pip install codespell
   ```
 
   Rules: Markdown (`mdl`, style in [`.mdlrc`](.mdlrc) +
-  [`mdl_style.rb`](mdl_style.rb)), spelling (codespell), hygiene checks
+  [`mdl_style.rb`](mdl_style.rb)), spelling (spellr, wordlist in
+  [`.spellr_wordlists/`](.spellr_wordlists/)), hygiene checks
   (trailing whitespace, final newline, YAML/JSON syntax, merge markers,
   case conflicts, executable/shebang consistency) and a 72-char pane-width
   cap on the refactoring sample sources. Run everything at any time with
