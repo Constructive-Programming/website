@@ -22,10 +22,11 @@ criteria:
 - **Termination** — every computation eventually finishes.
 
 The methodology is the lens through which we read code, design APIs, and
-prepare a codebase to be co-piloted by LLMs. The [Libraries]({{ '/libraries/' | relative_url }})
-page lists the OSS that puts the methodology into Scala practice, and the
-home page introduces [Fixed](https://github.com/Constructive-Programming/fixed) —
-a new language being designed around the same principles.
+prepare a codebase to be co-piloted by LLMs. The
+[Libraries]({{ '/libraries/' | relative_url }}) page lists the OSS that
+puts the methodology into Scala practice, and the home page introduces
+[Fixed](https://github.com/Constructive-Programming/fixed) — a new
+language being designed around the same principles.
 
 ## The team
 

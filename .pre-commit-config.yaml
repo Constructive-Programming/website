@@ -1,0 +1,51 @@
+# Linting for the site. The same rules run locally (pre-commit) and in
+# CI (.github/workflows/lint.yml runs `pre-commit run --all-files`), so
+# the two can never drift apart.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-json
+        # search.json is a Jekyll/Liquid template with a front matter,
+        # not a plain JSON file.
+        exclude: ^assets/data/search\.json$
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+
+  # Spelling on Markdown and code comments (the refactoring samples are
+  # .scala/.hs, which codespell checks as plain text).
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.3
+    hooks:
+      - id: codespell
+        args:
+          - --ignore-words-list
+          # German proper nouns used in the refactoring pages' citations.
+          - Claus,Technik
+        exclude: ^assets/img/_site/
+
+  - repo: local
+    hooks:
+      # Markdown style; config lives in .markdownlint-cli2.yaml so editors
+      # and CI share the exact same rules.
+      - id: markdownlint-cli2
+        name: markdownlint (markdownlint-cli2)
+        language: node
+        additional_dependencies: ["markdownlint-cli2@0.23.2"]
+        entry: markdownlint-cli2
+        args: [--config, .markdownlint-cli2.yaml, "**/*.md"]
+        pass_filenames: false
+
+      # Refactoring samples: LESSONS.md fixes the pane width at 72 chars
+      # and the teaching code is deliberately aligned by hand, so we
+      # enforce the width rule instead of a byte-exact formatter.
+      - id: refactoring-sample-width
+        name: refactoring samples (source lines <= 72 chars)
+        language: system
+        entry: bash scripts/check-sample-width.sh
+        files: ^pages/refactorings/.*\.(scala|hs)$

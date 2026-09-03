@@ -1,0 +1,19 @@
+# Markdown style for the site (markdownlint-cli2, shared with pre-commit,
+# editors and CI). Rules are defaults unless overridden here.
+config:
+  default: true
+
+  MD013:
+    line_length: 80
+    # Code blocks, table cells and headings carry their own width rules
+    # (the refactoring panes are capped at 72 chars by scripts/check-sample-width.sh).
+    code_blocks: false
+    tables: false
+    headings: false
+
+  MD060: false # Jekyll pages use empty "| | |" header rows; padded pipes read worse.
+
+globs:
+  - "**/*.md"
+  - "!node_modules/**"
+  - "!vendor/**"
