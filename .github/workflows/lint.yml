@@ -15,13 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - uses: ruby/setup-ruby@v1
         with:
-          python-version: "3.12"
+          ruby-version: "3.3"
+          bundler-cache: true
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+      # codespell is the one non-Ruby tool in the suite; install directly.
+      - run: pip install codespell
 
-      - name: Run pre-commit on all files
-        uses: pre-commit/action@v3.0.1
+      - name: Run the lint suite
+        run: scripts/lint.sh
+
+      - name: Build the site
+        run: bundle exec jekyll build

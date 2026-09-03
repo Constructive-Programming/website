@@ -1,0 +1,81 @@
+# Linting for the site, Ruby/bundler based (replaces the previous
+# pre-commit/python setup with the same checks):
+#
+#   Local hooks:  bundle exec overcommit --install
+#   Whole repo:   scripts/lint.sh   (= `bundle exec overcommit --run`)
+#   CI:           .github/workflows/lint.yml runs scripts/lint.sh
+#
+# Local hooks and CI execute this same configuration, so they cannot drift.
+#
+# Signature verification is off so CI can run `overcommit --run` on a fresh
+# checkout (signatures live in the local git config, which CI never has).
+verify_signatures: false
+
+# Make the installed git hooks resolve gems through the bundle, so hooks find
+# `mdl` and friends without a system-wide gem install.
+gemfile: Gemfile
+
+# Only print hook output when a hook warns or fails.
+quiet: true
+
+PreCommit:
+  # Hygiene checks (previously pre-commit-hooks):
+  #   trailing whitespace -> TrailingWhitespace, CRLF check dropped (repo is
+  #   LF only), case conflicts -> CaseConflicts, merge markers ->
+  #   MergeConflicts, YAML/JSON syntax -> YamlSyntax/JsonSyntax, final
+  #   newline -> FinalNewline, shebang/exec-bit consistency ->
+  #   CheckExecutableShebangs.
+
+  CaseConflicts:
+    enabled: true
+
+  MergeConflicts:
+    enabled: true
+
+  TrailingWhitespace:
+    enabled: true
+    requires_files: true
+
+  JsonSyntax:
+    enabled: true
+    requires_files: true
+    exclude:
+      # search.json is a Jekyll/Liquid template with front matter,
+      # not a plain JSON file.
+      - 'assets/data/search.json'
+
+  YamlSyntax:
+    enabled: true
+    requires_files: true
+
+  FinalNewline:
+    enabled: true
+    requires_files: true
+
+  CheckExecutableShebangs:
+    enabled: true
+    requires_files: true
+
+  # Markdown style (previously markdownlint-cli2). Rules live in .mdlrc +
+  # mdl_style.rb, shared with any editor or manual `mdl` run.
+  Mdl:
+    enabled: true
+    requires_files: true
+    command: ['bundle', 'exec', 'mdl']
+
+  # Spelling (previously codespell; still codespell, invoked through the
+  # Ruby harness — see .git-hooks/pre_commit/codespell.rb). Install it with
+  # `pip install codespell`.
+  Codespell:
+    enabled: true
+    required_executable: codespell
+    install_command: 'pip install codespell'
+    requires_files: true
+
+  # Refactoring sample sources must stay within the 72-char pane width
+  # (previously scripts/check-sample-width.sh via pre-commit).
+  RefactoringSampleWidth:
+    enabled: true
+    requires_files: true
+    include:
+      - 'pages/refactorings/**/*.{scala,hs}'

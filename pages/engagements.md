@@ -9,8 +9,9 @@ tags: engagements
 We have three main offerings. Each has a fixed structure so you know
 what you are buying; the actual content is shaped on the scoping call.
 
-If your need does not fit any of the three, the [scoping call](https://cal.constructive.dev/rhansen)
-is the right place to figure it out — there is no charge for it.
+If your need does not fit any of the three, the
+[scoping call](https://cal.constructive.dev/rhansen) is the right place to
+figure it out — there is no charge for it.
 
 ## Which one is right for you
 
@@ -121,4 +122,5 @@ the scoping call.
 ## Get in touch
 
 [Book a 30-minute scoping call](https://cal.constructive.dev/rhansen)
-or email [consulting@constructive.dev](mailto:consulting@constructive.dev?subject=Engagement%20inquiry).
+or email
+[consulting@constructive.dev](mailto:consulting@constructive.dev?subject=Engagement%20inquiry).

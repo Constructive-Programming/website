@@ -71,3 +71,6 @@ typings/
 dist-newstyle/
 *.hi
 *.o
+
+# Local linting venv (see README "Lint")
+/.venv/
