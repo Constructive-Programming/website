@@ -1,0 +1,12 @@
+# Markdown style for the site, shared by every entry point that runs mdl
+# (the overcommit Mdl hook, `scripts/lint.sh`, CI, and ad-hoc manual runs).
+# mdl picks this up automatically from the current directory.
+
+# Jekyll pages and posts start with YAML front matter, which is not prose.
+ignore_front_matter true
+
+# When given a directory, only look at files git tracks, so generated
+# output (_site/, .jekyll-cache/) and dependency dirs are never linted.
+git_recurse true
+
+style "#{File.dirname(__FILE__)}/mdl_style.rb"

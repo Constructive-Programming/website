@@ -44,5 +44,6 @@ or moving toward agent-native development with constructive guardrails,
 [book a 30-minute scoping call](https://cal.constructive.dev/rhansen)
 or email
 [consulting@constructive.dev](mailto:consulting@constructive.dev?subject=Scoping%20call).
-The libraries above are the ground we stand on; the [consulting offer]({{ '/#consulting' | relative_url }})
-is how we bring it to your codebase.
+The libraries above are the ground we stand on; the
+[consulting offer]({{ '/#consulting' | relative_url }}) is how we
+bring it to your codebase.

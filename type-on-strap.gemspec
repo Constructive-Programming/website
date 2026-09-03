@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
 
                                       * Use _data/ for social and language customization
 
-                                      * Vist https://github.com/sylhare/Type-on-Strap
+                                      * Visit https://github.com/sylhare/Type-on-Strap
                                       for more info.
 
                                     ----------------------------------------------------------

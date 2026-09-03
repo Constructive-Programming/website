@@ -22,10 +22,11 @@ criteria:
 - **Termination** — every computation eventually finishes.
 
 The methodology is the lens through which we read code, design APIs, and
-prepare a codebase to be co-piloted by LLMs. The [Libraries]({{ '/libraries/' | relative_url }})
-page lists the OSS that puts the methodology into Scala practice, and the
-home page introduces [Fixed](https://github.com/Constructive-Programming/fixed) —
-a new language being designed around the same principles.
+prepare a codebase to be co-piloted by LLMs. The
+[Libraries]({{ '/libraries/' | relative_url }}) page lists the OSS that
+puts the methodology into Scala practice, and the home page introduces
+[Fixed](https://github.com/Constructive-Programming/fixed) — a new
+language being designed around the same principles.
 
 ## The team
 
@@ -63,7 +64,8 @@ delivering at web scale and web speed, and constantly asking what the
 type system could do to make wrong programs harder to write.
 
 **Find Rodolfo:** [LinkedIn](https://www.linkedin.com/in/rodolfohansen/) ·
-[GitHub](https://github.com/kryptt) · [Medium](https://rodolfohansen.medium.com/)
+[GitHub](https://github.com/kryptt) ·
+[Medium](https://rodolfohansen.medium.com/)
 
 #### Talks
 
@@ -104,9 +106,10 @@ banner, get in touch at
 ## Working with us
 
 We work on architecture-review, fractional-advisory, embedded-IC, and
-workshops/training shapes — see the [home page]({{ '/' | relative_url }}#consulting)
-for the engagement bullets. We are available for select engagements;
-based in the Netherlands; comfortable with EU MSAs and standard NDAs.
+workshops/training shapes — see the
+[home page]({{ '/' | relative_url }}#consulting) for the engagement bullets. We
+are available for select engagements; based in the Netherlands; comfortable
+with EU MSAs and standard NDAs.
 
 The fastest path is
 [booking a 30-minute scoping call](https://cal.constructive.dev/rhansen)

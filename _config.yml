@@ -11,7 +11,9 @@ favicon: assets/img/favicon.svg
 # Hero
 header_feature_image: ""
 header_text: Constructive Programming
-header_subtitle: Ship at AI speed. Skip the gamble. Production code with AI, inside engineering guardrails that make most wrong versions impossible to build.
+header_subtitle: >-
+  Ship at AI speed. Skip the gamble. Production code with AI, inside
+  engineering guardrails that make most wrong versions impossible to build.
 
 # Footer
 footer_text: "Copyright Constructive Programming,"
