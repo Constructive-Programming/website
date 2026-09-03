@@ -27,8 +27,8 @@
     <path d="M242 106.5 L234 110 L242 113.5 Z"/>
   </g>
   <g fill="currentColor" font-size="12" text-anchor="middle">
-    <text x="320" y="64">extract (fold / lambda-lift)</text>
-    <text x="320" y="128">inline (unfold / beta)</text>
+    <text x="320" y="64">extract (define and fold / lambda-lift)</text>
+    <text x="320" y="128">inline (unfold and &beta;-reduce / denest)</text>
   </g>
   <text x="320" y="170" fill="currentColor" font-size="12" text-anchor="middle" opacity=".75"><tspan font-style="italic">v</tspan> are the free variables of <tspan font-style="italic">e</tspan>; they become the parameters of g</text>
 </svg>

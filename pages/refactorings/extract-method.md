@@ -78,9 +78,11 @@ since, including Stocker's Scala refactoring library behind the Scala IDE
 <figure class="rf-figure">
 {% include_relative extract-method/diagrams/koan.svg %}
 <figcaption>The koan. One equation, read in two directions: extract
-(define and fold) to the right, inline (unfold and β-reduce) to the left.
-The free variables of the region <em>e</em> are exactly the parameters
-of the new definition.</figcaption>
+(define and fold; lambda-lift, or simply nest the definition) to the
+right, inline (unfold and β-reduce; denest) to the left. The free
+variables of the region <em>e</em> become the parameters of a top-level
+definition — nested, they stay in the enclosing scope instead, and only
+what lies further out is passed.</figcaption>
 </figure>
 
 The catalogue lists each refactoring in both directions because the two
