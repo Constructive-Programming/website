@@ -23,8 +23,8 @@
   
   
   {
-      "title"    : "Extract method",
-      "subtitle"    : "Extract method: name a sub-expression, and its free variables become the parameters",
+      "title"    : "Extract / Inline Method",
+      "subtitle"    : "Extract / Inline method: name a sub-expression, and its free variables become the parameters — inline a call, and its arguments flow back into the body",
       "category" : "",
       "tags"     : "refactorings, extract-method",
       "url"      : "/pr-preview/pr-12/refactorings/extract-method/"
