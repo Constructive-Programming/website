@@ -9,7 +9,7 @@ tags: refactorings
 Object-oriented developers have a shared vocabulary for reshaping code
 without changing what it does — Fowler's catalogue, Opdyke's thesis, the
 *Refactoring* menu in every IDE — as well as a history of doing so
-informally or less structured before then. This is the same idea seen
+informally before then. This is the same idea seen
 through the functional-programming imagination: each move takes a program
 from one
 structure to an equivalent one, and in a referentially transparent
