@@ -87,6 +87,10 @@ pages/refactorings/<slug>/
 - A second property per example is expected when natural (the extracted piece on its own; a law it obeys).
 - In Haskell probe laziness/strictness with `undefined` where the refactoring could change what is forced;
   in Scala reason about evaluation count (def vs val, by-name) and say so in a comment when it matters.
+- If an example needs a global MUTABLE cell in Haskell: a top-level `IORef` CAF
+  (`{-# NOINLINE x #-}` + `unsafePerformIO (newIORef ...)`); Before's entry point lives
+  in IO, After's is pure — the type change is the point, say so on the page. Compare
+  projections (the lens rule), and use `checkSequential` when properties touch the cell.
 
 ## Style
 - Site prose: crisp, editorial, no hype; sentences, not bullets, in body text (the caveats section may use a list).
