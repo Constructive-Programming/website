@@ -72,7 +72,8 @@ pages/refactorings/<slug>/
         val r = Property.check(t.withConfig(PropertyConfig.default), t.result, Seed.fromTime())
         println(Test.renderReport("Props", t, r, ansiCodesSupported = false)); r.status }
       if !results.forall(_ == Status.ok) then sys.exit(1)
-  `.withTests(500)` on a property raises its count.
+  Bump a property's count with `property("name", prop).withTests(500)`:
+  `withTests` is a member of `Test`, not `Property`.
 - Haskell: GHC 9.8.4 + hedgehog. No ghc on this machine; docker image `cp-hedgehog` (run.sh builds it if missing):
     docker run --rm -v "$PWD/pages/refactorings/<slug>:/w" -w /w cp-hedgehog runghc -iNN-ex NN-ex/Spec.hs
   (from the repo root). Spec.hs: `main = do ok <- checkParallel (Group "Props" [...]); unless ok exitFailure`.

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 174" role="img" aria-labelledby="koan-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none">
+  <title id="koan-title">One equation read in two directions. Before, f reads a global g that appears in no signature. After, f takes g as a leading parameter and the caller supplies it. Parameterise abstracts over the global to the right; capture drops an invariant parameter back into one shared definition to the left.</title>
+  <defs>
+    <marker id="koan-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="currentColor"/>
+    </marker>
+  </defs>
+  <g fill="currentColor" font-size="12" opacity=".65">
+    <text x="16" y="22">before</text>
+    <text x="434" y="22">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="30" width="190" height="120" rx="4"/>
+    <rect x="434" y="30" width="190" height="120" rx="4"/>
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="56">f x = … <tspan font-style="italic" font-weight="700">g</tspan> …</text>
+    <text x="28" y="84"><tspan font-style="italic">g</tspan>: the global cell</text>
+    <text x="28" y="104">read inside f,</text>
+    <text x="28" y="124">listed in no signature</text>
+    <text x="446" y="56">f′ <tspan font-style="italic" font-weight="700">g</tspan> x = … <tspan font-style="italic">g</tspan> …</text>
+    <text x="446" y="76">f x = … f′ <tspan font-style="italic">g</tspan> x …</text>
+    <text x="446" y="104"><tspan font-style="italic">g</tspan>: the leading parameter,</text>
+    <text x="446" y="124">supplied by the caller</text>
+  </g>
+  <path d="M224 72 H416" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#koan-arrow)"/>
+  <text x="320" y="58" fill="currentColor" font-size="12" text-anchor="middle">parameterise: abstract over g</text>
+  <path d="M416 116 H224" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#koan-arrow)"/>
+  <text x="320" y="138" fill="currentColor" font-size="12" text-anchor="middle">capture: when g is invariant</text>
+</svg>
