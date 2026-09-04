@@ -1,0 +1,107 @@
+[
+  
+  
+  
+  {
+      "title"    : "About",
+      "subtitle"    : "The methodology and the team",
+      "category" : "",
+      "tags"     : "about",
+      "url"      : "/pr-preview/pr-16/about/"
+  },
+  
+  
+  
+  {
+      "title"    : "Engagements",
+      "subtitle"    : "How we work — three offerings, one bar for quality",
+      "category" : "",
+      "tags"     : "engagements",
+      "url"      : "/pr-preview/pr-16/engagements/"
+  },
+  
+  
+  
+  {
+      "title"    : "Extract / Inline Method",
+      "subtitle"    : "Extract / Inline method: name a sub-expression, and its free variables become the parameters — inline a call, and its arguments flow back into the body",
+      "category" : "",
+      "tags"     : "refactorings, extract-method",
+      "url"      : "/pr-preview/pr-16/refactorings/extract-method/"
+  },
+  
+  
+  
+  
+  
+  {
+      "title"    : "Libraries",
+      "subtitle"    : "Open engineering output from the practice",
+      "category" : "",
+      "tags"     : "libraries",
+      "url"      : "/pr-preview/pr-16/libraries/"
+  },
+  
+  
+  
+  
+  
+  {
+      "title"    : "Refactorings",
+      "subtitle"    : "The Constructive Programming refactoring catalogue",
+      "category" : "",
+      "tags"     : "refactorings",
+      "url"      : "/pr-preview/pr-16/refactorings/"
+  },
+  
+  
+  
+  {
+      "title"    : "Replace Global State with Parameter",
+      "subtitle"    : "Replace global state with parameter: the hidden dependency becomes an argument the caller supplies — capture an invariant parameter back into one shared definition, and it becomes global again",
+      "category" : "",
+      "tags"     : "refactorings, replace-global-state-with-parameter",
+      "url"      : "/pr-preview/pr-16/refactorings/replace-global-state-with-parameter/"
+  },
+  
+  
+  
+  {
+      "title"    : "Replace Mutable Fields with Lenses",
+      "subtitle"    : "Replace mutable fields with lenses: package how to reach a field and what to do with it as one optic value — read becomes get, write becomes set or modify; inline the lens, and a projection no one composes becomes a field again",
+      "category" : "",
+      "tags"     : "refactorings, replace-mutable-fields-with-lenses",
+      "url"      : "/pr-preview/pr-16/refactorings/replace-mutable-fields-with-lenses/"
+  },
+  
+  
+  
+  
+  
+  {
+      "title"    : "Search",
+      "subtitle"    : "What are you looking for?",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/pr-preview/pr-16/search/"
+  },
+  
+  
+  
+  {
+      "title"    : "Tags",
+      "subtitle"    : "",
+      "category" : "",
+      "tags"     : "",
+      "url"      : "/pr-preview/pr-16/tags/"
+  },
+  
+  
+  
+  
+  
+  
+  
+  
+  {}
+]

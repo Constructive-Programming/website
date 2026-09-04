@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.5, maximum-scale=5"> <!-- Theme Mode --> <script> const darkBtn = "Dark"; const lightBtn = "Light"; const isAutoTheme = true; const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; if (isAutoTheme) { document.documentElement.setAttribute('data-theme', sessionStorage.getItem('theme') ?? preferredTheme); } else { document.documentElement.setAttribute('data-theme', "auto"); } </script> <!-- Globals consumed by main.min.js. We don't use the cookie/GA features but the script references these variables unguarded; declaring them as empty strings makes main.min.js no-op those branches and still attach its DOMContentLoaded listeners. --> <script> const cookieName = 'cookie-notice-dismissed-https://www.constructive.dev'; const isCookieConsent = ''; const analyticsName = ''; const analyticsNameGA4 = ''; </script> <!-- Theme JS — KaTeX init + theme-toggle + navbar toggle. --> <script defer src="/pr-preview/pr-16/assets/js/main.min.js"></script> <!-- Local stylesheet — drives everything: type scale, layout, grid, cards, buttons. No external CSS framework. --> <link rel="stylesheet" href="/pr-preview/pr-16/assets/css/main.css"> <!-- Favicon set — SVG primary, ICO fallback, apple-touch for iOS. --> <link rel="icon" type="image/svg+xml" href="/pr-preview/pr-16/assets/img/favicon.svg"> <link rel="alternate icon" type="image/x-icon" href="/pr-preview/pr-16/assets/img/favicon.ico"> <link rel="apple-touch-icon" sizes="180x180" href="/pr-preview/pr-16/assets/img/apple-touch-icon.png"> <!-- RSS auto-discovery --> <link rel="alternate" type="application/rss+xml" title="Constructive Programming" href="https://www.constructive.dev/pr-preview/pr-16/feed.xml"> <!-- KaTeX 0.16.38 --> <script defer src="/pr-preview/pr-16/assets/js/vendor/katex.min.js"></script> <script defer src="/pr-preview/pr-16/assets/js/vendor/katex.auto-render.min.js" onload="renderMathInElement(document.body);"></script> <!-- Mermaid 11.13.0 --> <!-- Simple-Jekyll-Search 2.1.3 --> <script src="/pr-preview/pr-16/assets/js/vendor/simple-jekyll-search.min.js" type="text/javascript"></script> <!-- Open Graph + Twitter --> <meta property="og:image" content="https://www.constructive.dev/pr-preview/pr-16/assets/img/og-image.png"> <meta name="twitter:image" content="https://www.constructive.dev/pr-preview/pr-16/assets/img/og-image.png"> <meta name="twitter:card" content="summary_large_image"> <meta property="og:type" content="website" /> <!-- Begin Jekyll SEO tag v2.9.0 --> <title>Replace Global State with Parameter | Constructive Programming</title> <meta name="generator" content="Jekyll v4.4.1" /> <meta property="og:title" content="Replace Global State with Parameter" /> <meta property="og:locale" content="en_US" /> <meta name="description" content="Software consultancy for platform teams: AI-accelerated delivery inside type-driven guardrails. Architecture reviews, embedded senior engineers (Scala, Rust, TypeScript), and agent-native development workflows." /> <meta name="twitter:description" property="og:description" content="Software consultancy for platform teams: AI-accelerated delivery inside type-driven guardrails. Architecture reviews, embedded senior engineers (Scala, Rust, TypeScript), and agent-native development workflows." /> <link rel="canonical" href="https://www.constructive.dev/pr-preview/pr-16/refactorings/replace-global-state-with-parameter/" /> <meta property="og:url" content="https://www.constructive.dev/pr-preview/pr-16/refactorings/replace-global-state-with-parameter/" /> <meta property="og:site_name" content="Constructive Programming" /> <meta property="og:type" content="website" /> <meta name="twitter:card" content="summary" /> <meta name="twitter:title" content="Replace Global State with Parameter" /> <script type="application/ld+json"> {"@context":"https://schema.org","@type":"WebPage","description":"Software consultancy for platform teams: AI-accelerated delivery inside type-driven guardrails. Architecture reviews, embedded senior engineers (Scala, Rust, TypeScript), and agent-native development workflows.","headline":"Replace Global State with Parameter","url":"https://www.constructive.dev/pr-preview/pr-16/refactorings/replace-global-state-with-parameter/"}</script> <!-- End Jekyll SEO tag --> </head>
+  <body>
+    
+    <header class="site-header"> <!-- Logo and title --> <div class="branding"> <a class="site-title" aria-label="Constructive Programming" href="/pr-preview/pr-16/"> Constructive Programming </a> </div> <!-- Toggle menu --> <nav class="clear"> <a aria-label="Open menu" id="pull" class="toggle" href="#"> <svg class="cp-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <rect x="4" y="6" width="16" height="2" rx="1"/> <rect x="4" y="11" width="16" height="2" rx="1"/> <rect x="4" y="16" width="16" height="2" rx="1"/> </svg> </a> <!-- Menu --> <ul class="hide"> <li class="separator"> | </li> <li> <a class="clear" aria-label="About" title="About" href="/pr-preview/pr-16/about/"><span class="navbar-label">About</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Engagements" title="Engagements" href="/pr-preview/pr-16/engagements/"><span class="navbar-label">Engagements</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Libraries" title="Libraries" href="/pr-preview/pr-16/libraries/"><span class="navbar-label">Libraries</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Refactorings" title="Refactorings" href="/pr-preview/pr-16/refactorings/"><span class="navbar-label">Refactorings</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Search" title="Search" href="/pr-preview/pr-16/search/"><i class="navbar-icon fa-search" aria-hidden="true"></i><span class="navbar-label navbar-label-with-icon">Search</span> </a> </li> <li class="separator"> | </li> <li> <a class="clear" aria-label="Tags" title="Tags" href="/pr-preview/pr-16/tags/"><i class="navbar-icon fa-tags" aria-hidden="true"></i><span class="navbar-label navbar-label-with-icon">Tags</span> </a> </li> <li class="separator"> | </li> <li><a id="theme-toggle" title="Dark" aria-label="Dark" onclick="themeToggle()"></a></li> </ul> </nav> </header>
+    <main class="content">
+      
+<article >
+    <header id="main" style="background-image: url('')">
+        <div class="title-padder">
+            <h1 id="Replace+Global+State+with+Parameter" class="title subtitle-as-header">Replace global state with parameter: the hidden dependency becomes an argument the caller supplies — capture an invariant parameter back into one shared definition, and it becomes global again</h1>
+            
+        </div>
+    </header>
+    <section class="post-content">
+        <p class="rf-crumb"><a href="/pr-preview/pr-16/refactorings/">← The refactoring catalogue</a> · 3 of 35</p>
+
+<p>A global is a value reachable from anywhere, appearing in no signature.
+The object-oriented catalogue names it as a smell — <em>Global Data</em> in the
+second edition’s bad-smells list, whose only listed cure is
+<em>Encapsulate Variable</em> [<a href="#ref-1">1</a>] — and as a pattern, the Singleton,
+whose intent is precisely “a global point of access” [<a href="#ref-2">2</a>]. The
+testing literature is harsher: singletons are “global state in sheep’s
+clothing”, and the moment code traverses a global, its API “lies about
+its true dependencies” [<a href="#ref-4">4</a>]. The OO corrective is dependency
+injection: wire collaborators in from the outside instead of letting
+objects reach out for them [<a href="#ref-3">3</a>].</p>
+
+<p>The functional reading starts from the same smell and states it in one
+sentence: a global is a free variable that no binder owns. A function
+that reads one has a hidden dependency, and if the cell is mutable, two
+identical calls need not return identical results — referential
+transparency fails silently. The move is to make the dependency
+explicit: the value becomes a parameter the caller supplies. Where the
+global was mutable, the function becomes a <em>state transformer</em> — a
+function from the state it reads to the state it returns, the shape
+Launchbury and Peyton Jones give to stateful computation in Haskell
+[<a href="#ref-5">5</a>]. The inverse move exists and has its own smell, which is why
+this entry, like every entry here, presents both directions as one
+equation.</p>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>Reach for the parameter when the signature lies. A function that reads a
+global needs something its type never mentions: the reader cannot see
+the dependency, the caller cannot control it, and two callers are
+coupled through the shared cell even though neither names the other.
+Tests inherit the coupling — each must set the cell up, reset it, and
+pray no other test runs concurrently against it; call order becomes
+observable, because every call can leave the cell different from how it
+found it. Making the value a parameter restores the truth: the signature
+lists what the function needs, the function runs unchanged under any
+value the caller supplies, and where the cell was mutable the returned
+state records the effect instead of hiding it in a shared location.</p>
+
+<p>Reach for the inverse when the parameter is noise. The smell that drives
+it is parameter pollution: the same value threaded through a deep call
+tree whose intermediate functions never inspect it, each signature
+carrying an argument only to hand it on. Where the value is genuinely
+invariant across the whole subtree, capturing it back into one shared
+definition says the same thing more briefly, and the signatures shrink
+to what each function actually decides. The precondition is the
+invariance: capture a parameter that varies between calls and the
+program has changed, not merely moved. When the value varies but the
+plumbing still stings, the principled middle way — bundling the
+environment into a computation rather than threading it by hand — is the
+next entry in this catalogue.</p>
+
+<h2 id="the-move">The move</h2>
+
+<p>The mechanics are short. Find every function that reads or writes the
+global. Give each one a parameter for it — leading, by convention — and
+replace every read with the parameter. Update the call sites to supply
+the value; where several call sites shared the cell, each now supplies
+its own. If the function wrote the cell, it returns the new value as
+part of its result instead, and the caller threads that result into the
+next call. Test. Fowler’s catalogue stops one step short: its answer to
+<em>Global Data</em> is <em>Encapsulate Variable</em>, which hides the cell behind
+accessors but leaves it shared [<a href="#ref-1">1</a>]; parameterisation removes the
+sharing itself. Dependency injection performs the same move at
+construction time, replacing a global lookup with a value handed in
+[<a href="#ref-3">3</a>].</p>
+
+<p>In the functional reading the move is abstraction. A global is a free
+variable of every definition that mentions it; replacing it with a
+parameter is defining a new function whose parameters are the old free
+variables and whose body is the old definition, then calling it with the
+value the global held. Johnsson’s lambda lifting is the same step pushed
+to a whole program — nested definitions lifted to top level by adding
+their free variables as leading parameters [<a href="#ref-6">6</a>]. Where the global
+was mutable, each read becomes an input and each write part of the
+result, and the definition takes the shape of a state transformer, a
+function from an initial state to a final one [<a href="#ref-5">5</a>]. The
+equation’s hypotheses are the constructive criteria: every read sees the
+value the caller supplied, every write is returned rather than lost, and
+the calls happen exactly as often and in the same order as before.</p>
+
+<h2 id="to-and-from">To and from</h2>
+
+<figure class="rf-figure">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 174" role="img" aria-labelledby="koan-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none">
+  <title id="koan-title">One equation read in two directions. Before, f reads a global g that appears in no signature. After, f takes g as a leading parameter and the caller supplies it. Parameterise abstracts over the global to the right; capture drops an invariant parameter back into one shared definition to the left.</title>
+  <defs>
+    <marker id="koan-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="currentColor" />
+    </marker>
+  </defs>
+  <g fill="currentColor" font-size="12" opacity=".65">
+    <text x="16" y="22">before</text>
+    <text x="434" y="22">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="30" width="190" height="120" rx="4" />
+    <rect x="434" y="30" width="190" height="120" rx="4" />
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="56">f x = … <tspan font-style="italic" font-weight="700">g</tspan> …</text>
+    <text x="28" y="84"><tspan font-style="italic">g</tspan>: the global cell</text>
+    <text x="28" y="104">read inside f,</text>
+    <text x="28" y="124">listed in no signature</text>
+    <text x="446" y="56">f′ <tspan font-style="italic" font-weight="700">g</tspan> x = … <tspan font-style="italic">g</tspan> …</text>
+    <text x="446" y="76">f x = … f′ <tspan font-style="italic">g</tspan> x …</text>
+    <text x="446" y="104"><tspan font-style="italic">g</tspan>: the leading parameter,</text>
+    <text x="446" y="124">supplied by the caller</text>
+  </g>
+  <path d="M224 72 H416" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#koan-arrow)" />
+  <text x="320" y="58" fill="currentColor" font-size="12" text-anchor="middle">parameterise: abstract over g</text>
+  <path d="M416 116 H224" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#koan-arrow)" />
+  <text x="320" y="138" fill="currentColor" font-size="12" text-anchor="middle">capture: when g is invariant</text>
+</svg>
+
+<figcaption>The koan. One equation, read in two directions: replace the
+global with a parameter to the right — the definition that reached
+aside for <em>g</em> receives it from its caller instead; capture the
+parameter to the left — where it is invariant across the whole
+subtree, one shared definition supplies it and the signatures shrink.
+The two directions are the same equality between programs.</figcaption>
+</figure>
+
+<p>The catalogue lists each refactoring in both directions because the two
+moves are one equation read left to right and right to left. For a
+definition <em>f</em> that reads a global <em>g</em> and a caller that supplies the
+value <em>v</em>, <em>f</em> reaching for <em>g</em> equals <em>f′</em> applied to <em>v</em>, provided
+every read of <em>g</em> inside <em>f</em> sees <em>v</em>, every write is returned, and the
+call order is unchanged. Read from global to parameter it is this entry:
+abstract over the hidden dependency, supply it at the call sites. Read
+from parameter to global it is the inverse: where a parameter is
+invariant across a call graph, drop it back into a shared definition —
+Danvy and Schultz’s lambda dropping, which restores block structure by
+dropping invariant parameters back into scope [<a href="#ref-7">7</a>]. The directions
+serve different ends. Parameterisation is for truth and isolation: the
+signature states the dependency, and the function can be tested and
+reused under values the original cell never held. Capture is for
+brevity: plumbing that carries a value nobody inspects is noise, and one
+named definition replaces a dozen identical arguments.</p>
+
+<h2 id="three-examples">Three examples</h2>
+
+<p>Each example is the same program twice, <code class="language-plaintext highlighter-rouge">Before</code> and <code class="language-plaintext highlighter-rouge">After</code>, in Scala 3
+and in Haskell. The entry point keeps its name, the parameterisation is
+the only difference, and a hedgehog property generates inputs and
+demands that both versions agree on every one of them. The sources below
+are included verbatim from the files the tests run against.</p>
+
+<h3 id="1--a-hidden-setting-the-textbook-move">1 · A hidden setting: the textbook move</h3>
+
+<p>A service fee lives in a global <code class="language-plaintext highlighter-rouge">val</code>; the function <code class="language-plaintext highlighter-rouge">fee</code> reads it, and
+nothing in its signature says so. The move is one line: <code class="language-plaintext highlighter-rouge">fee</code> takes the
+value it used to read as a leading parameter, and the entry point
+<code class="language-plaintext highlighter-rouge">total</code> supplies the program’s default. The default has not disappeared
+— the refactoring does not delete the setting, it stops the code from
+depending on it implicitly. The second property pins the gain: the fee
+is now controlled by the parameter, so the spec exercises fee values the
+<code class="language-plaintext highlighter-rouge">Before</code> version could never see.</p>
+
+<figure class="rf-figure">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 176" role="img" aria-labelledby="d1-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none">
+  <title id="d1-title">Before, fee(subtotal) reads the global serviceFee; the signature says nothing. After, fee(serviceFee, subtotal) takes the value as a leading parameter and total supplies the program's default.</title>
+  <defs>
+    <marker id="d1-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="currentColor" />
+    </marker>
+  </defs>
+  <g fill="currentColor" font-size="12" opacity=".65">
+    <text x="16" y="22">before</text>
+    <text x="464" y="22">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="30" width="300" height="126" rx="4" />
+    <rect x="464" y="30" width="300" height="126" rx="4" />
+  </g>
+  <g fill="rgba(128,128,128,.12)">
+    <rect x="30" y="62" width="272" height="42" rx="3" />
+    <rect x="478" y="62" width="272" height="42" rx="3" />
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="50">serviceFee = 300</text>
+    <text x="40" y="80">fee(subtotal) =</text>
+    <text x="52" y="98">subtotal + serviceFee</text>
+    <text x="28" y="126">the fee reads the global;</text>
+    <text x="28" y="144">the signature says nothing</text>
+    <text x="476" y="50">serviceFee = 300  // the default</text>
+    <text x="488" y="80">fee(serviceFee, subtotal) =</text>
+    <text x="500" y="98">subtotal + serviceFee</text>
+    <text x="476" y="126">total(lines) =</text>
+    <text x="488" y="144">fee(serviceFee, lines.sum)</text>
+  </g>
+  <path d="M332 98 H448" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#d1-arrow)" />
+  <text x="390" y="66" fill="currentColor" font-size="12" text-anchor="middle">the setting becomes</text>
+  <text x="390" y="82" fill="currentColor" font-size="12" text-anchor="middle">the leading parameter</text>
+</svg>
+
+</figure>
+
+<div class="rf-pair">
+<div><h4>Before · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Total of an order: the lines summed, plus a fixed service fee.</span>
+<span class="k">object</span> <span class="nc">Before</span><span class="k">:</span>
+  <span class="kt">val</span> <span class="kt">serviceFee</span> <span class="o">=</span> <span class="mi">300</span> <span class="c1">// cents; a global setting</span>
+
+  <span class="k">def</span> <span class="nf">fee</span><span class="o">(</span><span class="n">subtotal</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="n">subtotal</span> <span class="o">+</span> <span class="n">serviceFee</span>
+
+  <span class="k">def</span> <span class="nf">total</span><span class="o">(</span><span class="n">lines</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Int</span><span class="o">])</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="nf">fee</span><span class="o">(</span><span class="nv">lines</span><span class="o">.</span><span class="py">sum</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>Before · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Total of an order: the lines summed, plus a fixed service fee.</span>
+<span class="kr">module</span> <span class="nn">Before</span> <span class="kr">where</span>
+
+<span class="n">serviceFee</span> <span class="o">::</span> <span class="kt">Int</span>
+<span class="n">serviceFee</span> <span class="o">=</span> <span class="mi">300</span> <span class="c1">-- cents; a global setting</span>
+
+<span class="n">fee</span> <span class="o">::</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Int</span>
+<span class="n">fee</span> <span class="n">subtotal</span> <span class="o">=</span> <span class="n">subtotal</span> <span class="o">+</span> <span class="n">serviceFee</span>
+
+<span class="n">total</span> <span class="o">::</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="kt">Int</span>
+<span class="n">total</span> <span class="n">lines</span> <span class="o">=</span> <span class="n">fee</span> <span class="p">(</span><span class="n">sum</span> <span class="n">lines</span><span class="p">)</span></code></pre></figure>
+
+</div>
+</div>
+
+<div class="rf-pair">
+<div><h4>After · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Total of an order: the lines summed, plus a fixed service fee.</span>
+<span class="k">object</span> <span class="nc">After</span><span class="k">:</span>
+  <span class="kt">val</span> <span class="kt">serviceFee</span> <span class="o">=</span> <span class="mi">300</span> <span class="c1">// cents; still the program's default</span>
+
+  <span class="k">def</span> <span class="nf">fee</span><span class="o">(</span><span class="n">serviceFee</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">subtotal</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span>
+    <span class="n">subtotal</span> <span class="o">+</span> <span class="n">serviceFee</span>
+
+  <span class="k">def</span> <span class="nf">total</span><span class="o">(</span><span class="n">lines</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Int</span><span class="o">])</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="nf">fee</span><span class="o">(</span><span class="n">serviceFee</span><span class="o">,</span> <span class="nv">lines</span><span class="o">.</span><span class="py">sum</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>After · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Total of an order: the lines summed, plus a fixed service fee.</span>
+<span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
+
+<span class="n">serviceFee</span> <span class="o">::</span> <span class="kt">Int</span>
+<span class="n">serviceFee</span> <span class="o">=</span> <span class="mi">300</span> <span class="c1">-- cents; still the program's default</span>
+
+<span class="n">fee</span> <span class="o">::</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Int</span>
+<span class="n">fee</span> <span class="n">serviceFee</span> <span class="n">subtotal</span> <span class="o">=</span> <span class="n">subtotal</span> <span class="o">+</span> <span class="n">serviceFee</span>
+
+<span class="n">total</span> <span class="o">::</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="kt">Int</span>
+<span class="n">total</span> <span class="n">lines</span> <span class="o">=</span> <span class="n">fee</span> <span class="n">serviceFee</span> <span class="p">(</span><span class="n">sum</span> <span class="n">lines</span><span class="p">)</span></code></pre></figure>
+
+</div>
+</div>
+
+<details class="rf-spec">
+<summary>The property: <code>Before.total == After.total</code> on generated orders, and the parameter really controls the fee</summary>
+<div class="rf-pair">
+<div><h4>Spec · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">//&gt; using scala 3.3.4</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-core:0.14.0</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-runner:0.14.0</span>
+<span class="k">import</span> <span class="nn">hedgehog.</span><span class="o">*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">core</span><span class="o">.*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">runner</span><span class="o">.*</span>
+
+<span class="k">object</span> <span class="nc">Props</span> <span class="k">extends</span> <span class="nc">Properties</span><span class="k">:</span>
+  <span class="kt">def</span> <span class="kt">tests:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Test</span><span class="o">]</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"total: Before == After"</span><span class="o">,</span> <span class="n">totalAgrees</span><span class="o">),</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"the fee parameter controls the whole fee"</span><span class="o">,</span>
+      <span class="n">feeIsParametric</span><span class="o">),</span>
+  <span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">genLines</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Int</span><span class="o">]]</span> <span class="k">=</span>
+    <span class="nv">Gen</span><span class="o">.</span><span class="py">int</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(-</span><span class="mi">100</span><span class="o">,</span> <span class="mi">100</span><span class="o">)).</span><span class="py">list</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">10</span><span class="o">))</span>
+
+  <span class="k">def</span> <span class="nf">totalAgrees</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span> <span class="n">lines</span> <span class="k">&lt;-</span> <span class="nv">genLines</span><span class="o">.</span><span class="py">forAll</span>
+    <span class="k">yield</span> <span class="nv">Before</span><span class="o">.</span><span class="py">total</span><span class="o">(</span><span class="n">lines</span><span class="o">)</span> <span class="o">====</span> <span class="nv">After</span><span class="o">.</span><span class="py">total</span><span class="o">(</span><span class="n">lines</span><span class="o">)</span>
+
+  <span class="c1">// The parameter has taken over the global's job: at subtotal 0 the</span>
+  <span class="c1">// result is exactly the fee handed in, for any fee in the range.</span>
+  <span class="k">def</span> <span class="nf">feeIsParametric</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="k">&lt;-</span> <span class="nv">Gen</span><span class="o">.</span><span class="py">int</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">1000</span><span class="o">)).</span><span class="py">forAll</span>
+    <span class="k">yield</span> <span class="nv">After</span><span class="o">.</span><span class="py">fee</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="mi">0</span><span class="o">)</span> <span class="o">====</span> <span class="n">f</span>
+
+<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span>
+  <span class="k">val</span> <span class="nv">results</span> <span class="k">=</span> <span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">.</span><span class="py">map</span> <span class="o">{</span> <span class="n">t</span> <span class="k">=&gt;</span>
+    <span class="k">val</span> <span class="nv">r</span> <span class="k">=</span> <span class="nv">Property</span><span class="o">.</span><span class="py">check</span><span class="o">(</span>
+      <span class="nv">t</span><span class="o">.</span><span class="py">withConfig</span><span class="o">(</span><span class="nv">PropertyConfig</span><span class="o">.</span><span class="py">default</span><span class="o">),</span>
+      <span class="nv">t</span><span class="o">.</span><span class="py">result</span><span class="o">,</span>
+      <span class="nv">Seed</span><span class="o">.</span><span class="py">fromTime</span><span class="o">(),</span>
+    <span class="o">)</span>
+    <span class="nf">println</span><span class="o">(</span><span class="nv">Test</span><span class="o">.</span><span class="py">renderReport</span><span class="o">(</span><span class="s">"Props"</span><span class="o">,</span> <span class="n">t</span><span class="o">,</span> <span class="n">r</span><span class="o">,</span>
+      <span class="n">ansiCodesSupported</span> <span class="k">=</span> <span class="kc">false</span><span class="o">))</span>
+    <span class="nv">r</span><span class="o">.</span><span class="py">status</span>
+  <span class="o">}</span>
+  <span class="k">if</span> <span class="o">!</span><span class="nv">results</span><span class="o">.</span><span class="py">forall</span><span class="o">(</span><span class="k">_</span> <span class="o">==</span> <span class="nv">Status</span><span class="o">.</span><span class="py">ok</span><span class="o">)</span> <span class="n">then</span> <span class="nv">sys</span><span class="o">.</span><span class="py">exit</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>Spec · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="cp">{-# LANGUAGE OverloadedStrings #-}</span>
+<span class="kr">module</span> <span class="nn">Main</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Control.Monad</span> <span class="p">(</span><span class="nf">unless</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">System.Exit</span> <span class="p">(</span><span class="nf">exitFailure</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Hedgehog</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Gen</span> <span class="k">as</span> <span class="n">Gen</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Range</span> <span class="k">as</span> <span class="n">Range</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Before</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">After</span>
+
+<span class="n">genLines</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span>
+<span class="n">genLines</span> <span class="o">=</span>
+  <span class="kt">Gen</span><span class="o">.</span><span class="n">list</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="mi">0</span> <span class="mi">10</span><span class="p">)</span> <span class="p">(</span><span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span> <span class="mi">100</span><span class="p">))</span>
+
+<span class="n">prop_total_agrees</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_total_agrees</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">lines</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genLines</span>
+  <span class="kt">Before</span><span class="o">.</span><span class="n">total</span> <span class="n">lines</span> <span class="o">===</span> <span class="kt">After</span><span class="o">.</span><span class="n">total</span> <span class="n">lines</span>
+
+<span class="c1">-- The parameter has taken over the global's job: at subtotal 0 the</span>
+<span class="c1">-- result is exactly the fee handed in, for any fee in the range.</span>
+<span class="n">prop_fee_is_parametric</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_fee_is_parametric</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">f</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="p">(</span><span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="mi">0</span> <span class="mi">1000</span><span class="p">))</span>
+  <span class="kt">After</span><span class="o">.</span><span class="n">fee</span> <span class="n">f</span> <span class="mi">0</span> <span class="o">===</span> <span class="n">f</span>
+
+<span class="n">main</span> <span class="o">::</span> <span class="kt">IO</span> <span class="nb">()</span>
+<span class="n">main</span> <span class="o">=</span> <span class="kr">do</span>
+  <span class="n">ok</span> <span class="o">&lt;-</span> <span class="n">checkParallel</span> <span class="o">$</span> <span class="kt">Group</span> <span class="s">"Props"</span>
+    <span class="p">[</span> <span class="p">(</span><span class="s">"total: Before == After"</span><span class="p">,</span> <span class="n">prop_total_agrees</span><span class="p">)</span>
+    <span class="p">,</span> <span class="p">(</span> <span class="s">"the fee parameter controls the whole fee"</span>
+      <span class="p">,</span> <span class="n">prop_fee_is_parametric</span> <span class="p">)</span>
+    <span class="p">]</span>
+  <span class="n">unless</span> <span class="n">ok</span> <span class="n">exitFailure</span></code></pre></figure>
+
+</div>
+</div>
+</details>
+
+<h3 id="2--a-shared-policy-the-whole-record-becomes-one-parameter">2 · A shared policy: the whole record becomes one parameter</h3>
+
+<p>The step of a fold reads a policy record — overdraft limit and per
+transaction fee — from a global <code class="language-plaintext highlighter-rouge">val</code>. The record becomes a leading
+parameter of the step, and the entry point supplies it. Leading is the
+useful position: in Haskell the step partially applies at exactly the
+fold’s boundary, <code class="language-plaintext highlighter-rouge">foldl' (applyTx policy) 0</code>, and the fold’s type no
+longer mentions the policy at all. The second property exercises a
+different policy — no fee, a limit out of reach — and reduces the step
+to plain addition. <code class="language-plaintext highlighter-rouge">Before</code> could not be tested against any policy but
+its own; the parameter is what makes the question askable.</p>
+
+<figure class="rf-figure">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 196" role="img" aria-labelledby="d2-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none">
+  <title id="d2-title">Before, applyTx(balance, tx) reaches aside for the global policy record. After, applyTx(policy, balance, tx) takes the record as one leading parameter, and settle fixes it by partial application at the fold.</title>
+  <defs>
+    <marker id="d2-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="currentColor" />
+    </marker>
+  </defs>
+  <g fill="currentColor" font-size="12" opacity=".65">
+    <text x="16" y="22">before</text>
+    <text x="464" y="22">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="30" width="300" height="146" rx="4" />
+    <rect x="464" y="30" width="300" height="146" rx="4" />
+  </g>
+  <g fill="rgba(128,128,128,.12)">
+    <rect x="30" y="62" width="272" height="60" rx="3" />
+    <rect x="478" y="62" width="272" height="60" rx="3" />
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="50">policy = Policy(limit = 30, fee = 2)</text>
+    <text x="40" y="80">applyTx(balance, tx) =</text>
+    <text x="52" y="98">next = balance + tx</text>
+    <text x="52" y="116">if next &lt; -policy.limit …</text>
+    <text x="28" y="146">the step reaches aside for the record</text>
+    <text x="488" y="80">applyTx(policy, balance, tx) =</text>
+    <text x="500" y="98">next = balance + tx</text>
+    <text x="500" y="116">if next &lt; -policy.limit …</text>
+    <text x="476" y="146">settle = foldl′ (applyTx policy) 0</text>
+    <text x="476" y="164">partial application at the fold</text>
+  </g>
+  <path d="M332 98 H448" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#d2-arrow)" />
+  <text x="390" y="66" fill="currentColor" font-size="12" text-anchor="middle">the whole record</text>
+  <text x="390" y="82" fill="currentColor" font-size="12" text-anchor="middle">becomes one parameter</text>
+</svg>
+
+</figure>
+
+<div class="rf-pair">
+<div><h4>Before · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Settle transactions: refuse any that would overdraw past the</span>
+<span class="c1">// limit, and charge a fee on each one accepted.</span>
+<span class="k">object</span> <span class="nc">Before</span><span class="k">:</span>
+  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Policy</span><span class="o">(</span><span class="kt">limit:</span> <span class="kt">Int</span><span class="o">,</span> <span class="kt">fee:</span> <span class="kt">Int</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">policy</span> <span class="k">=</span> <span class="nc">Policy</span><span class="o">(</span><span class="n">limit</span> <span class="k">=</span> <span class="mi">30</span><span class="o">,</span> <span class="n">fee</span> <span class="k">=</span> <span class="mi">2</span><span class="o">)</span> <span class="c1">// global policy</span>
+
+  <span class="k">def</span> <span class="nf">applyTx</span><span class="o">(</span><span class="n">balance</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">tx</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span>
+    <span class="k">val</span> <span class="nv">next</span> <span class="k">=</span> <span class="n">balance</span> <span class="o">+</span> <span class="n">tx</span>
+    <span class="k">if</span> <span class="n">next</span> <span class="o">&lt;</span> <span class="o">-</span><span class="nv">policy</span><span class="o">.</span><span class="py">limit</span> <span class="n">then</span> <span class="n">balance</span>
+    <span class="k">else</span> <span class="n">next</span> <span class="o">-</span> <span class="nv">policy</span><span class="o">.</span><span class="py">fee</span>
+
+  <span class="k">def</span> <span class="nf">settle</span><span class="o">(</span><span class="n">txs</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Int</span><span class="o">])</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="nv">txs</span><span class="o">.</span><span class="py">foldLeft</span><span class="o">(</span><span class="mi">0</span><span class="o">)(</span><span class="n">applyTx</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>Before · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Settle transactions: refuse any that would overdraw past the</span>
+<span class="c1">-- limit, and charge a fee on each one accepted.</span>
+<span class="kr">module</span> <span class="nn">Before</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Data.List</span> <span class="p">(</span><span class="nf">foldl'</span><span class="p">)</span>
+
+<span class="kr">data</span> <span class="kt">Policy</span> <span class="o">=</span> <span class="kt">Policy</span> <span class="p">{</span> <span class="n">limit</span> <span class="o">::</span> <span class="kt">Int</span><span class="p">,</span> <span class="n">fee</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
+
+<span class="n">policy</span> <span class="o">::</span> <span class="kt">Policy</span>
+<span class="n">policy</span> <span class="o">=</span> <span class="kt">Policy</span> <span class="p">{</span> <span class="n">limit</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span> <span class="n">fee</span> <span class="o">=</span> <span class="mi">2</span> <span class="p">}</span> <span class="c1">-- global policy</span>
+
+<span class="n">applyTx</span> <span class="o">::</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Int</span>
+<span class="n">applyTx</span> <span class="n">balance</span> <span class="n">tx</span> <span class="o">=</span>
+  <span class="kr">let</span> <span class="n">next</span> <span class="o">=</span> <span class="n">balance</span> <span class="o">+</span> <span class="n">tx</span>
+  <span class="kr">in</span> <span class="kr">if</span> <span class="n">next</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">limit</span> <span class="n">policy</span> <span class="kr">then</span> <span class="n">balance</span>
+     <span class="kr">else</span> <span class="n">next</span> <span class="o">-</span> <span class="n">fee</span> <span class="n">policy</span>
+
+<span class="n">settle</span> <span class="o">::</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="kt">Int</span>
+<span class="n">settle</span> <span class="o">=</span> <span class="n">foldl'</span> <span class="n">applyTx</span> <span class="mi">0</span></code></pre></figure>
+
+</div>
+</div>
+
+<div class="rf-pair">
+<div><h4>After · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Settle transactions: refuse any that would overdraw past the</span>
+<span class="c1">// limit, and charge a fee on each one accepted.</span>
+<span class="k">object</span> <span class="nc">After</span><span class="k">:</span>
+  <span class="kt">case</span> <span class="kt">class</span> <span class="kt">Policy</span><span class="o">(</span><span class="kt">limit:</span> <span class="kt">Int</span><span class="o">,</span> <span class="kt">fee:</span> <span class="kt">Int</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nv">policy</span> <span class="k">=</span> <span class="nc">Policy</span><span class="o">(</span><span class="n">limit</span> <span class="k">=</span> <span class="mi">30</span><span class="o">,</span> <span class="n">fee</span> <span class="k">=</span> <span class="mi">2</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">applyTx</span><span class="o">(</span><span class="n">policy</span><span class="k">:</span> <span class="kt">Policy</span><span class="o">,</span> <span class="n">balance</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">tx</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span>
+    <span class="k">val</span> <span class="nv">next</span> <span class="k">=</span> <span class="n">balance</span> <span class="o">+</span> <span class="n">tx</span>
+    <span class="k">if</span> <span class="n">next</span> <span class="o">&lt;</span> <span class="o">-</span><span class="nv">policy</span><span class="o">.</span><span class="py">limit</span> <span class="n">then</span> <span class="n">balance</span>
+    <span class="k">else</span> <span class="n">next</span> <span class="o">-</span> <span class="nv">policy</span><span class="o">.</span><span class="py">fee</span>
+
+  <span class="k">def</span> <span class="nf">settle</span><span class="o">(</span><span class="n">txs</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Int</span><span class="o">])</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span>
+    <span class="nv">txs</span><span class="o">.</span><span class="py">foldLeft</span><span class="o">(</span><span class="mi">0</span><span class="o">)(</span><span class="nf">applyTx</span><span class="o">(</span><span class="n">policy</span><span class="o">,</span> <span class="k">_</span><span class="o">,</span> <span class="k">_</span><span class="o">))</span></code></pre></figure>
+
+</div>
+<div><h4>After · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Settle transactions: refuse any that would overdraw past the</span>
+<span class="c1">-- limit, and charge a fee on each one accepted.</span>
+<span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Data.List</span> <span class="p">(</span><span class="nf">foldl'</span><span class="p">)</span>
+
+<span class="kr">data</span> <span class="kt">Policy</span> <span class="o">=</span> <span class="kt">Policy</span> <span class="p">{</span> <span class="n">limit</span> <span class="o">::</span> <span class="kt">Int</span><span class="p">,</span> <span class="n">fee</span> <span class="o">::</span> <span class="kt">Int</span> <span class="p">}</span>
+
+<span class="n">policy</span> <span class="o">::</span> <span class="kt">Policy</span>
+<span class="n">policy</span> <span class="o">=</span> <span class="kt">Policy</span> <span class="p">{</span> <span class="n">limit</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span> <span class="n">fee</span> <span class="o">=</span> <span class="mi">2</span> <span class="p">}</span>
+
+<span class="n">applyTx</span> <span class="o">::</span> <span class="kt">Policy</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Int</span>
+<span class="n">applyTx</span> <span class="n">policy</span> <span class="n">balance</span> <span class="n">tx</span> <span class="o">=</span>
+  <span class="kr">let</span> <span class="n">next</span> <span class="o">=</span> <span class="n">balance</span> <span class="o">+</span> <span class="n">tx</span>
+  <span class="kr">in</span> <span class="kr">if</span> <span class="n">next</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">limit</span> <span class="n">policy</span> <span class="kr">then</span> <span class="n">balance</span>
+     <span class="kr">else</span> <span class="n">next</span> <span class="o">-</span> <span class="n">fee</span> <span class="n">policy</span>
+
+<span class="n">settle</span> <span class="o">::</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="kt">Int</span>
+<span class="n">settle</span> <span class="o">=</span> <span class="n">foldl'</span> <span class="p">(</span><span class="n">applyTx</span> <span class="n">policy</span><span class="p">)</span> <span class="mi">0</span></code></pre></figure>
+
+</div>
+</div>
+
+<p>The generators stay narrow on purpose: with a limit of 30 and
+transactions between −30 and 30, the boundary where the next balance
+equals the negated limit is hit within a handful of cases, which is
+where a <code class="language-plaintext highlighter-rouge">&lt;</code> quietly replaced by <code class="language-plaintext highlighter-rouge">&lt;=</code> would hide (see Verification).</p>
+
+<details class="rf-spec">
+<summary>The property: <code>Before.settle == After.settle</code> on generated transaction runs, and a neutral policy reduces the step to addition</summary>
+<div class="rf-pair">
+<div><h4>Spec · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">//&gt; using scala 3.3.4</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-core:0.14.0</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-runner:0.14.0</span>
+<span class="k">import</span> <span class="nn">hedgehog.</span><span class="o">*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">core</span><span class="o">.*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">runner</span><span class="o">.*</span>
+
+<span class="k">object</span> <span class="nc">Props</span> <span class="k">extends</span> <span class="nc">Properties</span><span class="k">:</span>
+  <span class="kt">def</span> <span class="kt">tests:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Test</span><span class="o">]</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"settle: Before == After"</span><span class="o">,</span> <span class="n">settleAgrees</span><span class="o">)</span>
+      <span class="o">.</span><span class="py">withTests</span><span class="o">(</span><span class="mi">500</span><span class="o">),</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"settings as parameter: fee 0, wide limit sums"</span><span class="o">,</span>
+      <span class="n">neutralSettings</span><span class="o">),</span>
+  <span class="o">)</span>
+
+  <span class="c1">// Narrow range, so the overdraft boundary (next == -limit) is hit</span>
+  <span class="c1">// often.</span>
+  <span class="k">val</span> <span class="nv">genTxs</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Int</span><span class="o">]]</span> <span class="k">=</span>
+    <span class="nv">Gen</span><span class="o">.</span><span class="py">int</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(-</span><span class="mi">30</span><span class="o">,</span> <span class="mi">30</span><span class="o">)).</span><span class="py">list</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">20</span><span class="o">))</span>
+
+  <span class="k">def</span> <span class="nf">settleAgrees</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span> <span class="n">txs</span> <span class="k">&lt;-</span> <span class="nv">genTxs</span><span class="o">.</span><span class="py">forAll</span>
+    <span class="k">yield</span> <span class="nv">Before</span><span class="o">.</span><span class="py">settle</span><span class="o">(</span><span class="n">txs</span><span class="o">)</span> <span class="o">====</span> <span class="nv">After</span><span class="o">.</span><span class="py">settle</span><span class="o">(</span><span class="n">txs</span><span class="o">)</span>
+
+  <span class="c1">// The record is now an argument, so other policies are testable:</span>
+  <span class="c1">// with no fee and a limit out of reach, the step is plain addition.</span>
+  <span class="k">def</span> <span class="nf">neutralSettings</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span>
+      <span class="n">b</span> <span class="k">&lt;-</span> <span class="nv">Gen</span><span class="o">.</span><span class="py">int</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(-</span><span class="mi">30</span><span class="o">,</span> <span class="mi">30</span><span class="o">)).</span><span class="py">forAll</span>
+      <span class="n">t</span> <span class="k">&lt;-</span> <span class="nv">Gen</span><span class="o">.</span><span class="py">int</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(-</span><span class="mi">30</span><span class="o">,</span> <span class="mi">30</span><span class="o">)).</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="nv">After</span><span class="o">.</span><span class="py">applyTx</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">Policy</span><span class="o">(</span><span class="mi">10000</span><span class="o">,</span> <span class="mi">0</span><span class="o">),</span> <span class="n">b</span><span class="o">,</span> <span class="n">t</span><span class="o">)</span> <span class="o">====</span> <span class="n">b</span> <span class="o">+</span> <span class="n">t</span>
+
+<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span>
+  <span class="k">val</span> <span class="nv">results</span> <span class="k">=</span> <span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">.</span><span class="py">map</span> <span class="o">{</span> <span class="n">t</span> <span class="k">=&gt;</span>
+    <span class="k">val</span> <span class="nv">r</span> <span class="k">=</span> <span class="nv">Property</span><span class="o">.</span><span class="py">check</span><span class="o">(</span>
+      <span class="nv">t</span><span class="o">.</span><span class="py">withConfig</span><span class="o">(</span><span class="nv">PropertyConfig</span><span class="o">.</span><span class="py">default</span><span class="o">),</span>
+      <span class="nv">t</span><span class="o">.</span><span class="py">result</span><span class="o">,</span>
+      <span class="nv">Seed</span><span class="o">.</span><span class="py">fromTime</span><span class="o">(),</span>
+    <span class="o">)</span>
+    <span class="nf">println</span><span class="o">(</span><span class="nv">Test</span><span class="o">.</span><span class="py">renderReport</span><span class="o">(</span><span class="s">"Props"</span><span class="o">,</span> <span class="n">t</span><span class="o">,</span> <span class="n">r</span><span class="o">,</span>
+      <span class="n">ansiCodesSupported</span> <span class="k">=</span> <span class="kc">false</span><span class="o">))</span>
+    <span class="nv">r</span><span class="o">.</span><span class="py">status</span>
+  <span class="o">}</span>
+  <span class="k">if</span> <span class="o">!</span><span class="nv">results</span><span class="o">.</span><span class="py">forall</span><span class="o">(</span><span class="k">_</span> <span class="o">==</span> <span class="nv">Status</span><span class="o">.</span><span class="py">ok</span><span class="o">)</span> <span class="n">then</span> <span class="nv">sys</span><span class="o">.</span><span class="py">exit</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>Spec · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="cp">{-# LANGUAGE OverloadedStrings #-}</span>
+<span class="kr">module</span> <span class="nn">Main</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Control.Monad</span> <span class="p">(</span><span class="nf">unless</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">System.Exit</span> <span class="p">(</span><span class="nf">exitFailure</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Hedgehog</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Gen</span> <span class="k">as</span> <span class="n">Gen</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Range</span> <span class="k">as</span> <span class="n">Range</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Before</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">After</span>
+
+<span class="c1">-- Narrow range, so the overdraft boundary (next == -limit) is hit</span>
+<span class="c1">-- often.</span>
+<span class="n">genTxs</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span>
+<span class="n">genTxs</span> <span class="o">=</span>
+  <span class="kt">Gen</span><span class="o">.</span><span class="n">list</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="mi">0</span> <span class="mi">20</span><span class="p">)</span> <span class="p">(</span><span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="p">(</span><span class="o">-</span><span class="mi">30</span><span class="p">)</span> <span class="mi">30</span><span class="p">))</span>
+
+<span class="n">prop_settle_agrees</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_settle_agrees</span> <span class="o">=</span> <span class="n">withTests</span> <span class="mi">500</span> <span class="o">$</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">txs</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="n">genTxs</span>
+  <span class="kt">Before</span><span class="o">.</span><span class="n">settle</span> <span class="n">txs</span> <span class="o">===</span> <span class="kt">After</span><span class="o">.</span><span class="n">settle</span> <span class="n">txs</span>
+
+<span class="c1">-- The record is now an argument, so other policies are testable:</span>
+<span class="c1">-- with no fee and a limit out of reach, the step is plain addition.</span>
+<span class="n">prop_neutral_settings</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_neutral_settings</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">b</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="p">(</span><span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="p">(</span><span class="o">-</span><span class="mi">30</span><span class="p">)</span> <span class="mi">30</span><span class="p">))</span>
+  <span class="n">t</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="p">(</span><span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="p">(</span><span class="o">-</span><span class="mi">30</span><span class="p">)</span> <span class="mi">30</span><span class="p">))</span>
+  <span class="kt">After</span><span class="o">.</span><span class="n">applyTx</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Policy</span> <span class="mi">10000</span> <span class="mi">0</span><span class="p">)</span> <span class="n">b</span> <span class="n">t</span> <span class="o">===</span> <span class="n">b</span> <span class="o">+</span> <span class="n">t</span>
+
+<span class="n">main</span> <span class="o">::</span> <span class="kt">IO</span> <span class="nb">()</span>
+<span class="n">main</span> <span class="o">=</span> <span class="kr">do</span>
+  <span class="n">ok</span> <span class="o">&lt;-</span> <span class="n">checkParallel</span> <span class="o">$</span> <span class="kt">Group</span> <span class="s">"Props"</span>
+    <span class="p">[</span> <span class="p">(</span><span class="s">"settle: Before == After"</span><span class="p">,</span> <span class="n">prop_settle_agrees</span><span class="p">)</span>
+    <span class="p">,</span> <span class="p">(</span> <span class="s">"settings as parameter: fee 0, wide limit sums"</span>
+      <span class="p">,</span> <span class="n">prop_neutral_settings</span> <span class="p">)</span>
+    <span class="p">]</span>
+  <span class="n">unless</span> <span class="n">ok</span> <span class="n">exitFailure</span></code></pre></figure>
+
+</div>
+</div>
+</details>
+
+<h3 id="3--a-fresh-number-supply-the-state-itself-becomes-a-parameter">3 · A fresh-number supply: the state itself becomes a parameter</h3>
+
+<p>Numbering every variable in an expression tree needs a supply of fresh
+numbers. <code class="language-plaintext highlighter-rouge">Before</code> keeps the supply in a mutable global: a Scala <code class="language-plaintext highlighter-rouge">var</code>,
+and in Haskell — where a mutable cell is an effect and cannot be
+smuggled into pure code — a top-level <code class="language-plaintext highlighter-rouge">IORef</code> that forces the entry
+point to live in <code class="language-plaintext highlighter-rouge">IO</code>. <code class="language-plaintext highlighter-rouge">After</code> threads the supply as a parameter through
+the walk and returns the updated value with each result: each read is an
+input, each write part of the answer, exactly the state-transformer
+shape [<a href="#ref-5">5</a>]. The order of reads and writes is no longer a fact
+about when calls happen; it is recorded in the data flow, where the type
+checker and the tests can see it. In Haskell the entry point is pure
+again, and the signature records the improvement. In Scala the <code class="language-plaintext highlighter-rouge">var</code>
+hid the effect all along, so the improvement shows only in the tests and
+in what a reader no longer has to check.</p>
+
+<figure class="rf-figure">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 196" role="img" aria-labelledby="d3-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none">
+  <title id="d3-title">Before, go reads and writes a global supply cell; the order of updates lives in when calls happen. After, go(e, n) takes the supply as n and returns it updated; the order lives in the data flow.</title>
+  <defs>
+    <marker id="d3-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="currentColor" />
+    </marker>
+  </defs>
+  <g fill="currentColor" font-size="12" opacity=".65">
+    <text x="16" y="22">before</text>
+    <text x="464" y="22">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="30" width="300" height="146" rx="4" />
+    <rect x="464" y="30" width="300" height="146" rx="4" />
+  </g>
+  <g fill="rgba(128,128,128,.12)">
+    <rect x="30" y="62" width="272" height="60" rx="3" />
+    <rect x="478" y="62" width="272" height="60" rx="3" />
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="50">supply: the global cell</text>
+    <text x="40" y="80">go(e) = e match</text>
+    <text x="52" y="98">Var → read supply, write supply+1</text>
+    <text x="52" y="116">Add → go(l), then go(r)</text>
+    <text x="28" y="146">reads and writes hide in the cell</text>
+    <text x="488" y="80">go(e, n) = e match</text>
+    <text x="500" y="98">Var → (labelled with n, n + 1)</text>
+    <text x="500" y="116">Add → go(l, n), then go(r, n′)</text>
+    <text x="476" y="146">n flows in, n′ flows out</text>
+    <text x="476" y="164">order lives in the data flow</text>
+  </g>
+  <path d="M332 98 H448" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#d3-arrow)" />
+  <text x="390" y="66" fill="currentColor" font-size="12" text-anchor="middle">reads become inputs,</text>
+  <text x="390" y="82" fill="currentColor" font-size="12" text-anchor="middle">writes become results</text>
+</svg>
+
+</figure>
+
+<div class="rf-pair">
+<div><h4>Before · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Number every variable in an expression tree, pre-order, with a</span>
+<span class="c1">// fresh-number supply.</span>
+<span class="k">object</span> <span class="nc">Before</span><span class="k">:</span>
+  <span class="kt">enum</span> <span class="kt">Expr:</span>
+    <span class="kt">case</span> <span class="kt">Var</span><span class="o">(</span><span class="kt">name:</span> <span class="kt">String</span><span class="o">)</span>
+    <span class="kt">case</span> <span class="kt">Lit</span><span class="o">(</span><span class="kt">value:</span> <span class="kt">Int</span><span class="o">)</span>
+    <span class="kt">case</span> <span class="kt">Add</span><span class="o">(</span><span class="kt">lhs:</span> <span class="kt">Expr</span><span class="o">,</span> <span class="kt">rhs:</span> <span class="kt">Expr</span><span class="o">)</span>
+
+  <span class="k">var</span> <span class="n">supply</span> <span class="k">=</span> <span class="mi">0</span> <span class="c1">// global fresh-number supply</span>
+
+  <span class="k">def</span> <span class="nf">number</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=</span>
+    <span class="n">supply</span> <span class="k">=</span> <span class="mi">0</span>
+    <span class="nf">go</span><span class="o">(</span><span class="n">e</span><span class="o">)</span>
+
+  <span class="k">private</span> <span class="k">def</span> <span class="nf">go</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="n">e</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">Expr</span><span class="o">.</span><span class="py">Var</span><span class="o">(</span><span class="n">name</span><span class="o">)</span> <span class="k">=&gt;</span>
+      <span class="k">val</span> <span class="nv">n</span> <span class="k">=</span> <span class="n">supply</span>
+      <span class="n">supply</span> <span class="o">+=</span> <span class="mi">1</span>
+      <span class="nv">Expr</span><span class="o">.</span><span class="py">Var</span><span class="o">(</span><span class="n">name</span> <span class="o">+</span> <span class="n">n</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">Expr</span><span class="o">.</span><span class="py">Lit</span><span class="o">(</span><span class="k">_</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">e</span>
+    <span class="k">case</span> <span class="nv">Expr</span><span class="o">.</span><span class="py">Add</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">r</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">Expr</span><span class="o">.</span><span class="py">Add</span><span class="o">(</span><span class="nf">go</span><span class="o">(</span><span class="n">l</span><span class="o">),</span> <span class="nf">go</span><span class="o">(</span><span class="n">r</span><span class="o">))</span></code></pre></figure>
+
+</div>
+<div><h4>Before · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Number every variable in an expression tree, pre-order, with a</span>
+<span class="c1">-- fresh-number supply.</span>
+<span class="kr">module</span> <span class="nn">Before</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Data.IORef</span> <span class="p">(</span><span class="kt">IORef</span><span class="p">,</span> <span class="nf">newIORef</span><span class="p">,</span> <span class="nf">readIORef</span><span class="p">,</span> <span class="nf">writeIORef</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">System.IO.Unsafe</span> <span class="p">(</span><span class="nf">unsafePerformIO</span><span class="p">)</span>
+
+<span class="kr">data</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="kt">Var</span> <span class="kt">String</span> <span class="o">|</span> <span class="kt">Lit</span> <span class="kt">Int</span> <span class="o">|</span> <span class="kt">Add</span> <span class="kt">Expr</span> <span class="kt">Expr</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="n">supply</span> <span class="o">::</span> <span class="kt">IORef</span> <span class="kt">Int</span>
+<span class="cp">{-# NOINLINE supply #-}</span>
+<span class="n">supply</span> <span class="o">=</span> <span class="n">unsafePerformIO</span> <span class="p">(</span><span class="n">newIORef</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">-- global fresh-number supply</span>
+
+<span class="n">number</span> <span class="o">::</span> <span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">IO</span> <span class="kt">Expr</span>
+<span class="n">number</span> <span class="n">e</span> <span class="o">=</span> <span class="kr">do</span>
+  <span class="n">writeIORef</span> <span class="n">supply</span> <span class="mi">0</span>
+  <span class="n">go</span> <span class="n">e</span>
+
+<span class="n">go</span> <span class="o">::</span> <span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">IO</span> <span class="kt">Expr</span>
+<span class="n">go</span> <span class="p">(</span><span class="kt">Var</span> <span class="n">name</span><span class="p">)</span> <span class="o">=</span> <span class="kr">do</span>
+  <span class="n">n</span> <span class="o">&lt;-</span> <span class="n">readIORef</span> <span class="n">supply</span>
+  <span class="n">writeIORef</span> <span class="n">supply</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="n">pure</span> <span class="p">(</span><span class="kt">Var</span> <span class="p">(</span><span class="n">name</span> <span class="o">++</span> <span class="n">show</span> <span class="n">n</span><span class="p">))</span>
+<span class="n">go</span> <span class="n">e</span><span class="o">@</span><span class="p">(</span><span class="kt">Lit</span> <span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">pure</span> <span class="n">e</span>
+<span class="n">go</span> <span class="p">(</span><span class="kt">Add</span> <span class="n">l</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="kr">do</span>
+  <span class="n">l'</span> <span class="o">&lt;-</span> <span class="n">go</span> <span class="n">l</span>
+  <span class="n">r'</span> <span class="o">&lt;-</span> <span class="n">go</span> <span class="n">r</span>
+  <span class="n">pure</span> <span class="p">(</span><span class="kt">Add</span> <span class="n">l'</span> <span class="n">r'</span><span class="p">)</span></code></pre></figure>
+
+</div>
+</div>
+
+<div class="rf-pair">
+<div><h4>After · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">// Number every variable in an expression tree, pre-order, with a</span>
+<span class="c1">// fresh-number supply.</span>
+<span class="k">object</span> <span class="nc">After</span><span class="k">:</span>
+  <span class="kt">enum</span> <span class="kt">Expr:</span>
+    <span class="kt">case</span> <span class="kt">Var</span><span class="o">(</span><span class="kt">name:</span> <span class="kt">String</span><span class="o">)</span>
+    <span class="kt">case</span> <span class="kt">Lit</span><span class="o">(</span><span class="kt">value:</span> <span class="kt">Int</span><span class="o">)</span>
+    <span class="kt">case</span> <span class="kt">Add</span><span class="o">(</span><span class="kt">lhs:</span> <span class="kt">Expr</span><span class="o">,</span> <span class="kt">rhs:</span> <span class="kt">Expr</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">number</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="nf">go</span><span class="o">(</span><span class="n">e</span><span class="o">,</span> <span class="mi">0</span><span class="o">).</span><span class="py">_1</span>
+
+  <span class="k">private</span> <span class="k">def</span> <span class="nf">go</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Expr</span><span class="o">,</span> <span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="o">(</span><span class="kt">Expr</span><span class="o">,</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">=</span> <span class="n">e</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">Expr</span><span class="o">.</span><span class="py">Var</span><span class="o">(</span><span class="n">name</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="nv">Expr</span><span class="o">.</span><span class="py">Var</span><span class="o">(</span><span class="n">name</span> <span class="o">+</span> <span class="n">n</span><span class="o">),</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">Expr</span><span class="o">.</span><span class="py">Lit</span><span class="o">(</span><span class="k">_</span><span class="o">)</span>    <span class="k">=&gt;</span> <span class="o">(</span><span class="n">e</span><span class="o">,</span> <span class="n">n</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">Expr</span><span class="o">.</span><span class="py">Add</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">r</span><span class="o">)</span> <span class="k">=&gt;</span>
+      <span class="nf">val</span> <span class="o">(</span><span class="n">l1</span><span class="o">,</span> <span class="n">n1</span><span class="o">)</span> <span class="k">=</span> <span class="nf">go</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">n</span><span class="o">)</span>
+      <span class="nf">val</span> <span class="o">(</span><span class="n">r1</span><span class="o">,</span> <span class="n">n2</span><span class="o">)</span> <span class="k">=</span> <span class="nf">go</span><span class="o">(</span><span class="n">r</span><span class="o">,</span> <span class="n">n1</span><span class="o">)</span>
+      <span class="o">(</span><span class="nv">Expr</span><span class="o">.</span><span class="py">Add</span><span class="o">(</span><span class="n">l1</span><span class="o">,</span> <span class="n">r1</span><span class="o">),</span> <span class="n">n2</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>After · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Number every variable in an expression tree, pre-order, with a</span>
+<span class="c1">-- fresh-number supply.</span>
+<span class="kr">module</span> <span class="nn">After</span> <span class="kr">where</span>
+
+<span class="kr">data</span> <span class="kt">Expr</span> <span class="o">=</span> <span class="kt">Var</span> <span class="kt">String</span> <span class="o">|</span> <span class="kt">Lit</span> <span class="kt">Int</span> <span class="o">|</span> <span class="kt">Add</span> <span class="kt">Expr</span> <span class="kt">Expr</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="n">number</span> <span class="o">::</span> <span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">Expr</span>
+<span class="n">number</span> <span class="n">e</span> <span class="o">=</span> <span class="n">fst</span> <span class="p">(</span><span class="n">go</span> <span class="n">e</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">go</span> <span class="o">::</span> <span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="kt">Expr</span><span class="p">,</span> <span class="kt">Int</span><span class="p">)</span>
+<span class="n">go</span> <span class="p">(</span><span class="kt">Var</span> <span class="n">name</span><span class="p">)</span> <span class="n">n</span> <span class="o">=</span> <span class="p">(</span><span class="kt">Var</span> <span class="p">(</span><span class="n">name</span> <span class="o">++</span> <span class="n">show</span> <span class="n">n</span><span class="p">),</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">go</span> <span class="n">e</span><span class="o">@</span><span class="p">(</span><span class="kt">Lit</span> <span class="kr">_</span><span class="p">)</span> <span class="n">n</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">go</span> <span class="p">(</span><span class="kt">Add</span> <span class="n">l</span> <span class="n">r</span><span class="p">)</span> <span class="n">n</span> <span class="o">=</span>
+  <span class="kr">let</span> <span class="p">(</span><span class="n">l'</span><span class="p">,</span> <span class="n">n'</span><span class="p">)</span> <span class="o">=</span> <span class="n">go</span> <span class="n">l</span> <span class="n">n</span>
+      <span class="p">(</span><span class="n">r'</span><span class="p">,</span> <span class="n">n''</span><span class="p">)</span> <span class="o">=</span> <span class="n">go</span> <span class="n">r</span> <span class="n">n'</span>
+  <span class="kr">in</span> <span class="p">(</span><span class="kt">Add</span> <span class="n">l'</span> <span class="n">r'</span><span class="p">,</span> <span class="n">n''</span><span class="p">)</span></code></pre></figure>
+
+</div>
+</div>
+
+<p>The walk still forces nothing it did not force before: the spec puts an
+<code class="language-plaintext highlighter-rouge">undefined</code> payload in a <code class="language-plaintext highlighter-rouge">Lit</code> and confirms in both versions that the
+numbering passes through without touching it. And the labels come out
+exactly <code class="language-plaintext highlighter-rouge">x0, x1, …</code> in visit order — no skips, no repeats, no
+reordering — whatever tree the generator builds.</p>
+
+<details class="rf-spec">
+<summary>The property: <code>Before.number == After.number</code> on generated trees, the labels run in order, and laziness survives</summary>
+<div class="rf-pair">
+<div><h4>Spec · Scala</h4>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">//&gt; using scala 3.3.4</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-core:0.14.0</span>
+<span class="c1">//&gt; using dep qa.hedgehog::hedgehog-runner:0.14.0</span>
+<span class="k">import</span> <span class="nn">hedgehog.</span><span class="o">*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">core</span><span class="o">.*,</span> <span class="nv">hedgehog</span><span class="o">.</span><span class="py">runner</span><span class="o">.*</span>
+
+<span class="k">object</span> <span class="nc">Props</span> <span class="k">extends</span> <span class="nc">Properties</span><span class="k">:</span>
+  <span class="kt">def</span> <span class="kt">tests:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Test</span><span class="o">]</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"number: Before == After"</span><span class="o">,</span> <span class="n">agrees</span><span class="o">),</span>
+    <span class="nf">property</span><span class="o">(</span><span class="s">"labels run x0, x1, ... in pre-order"</span><span class="o">,</span> <span class="n">labelsRun</span><span class="o">),</span>
+  <span class="o">)</span>
+
+  <span class="c1">// A neutral tree, so one input feeds both Expr types. Names are</span>
+  <span class="c1">// always "x": the supply numbers occurrences, not names.</span>
+  <span class="n">enum</span> <span class="n">T</span><span class="k">:</span>
+    <span class="kt">case</span> <span class="kt">TVar</span>
+    <span class="k">case</span> <span class="nc">TLit</span><span class="o">(</span><span class="n">value</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">TAdd</span><span class="o">(</span><span class="n">lhs</span><span class="k">:</span> <span class="kt">T</span><span class="o">,</span> <span class="n">rhs</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span>
+
+  <span class="k">def</span> <span class="nf">genT</span><span class="o">(</span><span class="n">depth</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Gen</span><span class="o">[</span><span class="kt">T</span><span class="o">]</span> <span class="k">=</span>
+    <span class="k">val</span> <span class="nv">leaf</span> <span class="k">=</span> <span class="nv">Gen</span><span class="o">.</span><span class="py">choice1</span><span class="o">(</span>
+      <span class="nv">Gen</span><span class="o">.</span><span class="py">constant</span><span class="o">(</span><span class="nv">T</span><span class="o">.</span><span class="py">TVar</span><span class="o">),</span>
+      <span class="nv">Gen</span><span class="o">.</span><span class="py">int</span><span class="o">(</span><span class="nv">Range</span><span class="o">.</span><span class="py">linear</span><span class="o">(-</span><span class="mi">30</span><span class="o">,</span> <span class="mi">30</span><span class="o">)).</span><span class="py">map</span><span class="o">(</span><span class="nv">T</span><span class="o">.</span><span class="py">TLit</span><span class="o">(</span><span class="k">_</span><span class="o">)),</span>
+    <span class="o">)</span>
+    <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span> <span class="n">then</span> <span class="n">leaf</span>
+    <span class="k">else</span> <span class="nv">Gen</span><span class="o">.</span><span class="py">choice1</span><span class="o">(</span><span class="n">leaf</span><span class="o">,</span>
+      <span class="k">for</span> <span class="n">l</span> <span class="k">&lt;-</span> <span class="nf">genT</span><span class="o">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="o">);</span> <span class="n">r</span> <span class="k">&lt;-</span> <span class="nf">genT</span><span class="o">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span>
+      <span class="k">yield</span> <span class="nv">T</span><span class="o">.</span><span class="py">TAdd</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">r</span><span class="o">))</span>
+
+  <span class="k">def</span> <span class="nf">toBefore</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span><span class="k">:</span> <span class="kt">Before.Expr</span> <span class="o">=</span> <span class="n">t</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span>       <span class="k">=&gt;</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">Var</span><span class="o">(</span><span class="s">"x"</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLit</span><span class="o">(</span><span class="n">v</span><span class="o">)</span>    <span class="k">=&gt;</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">Lit</span><span class="o">(</span><span class="n">v</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TAdd</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">r</span><span class="o">)</span> <span class="k">=&gt;</span>
+      <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">Add</span><span class="o">(</span><span class="nf">toBefore</span><span class="o">(</span><span class="n">l</span><span class="o">),</span> <span class="nf">toBefore</span><span class="o">(</span><span class="n">r</span><span class="o">))</span>
+
+  <span class="k">def</span> <span class="nf">toAfter</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span><span class="k">:</span> <span class="kt">After.Expr</span> <span class="o">=</span> <span class="n">t</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TVar</span>       <span class="k">=&gt;</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">Var</span><span class="o">(</span><span class="s">"x"</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TLit</span><span class="o">(</span><span class="n">v</span><span class="o">)</span>    <span class="k">=&gt;</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">Lit</span><span class="o">(</span><span class="n">v</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">T</span><span class="o">.</span><span class="py">TAdd</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">r</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">Add</span><span class="o">(</span><span class="nf">toAfter</span><span class="o">(</span><span class="n">l</span><span class="o">),</span> <span class="nf">toAfter</span><span class="o">(</span><span class="n">r</span><span class="o">))</span>
+
+  <span class="c1">// The walk, as the list of variable labels in pre-order.</span>
+  <span class="k">def</span> <span class="nf">labelsBefore</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">Before.Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="n">e</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">Var</span><span class="o">(</span><span class="n">name</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="n">name</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">Lit</span><span class="o">(</span><span class="k">_</span><span class="o">)</span>    <span class="k">=&gt;</span> <span class="nc">Nil</span>
+    <span class="k">case</span> <span class="nv">Before</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">Add</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">r</span><span class="o">)</span> <span class="k">=&gt;</span>
+      <span class="nf">labelsBefore</span><span class="o">(</span><span class="n">l</span><span class="o">)</span> <span class="o">++</span> <span class="nf">labelsBefore</span><span class="o">(</span><span class="n">r</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nf">labelsAfter</span><span class="o">(</span><span class="n">e</span><span class="k">:</span> <span class="kt">After.Expr</span><span class="o">)</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="n">e</span> <span class="k">match</span>
+    <span class="k">case</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">Var</span><span class="o">(</span><span class="n">name</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="n">name</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">Lit</span><span class="o">(</span><span class="k">_</span><span class="o">)</span>    <span class="k">=&gt;</span> <span class="nc">Nil</span>
+    <span class="k">case</span> <span class="nv">After</span><span class="o">.</span><span class="py">Expr</span><span class="o">.</span><span class="py">Add</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">r</span><span class="o">)</span> <span class="k">=&gt;</span>
+      <span class="nf">labelsAfter</span><span class="o">(</span><span class="n">l</span><span class="o">)</span> <span class="o">++</span> <span class="nf">labelsAfter</span><span class="o">(</span><span class="n">r</span><span class="o">)</span>
+
+  <span class="c1">// Reading and incrementing the supply is the whole of the state,</span>
+  <span class="c1">// so equal label lists mean equal reads in equal order.</span>
+  <span class="k">def</span> <span class="nf">agrees</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="k">&lt;-</span> <span class="nf">genT</span><span class="o">(</span><span class="mi">4</span><span class="o">).</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="nf">labelsBefore</span><span class="o">(</span><span class="nv">Before</span><span class="o">.</span><span class="py">number</span><span class="o">(</span><span class="nf">toBefore</span><span class="o">(</span><span class="n">t</span><span class="o">)))</span>
+        <span class="o">====</span> <span class="nf">labelsAfter</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">number</span><span class="o">(</span><span class="nf">toAfter</span><span class="o">(</span><span class="n">t</span><span class="o">)))</span>
+
+  <span class="c1">// Whatever the tree holds, its labels must be exactly x0, x1, ...</span>
+  <span class="c1">// in visit order: no skips, no repeats, no reordering.</span>
+  <span class="k">def</span> <span class="nf">labelsRun</span><span class="k">:</span> <span class="kt">Property</span> <span class="o">=</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="k">&lt;-</span> <span class="nf">genT</span><span class="o">(</span><span class="mi">4</span><span class="o">).</span><span class="py">forAll</span>
+    <span class="k">yield</span>
+      <span class="k">val</span> <span class="nv">ls</span> <span class="k">=</span> <span class="nf">labelsAfter</span><span class="o">(</span><span class="nv">After</span><span class="o">.</span><span class="py">number</span><span class="o">(</span><span class="nf">toAfter</span><span class="o">(</span><span class="n">t</span><span class="o">)))</span>
+      <span class="n">ls</span> <span class="o">====</span> <span class="nv">ls</span><span class="o">.</span><span class="py">indices</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">i</span> <span class="k">=&gt;</span> <span class="s">"x"</span> <span class="o">+</span> <span class="n">i</span><span class="o">).</span><span class="py">toList</span>
+
+<span class="nd">@main</span> <span class="k">def</span> <span class="nf">spec</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span>
+  <span class="k">val</span> <span class="nv">results</span> <span class="k">=</span> <span class="nv">Props</span><span class="o">.</span><span class="py">tests</span><span class="o">.</span><span class="py">map</span> <span class="o">{</span> <span class="n">t</span> <span class="k">=&gt;</span>
+    <span class="k">val</span> <span class="nv">r</span> <span class="k">=</span> <span class="nv">Property</span><span class="o">.</span><span class="py">check</span><span class="o">(</span>
+      <span class="nv">t</span><span class="o">.</span><span class="py">withConfig</span><span class="o">(</span><span class="nv">PropertyConfig</span><span class="o">.</span><span class="py">default</span><span class="o">),</span>
+      <span class="nv">t</span><span class="o">.</span><span class="py">result</span><span class="o">,</span>
+      <span class="nv">Seed</span><span class="o">.</span><span class="py">fromTime</span><span class="o">(),</span>
+    <span class="o">)</span>
+    <span class="nf">println</span><span class="o">(</span><span class="nv">Test</span><span class="o">.</span><span class="py">renderReport</span><span class="o">(</span><span class="s">"Props"</span><span class="o">,</span> <span class="n">t</span><span class="o">,</span> <span class="n">r</span><span class="o">,</span>
+      <span class="n">ansiCodesSupported</span> <span class="k">=</span> <span class="kc">false</span><span class="o">))</span>
+    <span class="nv">r</span><span class="o">.</span><span class="py">status</span>
+  <span class="o">}</span>
+  <span class="k">if</span> <span class="o">!</span><span class="nv">results</span><span class="o">.</span><span class="py">forall</span><span class="o">(</span><span class="k">_</span> <span class="o">==</span> <span class="nv">Status</span><span class="o">.</span><span class="py">ok</span><span class="o">)</span> <span class="n">then</span> <span class="nv">sys</span><span class="o">.</span><span class="py">exit</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span></code></pre></figure>
+
+</div>
+<div><h4>Spec · Haskell</h4>
+
+<figure class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="cp">{-# LANGUAGE OverloadedStrings #-}</span>
+<span class="kr">module</span> <span class="nn">Main</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Control.Monad</span> <span class="p">(</span><span class="nf">unless</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Control.Monad.IO.Class</span> <span class="p">(</span><span class="nf">liftIO</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">System.Exit</span> <span class="p">(</span><span class="nf">exitFailure</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Hedgehog</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Gen</span> <span class="k">as</span> <span class="n">Gen</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Hedgehog.Range</span> <span class="k">as</span> <span class="n">Range</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Before</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">After</span>
+
+<span class="c1">-- A neutral tree, so one input feeds both Expr types. Names are</span>
+<span class="c1">-- always "x": the supply numbers occurrences, not names.</span>
+<span class="kr">data</span> <span class="kt">T</span> <span class="o">=</span> <span class="kt">TVar</span> <span class="o">|</span> <span class="kt">TLit</span> <span class="kt">Int</span> <span class="o">|</span> <span class="kt">TAdd</span> <span class="kt">T</span> <span class="kt">T</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+
+<span class="n">genT</span> <span class="o">::</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">Gen</span> <span class="kt">T</span>
+<span class="n">genT</span> <span class="n">depth</span> <span class="o">=</span>
+  <span class="kr">let</span> <span class="n">leaf</span> <span class="o">=</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">choice</span>
+        <span class="p">[</span> <span class="n">pure</span> <span class="kt">TVar</span>
+        <span class="p">,</span> <span class="kt">TLit</span> <span class="o">&lt;$&gt;</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="kt">Range</span><span class="o">.</span><span class="n">linear</span> <span class="p">(</span><span class="o">-</span><span class="mi">30</span><span class="p">)</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="p">]</span>
+  <span class="kr">in</span> <span class="kr">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span> <span class="kr">then</span> <span class="n">leaf</span>
+     <span class="kr">else</span> <span class="kt">Gen</span><span class="o">.</span><span class="n">choice</span>
+       <span class="p">[</span> <span class="n">leaf</span>
+       <span class="p">,</span> <span class="kt">TAdd</span> <span class="o">&lt;$&gt;</span> <span class="n">genT</span> <span class="p">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;*&gt;</span> <span class="n">genT</span> <span class="p">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+       <span class="p">]</span>
+
+<span class="n">toBefore</span> <span class="o">::</span> <span class="kt">T</span> <span class="o">-&gt;</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Expr</span>
+<span class="n">toBefore</span> <span class="kt">TVar</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Var</span> <span class="s">"x"</span>
+<span class="n">toBefore</span> <span class="p">(</span><span class="kt">TLit</span> <span class="n">v</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Lit</span> <span class="n">v</span>
+<span class="n">toBefore</span> <span class="p">(</span><span class="kt">TAdd</span> <span class="n">l</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Add</span> <span class="p">(</span><span class="n">toBefore</span> <span class="n">l</span><span class="p">)</span> <span class="p">(</span><span class="n">toBefore</span> <span class="n">r</span><span class="p">)</span>
+
+<span class="n">toAfter</span> <span class="o">::</span> <span class="kt">T</span> <span class="o">-&gt;</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Expr</span>
+<span class="n">toAfter</span> <span class="kt">TVar</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Var</span> <span class="s">"x"</span>
+<span class="n">toAfter</span> <span class="p">(</span><span class="kt">TLit</span> <span class="n">v</span><span class="p">)</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Lit</span> <span class="n">v</span>
+<span class="n">toAfter</span> <span class="p">(</span><span class="kt">TAdd</span> <span class="n">l</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Add</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">l</span><span class="p">)</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">r</span><span class="p">)</span>
+
+<span class="c1">-- The walk, as the list of variable labels in pre-order. Forces</span>
+<span class="c1">-- the spine and the labels only, never a Lit's payload.</span>
+<span class="n">labelsBefore</span> <span class="o">::</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span>
+<span class="n">labelsBefore</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">Var</span> <span class="n">n</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span><span class="p">]</span>
+<span class="n">labelsBefore</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">Lit</span> <span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="kt">[]</span>
+<span class="n">labelsBefore</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">Add</span> <span class="n">l</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span>
+  <span class="n">labelsBefore</span> <span class="n">l</span> <span class="o">++</span> <span class="n">labelsBefore</span> <span class="n">r</span>
+
+<span class="n">labelsAfter</span> <span class="o">::</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Expr</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span>
+<span class="n">labelsAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Var</span> <span class="n">n</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span><span class="p">]</span>
+<span class="n">labelsAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Lit</span> <span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="kt">[]</span>
+<span class="n">labelsAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Add</span> <span class="n">l</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="n">labelsAfter</span> <span class="n">l</span> <span class="o">++</span> <span class="n">labelsAfter</span> <span class="n">r</span>
+
+<span class="c1">-- Reading and incrementing the supply is the whole of the state,</span>
+<span class="c1">-- so equal label lists mean equal reads in equal order.</span>
+<span class="n">prop_agrees</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_agrees</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">t</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="p">(</span><span class="n">genT</span> <span class="mi">4</span><span class="p">)</span>
+  <span class="n">b</span> <span class="o">&lt;-</span> <span class="n">liftIO</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">number</span> <span class="p">(</span><span class="n">toBefore</span> <span class="n">t</span><span class="p">))</span>
+  <span class="n">labelsBefore</span> <span class="n">b</span> <span class="o">===</span> <span class="n">labelsAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">number</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">t</span><span class="p">))</span>
+
+<span class="c1">-- Whatever the tree holds, its labels must be exactly x0, x1, ...</span>
+<span class="c1">-- in visit order: no skips, no repeats, no reordering.</span>
+<span class="n">prop_labels_run</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_labels_run</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="n">t</span> <span class="o">&lt;-</span> <span class="n">forAll</span> <span class="p">(</span><span class="n">genT</span> <span class="mi">4</span><span class="p">)</span>
+  <span class="kr">let</span> <span class="n">ls</span> <span class="o">=</span> <span class="n">labelsAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">number</span> <span class="p">(</span><span class="n">toAfter</span> <span class="n">t</span><span class="p">))</span>
+  <span class="kr">let</span> <span class="n">expected</span> <span class="o">=</span>
+        <span class="n">take</span> <span class="p">(</span><span class="n">length</span> <span class="n">ls</span><span class="p">)</span> <span class="p">(</span><span class="n">map</span> <span class="p">(</span><span class="nf">\</span><span class="n">i</span> <span class="o">-&gt;</span> <span class="s">"x"</span> <span class="o">++</span> <span class="n">show</span> <span class="n">i</span><span class="p">)</span> <span class="p">[</span><span class="mi">0</span> <span class="o">::</span> <span class="kt">Int</span> <span class="o">..</span><span class="p">])</span>
+  <span class="n">ls</span> <span class="o">===</span> <span class="n">expected</span>
+
+<span class="c1">-- The Lit payload is never forced: an undefined there survives the</span>
+<span class="c1">-- numbering in both versions, because labels touches only the spine.</span>
+<span class="n">prop_lazy_probe</span> <span class="o">::</span> <span class="kt">Property</span>
+<span class="n">prop_lazy_probe</span> <span class="o">=</span> <span class="n">property</span> <span class="o">$</span> <span class="kr">do</span>
+  <span class="kr">let</span> <span class="n">probe</span> <span class="o">=</span> <span class="kt">Before</span><span class="o">.</span><span class="kt">Add</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">Var</span> <span class="s">"x"</span><span class="p">)</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="kt">Lit</span> <span class="n">undefined</span><span class="p">)</span>
+  <span class="n">b</span> <span class="o">&lt;-</span> <span class="n">liftIO</span> <span class="p">(</span><span class="kt">Before</span><span class="o">.</span><span class="n">number</span> <span class="n">probe</span><span class="p">)</span>
+  <span class="n">labelsBefore</span> <span class="n">b</span> <span class="o">===</span> <span class="p">[</span><span class="s">"x0"</span><span class="p">]</span>
+  <span class="kr">let</span> <span class="n">probe'</span> <span class="o">=</span> <span class="kt">After</span><span class="o">.</span><span class="kt">Add</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Var</span> <span class="s">"x"</span><span class="p">)</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="kt">Lit</span> <span class="n">undefined</span><span class="p">)</span>
+  <span class="n">labelsAfter</span> <span class="p">(</span><span class="kt">After</span><span class="o">.</span><span class="n">number</span> <span class="n">probe'</span><span class="p">)</span> <span class="o">===</span> <span class="p">[</span><span class="s">"x0"</span><span class="p">]</span>
+
+<span class="n">main</span> <span class="o">::</span> <span class="kt">IO</span> <span class="nb">()</span>
+<span class="n">main</span> <span class="o">=</span> <span class="kr">do</span>
+  <span class="c1">-- checkSequential: the properties share Before's top-level supply.</span>
+  <span class="n">ok</span> <span class="o">&lt;-</span> <span class="n">checkSequential</span> <span class="o">$</span> <span class="kt">Group</span> <span class="s">"Props"</span>
+    <span class="p">[</span> <span class="p">(</span><span class="s">"number: Before == After"</span><span class="p">,</span> <span class="n">prop_agrees</span><span class="p">)</span>
+    <span class="p">,</span> <span class="p">(</span><span class="s">"labels run x0, x1, ... in pre-order"</span><span class="p">,</span> <span class="n">prop_labels_run</span><span class="p">)</span>
+    <span class="p">,</span> <span class="p">(</span><span class="s">"a Lit payload is never forced"</span><span class="p">,</span> <span class="n">prop_lazy_probe</span><span class="p">)</span>
+    <span class="p">]</span>
+  <span class="n">unless</span> <span class="n">ok</span> <span class="n">exitFailure</span></code></pre></figure>
+
+</div>
+</div>
+</details>
+
+<h2 id="pitfalls">Pitfalls</h2>
+
+<p>The equation has hypotheses, and each is one of the constructive
+criteria. Where a hypothesis fails, parameterisation changes the
+program.</p>
+
+<ul>
+  <li><strong>Update order and count.</strong> With a mutable cell, every read sees
+whatever the last write left there; the program’s meaning depends on
+when calls happen relative to one another. Parameterising one function
+while other code still writes the cell can change what its reads see.
+The state-passing translation removes the hazard by construction: the
+order of reads and moves into the data flow, and the property checks
+it.</li>
+  <li><strong>Aliasing.</strong> Two names for one cell — two globals, or a global and a
+field — defeat the move: parameterise one path and the other still
+mutates behind the parameter’s back. The OO literature calls this the
+aliasing problem with global data [<a href="#ref-1">1</a>]; the cure is to
+parameterise every path before deleting the cell.</li>
+  <li><strong>Reset ceremony.</strong> A global that must be re-initialised between uses
+forces every entry point to reset it — both <code class="language-plaintext highlighter-rouge">Before</code> programs above
+carry that line. The ceremony is the smell made visible; the move
+deletes it, because a parameter is fresh by construction on every
+call.</li>
+  <li><strong>Capture’s precondition.</strong> The inverse move — replacing a parameter
+with a shared definition — is sound only where the value is invariant
+across every call in the subtree. Capture a parameter that varies and
+you have not refactored; you have changed the program. Lambda dropping
+states the condition formally [<a href="#ref-7">7</a>].</li>
+  <li><strong>Partiality is preserved, not fixed.</strong> The examples use integer
+arithmetic that overflows at the edges in both versions alike. The
+move changes how the value is reached, never what the computation
+does with it.</li>
+</ul>
+
+<p>In each case the fix is the same: restore the hypothesis, or admit that
+this is not a refactoring and test it as a change.</p>
+
+<details class="rf-spec">
+<summary>The functional reading</summary>
+<div>
+
+    <p>In a referentially transparent language a definition depends only on its
+free variables, and the type checker lists them. A global is the one
+exception a language can offer: a free variable that no binder owns,
+reachable without appearing in any signature. Replacing it with a
+parameter is the abstraction step — define a function whose parameters
+are the free variables the global stood for, and call it with the
+value the global held. There is no environment to rebuild, because
+there was never anything but the value.</p>
+
+    <p>The lineage is the same one the extract/inline entry draws on, applied
+one scope level out. Johnsson’s lambda lifting turns nested definitions
+into top-level equations by adding their free variables as leading
+parameters [<a href="#ref-6">6</a>]; replacing a global with a parameter is the same
+transformation where the enclosing scope is the whole program. Danvy and
+Schultz’s lambda dropping is the inverse, restoring block structure by
+dropping parameters that are invariant across a call graph back into
+scope [<a href="#ref-7">7</a>] — the capture direction of this entry, with its
+invariance precondition stated formally. Where the cell is mutable,
+Launchbury and Peyton Jones give the shape the parameterised program
+takes: a stateful computation is a state transformer, a function from
+an initial state to a final one, and the encapsulation that keeps one
+piece of state from leaking into another is assured by the type system
+[<a href="#ref-5">5</a>].</p>
+
+    <p>And when the parameter is threaded through a deep tree that never
+inspects it — the very smell that motivates the inverse — the typed
+answer is not to go back to a global but to bundle the environment into
+the computation itself. Jones’s tutorial defines the reader monad as
+“computations that consult some fixed environment” and builds the
+transformer <code class="language-plaintext highlighter-rouge">ReaderT</code> on top of it [<a href="#ref-8">8</a>]. That is the next entry
+in this catalogue.</p>
+
+    <p>That is the point. With referential transparency the precondition does
+not become easier to satisfy; it disappears, because the transformation
+is an instance of the language’s own equational theory. The hidden
+dependency becomes an argument, and the program that used to hope it
+preserved behaviour becomes an equation you wrote down.</p>
+
+  </div>
+</details>
+
+<h2 id="verification">Verification</h2>
+
+<p>Because the move is an equation, its correctness is a property: for all
+inputs <em>x</em> in the domain of the entry point, <code class="language-plaintext highlighter-rouge">Before x == After x</code>.
+That is a one-line property in the sense Claessen and Hughes introduced
+with QuickCheck, where a generator produces inputs and the framework
+searches for a counterexample and shrinks it to a minimal one
+[<a href="#ref-9">9</a>]. The catalogue states every entry this way, in Scala and in
+Haskell, with hedgehog on both sides [<a href="#ref-10">10</a>], [<a href="#ref-11">11</a>]. Hedgehog
+is used because its shrinking is integrated into the generator, so the
+minimal failing input it reports is a real input of the program.</p>
+
+<p>A property is only worth having if it can fail, so each spec above was
+mutation-checked: change <code class="language-plaintext highlighter-rouge">After</code> so it is no longer equivalent, confirm
+the property reports and shrinks a counterexample, then restore it.
+Replacing <code class="language-plaintext highlighter-rouge">&lt;</code> with <code class="language-plaintext highlighter-rouge">&lt;=</code> at the overdraft boundary of example 2 was
+caught within the first handful of tests and shrunk to the one
+transaction list <code class="language-plaintext highlighter-rouge">[-30]</code> where the balance lands exactly on the limit;
+that is why the generators stay narrow and the boundary property runs
+500 tests. Mutants that ignore the new parameter — hard-coding the old
+global’s value — pass the agreement property on purpose and are caught
+by the second, purpose property of examples 1 and 2. Incrementing the
+supply twice, or never, and numbering the right subtree before the left
+were each caught by example 3’s label properties, and a Haskell mutant
+that forces a <code class="language-plaintext highlighter-rouge">Lit</code> payload was caught by the laziness probe while the
+other two properties still passed.</p>
+
+<p>To run everything on this page yourself, from a checkout of
+<a href="https://github.com/Constructive-Programming/website">the site repository</a>:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sh pages/refactorings/replace-global-state-with-parameter/run.sh
+</code></pre></div></div>
+
+<p>It needs <a href="https://scala-cli.virtuslab.org/">scala-cli</a> and either GHC
+with hedgehog installed or Docker, and ends with <code class="language-plaintext highlighter-rouge">all properties passed</code>.</p>
+
+<h2 id="references">References</h2>
+
+<ol>
+<li id="ref-1">Martin Fowler. <em>Refactoring: Improving the Design of Existing Code</em>, second edition. Addison-Wesley, 2018. Chapter 3, &ldquo;Bad Smells in Code&rdquo;: <em>Global Data</em>, whose only listed cure is <em>Encapsulate Variable</em>.</li>
+<li id="ref-2">Erich Gamma, Richard Helm, Ralph Johnson and John Vlissides. <em>Design Patterns: Elements of Reusable Object-Oriented Software</em>. Addison-Wesley, 1994. Singleton: &ldquo;Ensure a class only has one instance, and provide a global point of access to it.&rdquo;</li>
+<li id="ref-3">Martin Fowler. &ldquo;Inversion of Control Containers and the Dependency Injection pattern&rdquo;. 2004. <a href="https://martinfowler.com/articles/injection.html">https://martinfowler.com/articles/injection.html</a></li>
+<li id="ref-4">Mi&scaron;ko Hevery. &ldquo;Root Cause of Singletons&rdquo;. Google Testing Blog, 27 August 2008. &ldquo;Singletons are global state in sheep's clothing&rdquo;; &ldquo;The moment you traverse a global variable your API lies about its true dependencies.&rdquo; <a href="https://testing.googleblog.com/2008/08/root-cause-of-singletons.html">https://testing.googleblog.com/2008/08/root-cause-of-singletons.html</a></li>
+<li id="ref-5">John Launchbury and Simon L. Peyton Jones. &ldquo;State in Haskell&rdquo;. <em>LISP and Symbolic Computation</em> 8(4):293&ndash;341, 1995. <a href="https://doi.org/10.1007/BF01018827">https://doi.org/10.1007/BF01018827</a></li>
+<li id="ref-6">Thomas Johnsson. &ldquo;Lambda Lifting: Transforming Programs to Recursive Equations&rdquo;. In <em>Functional Programming Languages and Computer Architecture (FPCA 1985)</em>, LNCS 201, pp. 190&ndash;203. Springer, 1985. <a href="https://doi.org/10.1007/3-540-15975-4_37">https://doi.org/10.1007/3-540-15975-4_37</a></li>
+<li id="ref-7">Olivier Danvy and Ulrik P. Schultz. &ldquo;Lambda-dropping: transforming recursive equations into programs with block structure&rdquo;. <em>Theoretical Computer Science</em> 248(1&ndash;2):243&ndash;287, 2000. <a href="https://www.sciencedirect.com/science/article/pii/S0304397500000542">https://www.sciencedirect.com/science/article/pii/S0304397500000542</a></li>
+<li id="ref-8">Mark P. Jones. &ldquo;Functional Programming with Overloading and Higher-Order Polymorphism&rdquo;. In <em>Advanced Functional Programming (AFP 1995)</em>, LNCS 925, pp. 97&ndash;136. Springer, 1995. Reader monads as &ldquo;computations that consult some fixed environment&rdquo;; <code>ReaderT</code>. <a href="https://doi.org/10.1007/3-540-59451-5_4">https://doi.org/10.1007/3-540-59451-5_4</a></li>
+<li id="ref-9">Koen Claessen and John Hughes. &ldquo;QuickCheck: a lightweight tool for random testing of Haskell programs&rdquo;. In <em>Proceedings of the ACM SIGPLAN International Conference on Functional Programming (ICFP 2000)</em>, pp. 268&ndash;279. <a href="https://doi.org/10.1145/351240.351266">https://doi.org/10.1145/351240.351266</a></li>
+<li id="ref-10">Hedgehog for Scala. <a href="https://github.com/hedgehogqa/scala-hedgehog">https://github.com/hedgehogqa/scala-hedgehog</a></li>
+<li id="ref-11">Hedgehog for Haskell. <a href="https://github.com/hedgehogqa/haskell-hedgehog">https://github.com/hedgehogqa/haskell-hedgehog</a></li>
+</ol>
+
+    </section>
+    <!-- Category and Tag list -->
+    <div class="tag-category-container">
+        <!-- Category list -->
+        
+        
+
+
+
+  <div class="category-list"></div>
+
+
+
+        <!-- Tag list for portfolio -->
+        
+        
+
+
+
+  <div class="tag-list" data-testid="tag-list">
+    <ul>
+      
+        <li class="meta">Tags</li>
+      
+
+      
+        <li><a class="button" data-testid="tag-link" href="/pr-preview/pr-16/tags#refactorings">
+          <p><i class="fa-tag" aria-hidden="true"></i>refactorings</p>
+        </a></li>
+      
+        <li><a class="button" data-testid="tag-link" href="/pr-preview/pr-16/tags#replace-global-state-with-parameter">
+          <p><i class="fa-tag" aria-hidden="true"></i>replace-global-state-with-parameter</p>
+        </a></li>
+      
+    </ul>
+  </div>
+
+
+    </div>
+</article>
+
+    </main>
+    
+    <footer class="site-footer"> <p class="text"> Copyright Constructive Programming, 2026 </p> <p class="text footer-legal">Constructive Programming · E&amp;O insurance available on request.</p> <div class="footer-icons"> <ul> <li> <a href="/pr-preview/pr-16/feed.xml" title="Follow RSS feed" aria-label="RSS feed" target="_blank" rel="noopener"> <svg class="cp-social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20 5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1Z"/> </svg> </a> </li> <li> <a href="https://github.com/Constructive-Programming" title="Follow on Github" aria-label="Github" target="_blank" rel="noopener"><svg class="cp-social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/> </svg></a> </li> <li> <a href="https://www.linkedin.com/in/rodolfohansen" title="Follow on Linkedin" aria-label="Linkedin" target="_blank" rel="noopener"><svg class="cp-social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.063 2.063 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/> </svg></a> </li> <li> <a href="mailto:consulting@constructive.dev" title="Follow on Mail" aria-label="Mail" target="_blank" rel="noopener"><svg class="cp-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"> <rect x="3" y="5" width="18" height="14" rx="2"/> <path d="m3 7 9 6 9-6"/> </svg></a> </li> <li> <a href="https://medium.com/@rodolfohansen" title="Follow on Medium" aria-label="Medium" target="_blank" rel="noopener"><svg class="cp-social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M13.54 12c0 3.04-2.42 5.5-5.42 5.5S2.7 15.04 2.7 12s2.42-5.5 5.42-5.5 5.42 2.46 5.42 5.5zm5.95 0c0 2.86-1.21 5.18-2.71 5.18s-2.71-2.32-2.71-5.18 1.21-5.18 2.71-5.18 2.71 2.32 2.71 5.18zM24 12c0 2.56-.43 4.64-.95 4.64s-.95-2.08-.95-4.64.43-4.64.95-4.64S24 9.44 24 12z"/> </svg></a> </li> </ul> </div> </footer>
+  </body>
+</html>
