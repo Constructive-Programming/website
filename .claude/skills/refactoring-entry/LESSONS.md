@@ -161,3 +161,40 @@ brief.md or workflow.js and deleted here. Keep the calibration table current.
   marker-ended arrows entirely inside that gutter, and low-alpha highlight fills with
   no stroke. Render the actual SVG at desktop and mobile widths before assembly.
   → folded into workflow.js's diagram prompt.
+
+## 2026-09-04 — 03 Replace global state with parameter
+
+- **Toolchain.** The system gem dir is not writable on this machine: `bundle install`
+  fails building native extensions. `bundle config set --local path vendor/bundle`
+  works; `/vendor/` added to `.gitignore` in this PR. Headless
+  `google-chrome-stable` exists for layout screenshots; a scratch
+  `python3 -m http.server` must be started with `setsid nohup ... &` or it dies
+  when the terminal command returns (first screenshot attempt was
+  ERR_CONNECTION_REFUSED).
+- **Rule.** In scala-hedgehog `withTests` is a member of `Test`, not `Property`:
+  `property("name", prop).withTests(500)`. The brief's old line misleads into a
+  compile error. -> reworded in brief.md.
+- **Rule.** Haskell model of a global mutable cell: top-level `IORef` CAF
+  (`{-# NOINLINE x #-}` + `unsafePerformIO (newIORef ...)`). Before's entry point
+  lives in IO, After's is pure; the spec compares projections (label lists), per
+  the lens entry's compare-results rule. A spec whose properties touch the same
+  top-level cell must use `checkSequential` — `checkParallel` races the cell.
+- **Harness.** `edit_file` cannot create files inside a fresh untracked directory
+  tree (VFS error "path changed from ... to ..."); write sources with a terminal
+  heredoc and `git add` them immediately — the mirror then tracks them. Recorded
+  so the next run loses no time to it.
+- **Reviewer (self-run mutation round).** Every mutant caught, none survived:
+  ex1 fee ignoring its parameter (caught by the purpose property only), fee
+  applied twice (agreement); ex2 `<` vs `<=` in both languages (shrunk to
+  `List(-30)` within 5 tests), limit hard-coded (purpose property only); ex3
+  increment-by-2 and no-increment (Scala), right-subtree-first numbering
+  (Haskell), forcing the `Lit` payload (Haskell, laziness probe only).
+- **Citation skeptic.** martinfowler.com/bliki GlobalVariables.html and
+  Singleton.html are 404; refactoring.com/catalog/globalData.html is 404 — the
+  smells live in the 2e book, cite the book. misko.hevery.com is unreachable —
+  cite the Google Testing Blog post that quotes the same claims. "State-passing
+  style" does not occur verbatim in State in Haskell; it says "state
+  transformer" — write it that way.
+- **Time.** Single agent, no batch runner (workflow.js is Claude-Code-only):
+  research + citation checks ~15 min, examples + specs ~25 min, mutation round
+  ~15 min, page + diagrams + screenshots ~30 min.

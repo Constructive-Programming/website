@@ -45,3 +45,4 @@ plugins: [jekyll-paginate, jekyll-seo-tag, jekyll-feed, jekyll-remote-theme]
 exclude:
   - pages/refactorings/extract-method/
   - pages/refactorings/replace-mutable-fields-with-lenses/
+  - pages/refactorings/replace-global-state-with-parameter/

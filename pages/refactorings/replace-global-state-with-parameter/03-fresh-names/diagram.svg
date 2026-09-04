@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 196" role="img" aria-labelledby="d3-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none">
+  <title id="d3-title">Before, go reads and writes a global supply cell; the order of updates lives in when calls happen. After, go(e, n) takes the supply as n and returns it updated; the order lives in the data flow.</title>
+  <defs>
+    <marker id="d3-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="currentColor"/>
+    </marker>
+  </defs>
+  <g fill="currentColor" font-size="12" opacity=".65">
+    <text x="16" y="22">before</text>
+    <text x="464" y="22">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="30" width="300" height="146" rx="4"/>
+    <rect x="464" y="30" width="300" height="146" rx="4"/>
+  </g>
+  <g fill="rgba(128,128,128,.12)">
+    <rect x="30" y="62" width="272" height="60" rx="3"/>
+    <rect x="478" y="62" width="272" height="60" rx="3"/>
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="50">supply: the global cell</text>
+    <text x="40" y="80">go(e) = e match</text>
+    <text x="52" y="98">Var → read supply, write supply+1</text>
+    <text x="52" y="116">Add → go(l), then go(r)</text>
+    <text x="28" y="146">reads and writes hide in the cell</text>
+    <text x="488" y="80">go(e, n) = e match</text>
+    <text x="500" y="98">Var → (labelled with n, n + 1)</text>
+    <text x="500" y="116">Add → go(l, n), then go(r, n′)</text>
+    <text x="476" y="146">n flows in, n′ flows out</text>
+    <text x="476" y="164">order lives in the data flow</text>
+  </g>
+  <path d="M332 98 H448" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#d3-arrow)"/>
+  <text x="390" y="66" fill="currentColor" font-size="12" text-anchor="middle">reads become inputs,</text>
+  <text x="390" y="82" fill="currentColor" font-size="12" text-anchor="middle">writes become results</text>
+</svg>

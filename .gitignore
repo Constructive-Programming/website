@@ -74,3 +74,6 @@ dist-newstyle/
 
 # Local linting venv (see README "Lint")
 /.venv/
+
+# Bundler local gem path (bundle config set --local path vendor/bundle)
+/vendor/

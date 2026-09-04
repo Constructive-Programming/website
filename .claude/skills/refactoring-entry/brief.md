@@ -72,7 +72,8 @@ pages/refactorings/<slug>/
         val r = Property.check(t.withConfig(PropertyConfig.default), t.result, Seed.fromTime())
         println(Test.renderReport("Props", t, r, ansiCodesSupported = false)); r.status }
       if !results.forall(_ == Status.ok) then sys.exit(1)
-  `.withTests(500)` on a property raises its count.
+  Bump a property's count with `property("name", prop).withTests(500)`:
+  `withTests` is a member of `Test`, not `Property`.
 - Haskell: GHC 9.8.4 + hedgehog. No ghc on this machine; docker image `cp-hedgehog` (run.sh builds it if missing):
     docker run --rm -v "$PWD/pages/refactorings/<slug>:/w" -w /w cp-hedgehog runghc -iNN-ex NN-ex/Spec.hs
   (from the repo root). Spec.hs: `main = do ok <- checkParallel (Group "Props" [...]); unless ok exitFailure`.
@@ -86,6 +87,10 @@ pages/refactorings/<slug>/
 - A second property per example is expected when natural (the extracted piece on its own; a law it obeys).
 - In Haskell probe laziness/strictness with `undefined` where the refactoring could change what is forced;
   in Scala reason about evaluation count (def vs val, by-name) and say so in a comment when it matters.
+- If an example needs a global MUTABLE cell in Haskell: a top-level `IORef` CAF
+  (`{-# NOINLINE x #-}` + `unsafePerformIO (newIORef ...)`); Before's entry point lives
+  in IO, After's is pure — the type change is the point, say so on the page. Compare
+  projections (the lens rule), and use `checkSequential` when properties touch the cell.
 
 ## Style
 - Site prose: crisp, editorial, no hype; sentences, not bullets, in body text (the caveats section may use a list).

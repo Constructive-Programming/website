@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 176" role="img" aria-labelledby="d1-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none">
+  <title id="d1-title">Before, fee(subtotal) reads the global serviceFee; the signature says nothing. After, fee(serviceFee, subtotal) takes the value as a leading parameter and total supplies the program's default.</title>
+  <defs>
+    <marker id="d1-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="currentColor"/>
+    </marker>
+  </defs>
+  <g fill="currentColor" font-size="12" opacity=".65">
+    <text x="16" y="22">before</text>
+    <text x="464" y="22">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="30" width="300" height="126" rx="4"/>
+    <rect x="464" y="30" width="300" height="126" rx="4"/>
+  </g>
+  <g fill="rgba(128,128,128,.12)">
+    <rect x="30" y="62" width="272" height="42" rx="3"/>
+    <rect x="478" y="62" width="272" height="42" rx="3"/>
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="50">serviceFee = 300</text>
+    <text x="40" y="80">fee(subtotal) =</text>
+    <text x="52" y="98">subtotal + serviceFee</text>
+    <text x="28" y="126">the fee reads the global;</text>
+    <text x="28" y="144">the signature says nothing</text>
+    <text x="476" y="50">serviceFee = 300  // the default</text>
+    <text x="488" y="80">fee(serviceFee, subtotal) =</text>
+    <text x="500" y="98">subtotal + serviceFee</text>
+    <text x="476" y="126">total(lines) =</text>
+    <text x="488" y="144">fee(serviceFee, lines.sum)</text>
+  </g>
+  <path d="M332 98 H448" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#d1-arrow)"/>
+  <text x="390" y="66" fill="currentColor" font-size="12" text-anchor="middle">the setting becomes</text>
+  <text x="390" y="82" fill="currentColor" font-size="12" text-anchor="middle">the leading parameter</text>
+</svg>
