@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 232" role="img" aria-labelledby="d2-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="d2-title">Replacing the Dict-is-a-Set-of-pairs alias with a Map and the arrow entries. Before: type Dict[K, V] = Set[(K, V)], and put must re-impose one value per key by hand, filtering the old key before inserting the new pair. After: Map[K, V] owns the invariant; the arrow entries, natural in V, leads to Set[(K, V)], where set algebra such as intersection applies. The way back needs a merge policy for colliding keys, which is a design decision, not a refactoring.</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="26">before</text>
+    <text x="428" y="26">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="36" width="340" height="156" rx="4"/>
+    <rect x="428" y="36" width="150" height="104" rx="4"/>
+    <rect x="654" y="36" width="110" height="104" rx="4"/>
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="60">type Dict[K, V] = Set[(K, V)]</text>
+    <text x="28" y="92">put(d, k, v) =</text>
+  </g>
+  <g fill="rgba(128,128,128,.12)">
+    <rect x="36" y="100" width="250" height="20" rx="3"/>
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="44" y="114">d.filterNot(_._1 == k) + ((k, v))</text>
+  </g>
+  <g fill="currentColor" font-size="12" opacity=".7">
+    <text x="28" y="150">one value per key: re-imposed by</text>
+    <text x="28" y="166">hand, at every put, forever</text>
+  </g>
+  <g fill="currentColor" font-size="13" font-weight="600" text-anchor="middle">
+    <text x="503" y="62">Map[K, V]</text>
+    <text x="709" y="62">Set[(K, V)]</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".75">
+    <text x="503" y="88">+ &#183; lookup</text>
+    <text x="503" y="106">owns the invariant</text>
+    <text x="709" y="88">&#8745; &#183; &#8746; &#183; &#8726;</text>
+    <text x="709" y="106">the set algebra</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M586 78 H642"/>
+  </g>
+  <g fill="currentColor">
+    <path d="M642 74.5 L650 78 L642 81.5 Z"/>
+  </g>
+  <g fill="currentColor" font-size="11" text-anchor="middle">
+    <text x="616" y="70">entries</text>
+    <text x="616" y="96">natural in V</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".75">
+    <text x="596" y="170">the way back must merge colliding keys:</text>
+    <text x="596" y="188">a policy, not a refactoring</text>
+  </g>
+</svg>
