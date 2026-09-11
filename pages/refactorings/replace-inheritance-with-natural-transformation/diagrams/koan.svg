@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 272" role="img" aria-labelledby="koan-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="koan-title">Replace inheritance with natural transformation: one equation read in two directions. Left: Stack[A] extends List[A], an is-a that is implicit and total, granting every List operation on every Stack. Right: a named arrow alpha from Stack[A] to List[A], one component per element type A, with the naturality square: alpha then map f equals map f then alpha. The arrow to the right is replace (name the coercion, hide the representation); the arrow to the left is inline (make the coercion implicit again).</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="28">before</text>
+    <text x="374" y="28">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="40" width="250" height="160" rx="4"/>
+    <rect x="374" y="40" width="250" height="160" rx="4"/>
+  </g>
+  <g fill="currentColor" font-size="14" text-anchor="middle">
+    <text x="141" y="78">Stack[A] <tspan font-weight="700">extends</tspan> List[A]</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".75">
+    <text x="141" y="110">every List operation,</text>
+    <text x="141" y="128">on every Stack</text>
+    <text x="141" y="158">the is-a: implicit, total,</text>
+    <text x="141" y="176">at every element type A</text>
+  </g>
+  <g fill="currentColor" font-size="13" text-anchor="middle">
+    <text x="499" y="64">&#945; : &#8704;A. Stack[A] &#8594; List[A]</text>
+  </g>
+  <g fill="currentColor" font-size="13" text-anchor="middle">
+    <text x="434" y="106">Stack[A]</text>
+    <text x="567" y="106">List[A]</text>
+    <text x="434" y="182">Stack[B]</text>
+    <text x="567" y="182">List[B]</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M470 102 H534"/>
+    <path d="M470 178 H534"/>
+    <path d="M434 116 V164"/>
+    <path d="M567 116 V164"/>
+  </g>
+  <g fill="currentColor">
+    <path d="M534 98.5 L542 102 L534 105.5 Z"/>
+    <path d="M534 174.5 L542 178 L534 181.5 Z"/>
+    <path d="M430.5 164 L434 172 L437.5 164 Z"/>
+    <path d="M563.5 164 L567 172 L570.5 164 Z"/>
+  </g>
+  <g fill="currentColor" font-size="11" text-anchor="middle" opacity=".85">
+    <text x="502" y="96">&#945;</text>
+    <text x="502" y="192">&#945;</text>
+    <text x="412" y="144">map f</text>
+    <text x="592" y="144">map f</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M282 104 H348"/>
+    <path d="M358 136 H292"/>
+  </g>
+  <g fill="currentColor">
+    <path d="M348 100.5 L356 104 L348 107.5 Z"/>
+    <path d="M292 132.5 L284 136 L292 139.5 Z"/>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle">
+    <text x="320" y="94">replace</text>
+    <text x="320" y="154">inline</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".75">
+    <text x="320" y="230">replace: name the coercion, hide the representation &#183; inline: make it implicit again</text>
+    <text x="320" y="252">&#945; &#8728; map f = map f &#8728; &#945; &#8212; free, by parametricity; no higher kinds needed</text>
+  </g>
+</svg>

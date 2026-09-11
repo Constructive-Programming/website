@@ -10,7 +10,7 @@
     - { name: "Introduce ReaderT (Kleisli)" }
     - { name: "Replace loop with fold" }
     - { name: "Replace recursion with fold" }
-    - { name: "Replace inheritance with natural transformation" }
+    - { name: "Replace inheritance with natural transformation", slug: replace-inheritance-with-natural-transformation }
     - { name: "Replace exception with extended response type" }
     - { name: "Replace null with optional" }
     - { name: "Replace optional fields with sum types" }

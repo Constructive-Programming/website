@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 232" role="img" aria-labelledby="d1-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="d1-title">Replacing the Stack-is-a-List alias with a Stack type and the arrow toList. Before: type Stack[A] = List[A]; push, undo and show are all list surgery on the same value, and replay hands the stack itself to the UI. After: Stack[A] exports push, undo and map; the arrow toList, natural in A, leads to List[A], where the sequence API applies; fromList, the constructor, is the arrow back, and the pair forgets nothing.</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="26">before</text>
+    <text x="428" y="26">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="36" width="340" height="156" rx="4"/>
+    <rect x="428" y="36" width="150" height="104" rx="4"/>
+    <rect x="654" y="36" width="110" height="104" rx="4"/>
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="60">type Stack[A] = List[A]</text>
+  </g>
+  <g fill="rgba(128,128,128,.12)">
+    <rect x="28" y="76" width="316" height="66" rx="3"/>
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="40" y="94">push = history :+ text</text>
+    <text x="40" y="114">undo = history.dropRight(1)</text>
+    <text x="40" y="134">show = history</text>
+  </g>
+  <g fill="currentColor" font-size="12" opacity=".7">
+    <text x="28" y="166">one API, the List's: discipline and</text>
+    <text x="28" y="182">surgery are indistinguishable</text>
+  </g>
+  <g fill="currentColor" font-size="13" font-weight="600" text-anchor="middle">
+    <text x="503" y="62">Stack[A]</text>
+    <text x="709" y="62">List[A]</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".75">
+    <text x="503" y="88">push &#183; undo &#183; map</text>
+    <text x="503" y="106">the discipline only</text>
+    <text x="709" y="88">take &#183; zip &#183; &#8230;</text>
+    <text x="709" y="106">the sequence API</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M586 78 H642"/>
+  </g>
+  <g fill="currentColor">
+    <path d="M642 74.5 L650 78 L642 81.5 Z"/>
+  </g>
+  <g fill="currentColor" font-size="11" text-anchor="middle">
+    <text x="616" y="70">toList</text>
+    <text x="616" y="96">natural in A</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".75">
+    <text x="596" y="170">the arrow back, fromList, is the constructor:</text>
+    <text x="596" y="188">this pair forgets nothing</text>
+  </g>
+</svg>

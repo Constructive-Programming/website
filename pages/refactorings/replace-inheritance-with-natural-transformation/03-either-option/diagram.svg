@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 232" role="img" aria-labelledby="d3-title" style="width:100%;height:auto;font-family:inherit;font-variant-ligatures:none;font-feature-settings:'calt' 0">
+  <title id="d3-title">Replacing a result class that is-a two views with one canonical type and one arrow per view. Before: enum Result extends Diagnosed and Present, so every caller sees both protocols and the class must answer both forever. After: Either[String, Int] is the canonical boundary type; the arrow toOption, natural in A, forgets the error channel, and the presence caller gets exactly Option[Int]. The way back, note(e), must invent an error value: forgetting is one-way.</title>
+  <g fill="currentColor" font-size="12" opacity=".6">
+    <text x="16" y="26">before</text>
+    <text x="428" y="26">after</text>
+  </g>
+  <g fill="rgba(128,128,128,.07)" stroke="currentColor" stroke-width="1">
+    <rect x="16" y="36" width="340" height="156" rx="4"/>
+    <rect x="428" y="36" width="170" height="104" rx="4"/>
+    <rect x="674" y="36" width="90" height="104" rx="4"/>
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="28" y="60">enum Result</text>
+  </g>
+  <g fill="rgba(128,128,128,.12)">
+    <rect x="36" y="70" width="250" height="20" rx="3"/>
+  </g>
+  <g fill="currentColor" font-size="12">
+    <text x="44" y="84">extends Diagnosed, Present</text>
+    <text x="28" y="114">Bad(why) &#183; Ok(n)</text>
+    <text x="28" y="138">err: the diagnosis &#183; value: the presence</text>
+  </g>
+  <g fill="currentColor" font-size="12" opacity=".7">
+    <text x="28" y="166">two supertypes: every caller sees both,</text>
+    <text x="28" y="182">and the class answers both, forever</text>
+  </g>
+  <g fill="currentColor" font-size="13" font-weight="600" text-anchor="middle">
+    <text x="513" y="62">Either[String, Int]</text>
+    <text x="719" y="62">Option[Int]</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".75">
+    <text x="513" y="88">the canonical type</text>
+    <text x="513" y="106">all the information</text>
+    <text x="719" y="88">presence</text>
+    <text x="719" y="106">one view, exactly</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <path d="M606 78 H662"/>
+  </g>
+  <g fill="currentColor">
+    <path d="M662 74.5 L670 78 L662 81.5 Z"/>
+  </g>
+  <g fill="currentColor" font-size="11" text-anchor="middle">
+    <text x="636" y="70">toOption</text>
+    <text x="636" y="96">natural in A</text>
+  </g>
+  <g fill="currentColor" font-size="12" text-anchor="middle" opacity=".75">
+    <text x="596" y="170">the way back, note(e), must invent an error:</text>
+    <text x="596" y="188">forgetting is one-way</text>
+  </g>
+</svg>
