@@ -22,10 +22,14 @@ what we reach for when a client needs the same lens to work over an
 in-memory record, a JSON byte buffer, and an Avro wire payload — and
 when they need that lens to keep its laws under change.
 
-[**scala-cardinality**](https://github.com/Constructive-Programming/scala-cardinality)
+[**scala-cardinality**](https://cardinality.constructive.dev/)
 is the research artefact behind the *Total Program Cardinality* thesis
 — the metric that counts the inhabitants of an ADT and informs the
-*narrowing* work we do on client codebases.
+*narrowing* work we do on client codebases. Now under active
+development, it keeps surprising us: it puts an actual number behind
+YAGNI, it found a `flatTraverse` we had missed, our ScalaCheck suites
+run much faster, and it roots out primitive obsession and string-based
+programming.
 [**surreals**](https://github.com/Constructive-Programming/surreals)
 is an algebraic exploration of Conway's surreal numbers using cats
 algebra and droste recursion schemes; it is the proving ground for
@@ -33,7 +37,7 @@ the recursion-scheme techniques that show up later in production
 pipelines.
 
 The home page introduces another, longer-running output:
-[**Fixed**]({{ '/#fixed' | relative_url }}) — a new functional
+[**Fixed**](https://fixed.constructive.dev/) — a new functional
 language being designed around the same constructive principles. Phase 0
 of that design is in flight; the implementation will follow.
 

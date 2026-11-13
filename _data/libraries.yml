@@ -48,9 +48,11 @@
   featured: true
   tagline: "Counting type inhabitants — keep your types small."
   description: >
-    A type-cardinality calculator for Scala ADTs (|T| over +, *, ^),
-    plus a scalafix rule that flags sum types used as function
-    arguments. Backs the "Keep Your Types Small" argument with code.
-  stack: "Scala + scalafix"
-  status: "Dormant (2022)"
+    A type-cardinality calculator for Scala ADTs (|T| over +, *, ^)
+    that reads compiled TASTy via tasty-query. The sbt-cardinality
+    plugin puts a number on every definition inside your build, so a
+    CI diff shows whether each change shrank the state space or grew it.
+  stack: "Scala + sbt + tasty-query"
+  status: "Active — sbt-cardinality 0.0.6 (2026)"
   repo: "https://github.com/Constructive-Programming/scala-cardinality"
+  docs: "https://cardinality.constructive.dev/"

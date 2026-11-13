@@ -25,7 +25,7 @@ The methodology is the lens through which we read code, design APIs, and
 prepare a codebase to be co-piloted by LLMs. The
 [Libraries]({{ '/libraries/' | relative_url }}) page lists the OSS that
 puts the methodology into Scala practice, and the home page introduces
-[Fixed](https://github.com/Constructive-Programming/fixed) — a new
+[Fixed](https://fixed.constructive.dev/) — a new
 language being designed around the same principles.
 
 ## The team
@@ -39,7 +39,7 @@ across Scala, Rust, Haskell, Kotlin, JavaScript, and a number of paradigms
 nearly every team scale below "100 engineers." He is currently the main
 engineer behind the [cats-eo](https://eo.constructive.dev/) library and
 is designing the new research language
-[Fixed](https://github.com/Constructive-Programming/fixed), based in the
+[Fixed](https://fixed.constructive.dev/), based in the
 Netherlands, where he operates this consulting firm.
 
 Earlier he was a **Global Software Quality &amp; Craftsmanship Expert at
