@@ -141,7 +141,6 @@ readme
 recurse
 reddit
 refactorings
-refactorings
 repl
 rhansen
 rivoli
@@ -151,6 +150,7 @@ rohan
 rossjrw
 rss
 runtimes
+sbt
 scaffeine
 scalafix
 scoverage
@@ -191,5 +191,6 @@ wght
 wipo
 wordlist
 wscript
+yagni
 yaml
 yml
