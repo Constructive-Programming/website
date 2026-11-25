@@ -1,7 +1,7 @@
-# Libraries listed on the home page and /libraries/ page.
+# Open-source contributions listed on the home page (featured) and /contributions/.
 
 - slug: eo
-  name: "cats-eo"
+  name: "eo"
   featured: true
   tagline: "Existential optics for Scala 3, built on cats."
   description: >
@@ -29,8 +29,6 @@
 - slug: rivoli
   name: "rivoli"
   featured: true
-  # Research artefact, not a library — shown on the home page only.
-  home_only: true
   tagline: "A 744B mixture-of-experts decode engine on one 128 GB APU."
   description: >
     Rust + tokio streaming inference for GLM-5.2 (744B int4, 78 layers,
@@ -42,9 +40,10 @@
   stack: "Rust + tokio + HIP/ROCm (gfx1151)"
   status: "Active — ≥1 tok/s goal met (2026)"
   repo: "https://github.com/Constructive-Programming/rivoli"
+  docs: "https://rivoli.constructive.dev/"
 
 - slug: cardinality
-  name: "scala-cardinality"
+  name: "cardinality"
   featured: true
   tagline: "Counting type inhabitants — keep your types small."
   description: >
@@ -56,3 +55,18 @@
   status: "Active — sbt-cardinality 0.0.6 (2026)"
   repo: "https://github.com/Constructive-Programming/scala-cardinality"
   docs: "https://cardinality.constructive.dev/"
+
+- slug: fixed
+  name: "Fixed"
+  tagline: "A functional language for multi-million-line codebases."
+  description: >
+    Whole-system guarantees without compromising speed, designed for
+    development alongside coding agents. Programs describe the
+    capabilities their methods need (cap); the compiler picks data
+    structures and machine layout, using algebraic effects, Perceus
+    reference counting and functional-but-in-place updates. Properties
+    (prop) and refinement types are first-class.
+  stack: "Language design"
+  status: "Phase 0 — design"
+  repo: "https://github.com/Constructive-Programming/fixed"
+  docs: "https://fixed.constructive.dev/"

@@ -38,6 +38,7 @@
 
     <!-- Menu -->
     <ul class="hide">
+        {% assign current_url = page.url %}
         {% assign name_page = "" %}
         {% assign emptyArray = '' | split: '' %}
         {% assign menus = site.data.menu | default: emptyArray %}
@@ -48,10 +49,17 @@
         {% unless page.title == null or page.hide or external or name_page contains page.title %}
             <li class="separator"> | </li>
             <li>
+                {%- if page.url == current_url -%}
+                <span class="clear nav-current" aria-current="page">
+                    {%- if page.icon -%}<i class="navbar-icon {{ page.icon }}" aria-hidden="true"></i>{%- endif -%}
+                    <span class="navbar-label{% if page.icon %} navbar-label-with-icon{% endif %}">{{ page.title }}</span>
+                </span>
+                {%- else -%}
                 <a class="clear" aria-label="{{ page.title }}" title="{{ page.title }}" href="{{ page.url | relative_url }}">
                     {%- if page.icon -%}<i class="navbar-icon {{ page.icon }}" aria-hidden="true"></i>{%- endif -%}
                     <span class="navbar-label{% if page.icon %} navbar-label-with-icon{% endif %}">{{ page.title }}</span>
                 </a>
+                {%- endif -%}
             </li>
         {% endunless %}
         {% assign name_page = page.title | append: name_page %}

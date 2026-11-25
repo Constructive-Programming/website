@@ -104,7 +104,7 @@ pre code {
 }
 
 /* --- Measure: cap prose at ~68ch on wide viewports.
-       Applies to the main reading columns on /, /about/, /libraries/.
+       Applies to the main reading columns on /, /about/, /contributions/.
        Doesn't constrain the card grids, the footer, or layout containers. ---- */
 
 #consulting .col-md-10,
@@ -176,6 +176,14 @@ pre code {
 .navbar-label,
 .site-title {
   font-family: $cp-sans;
+}
+
+/* Current page in the navbar: not a link, highlighted in the accent. */
+.nav-current {
+  color: var(--link);
+  font-weight: 700;
+  border-bottom: 2px solid currentColor;
+  cursor: default;
 }
 
 .site-title {
