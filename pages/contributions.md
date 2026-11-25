@@ -1,28 +1,29 @@
 ---
 layout: page
-title: Libraries
-subtitle: Open engineering output from the practice
-permalink: /libraries/
+title: Contributions
+subtitle: Open-source contributions from the practice
+permalink: /contributions/
 bootstrap: true
 tags: libraries
 ---
 
-These are the libraries Constructive Programming has built in the open
-— code that puts the methodology into production, and the research
-artefacts that justify the methodology in the first place. Each one is
-independently versioned at
+**Everything here is open source.** These are Constructive Programming's
+open-source contributions: libraries that put the methodology into
+production, and the research artefacts that justify it in the first
+place. Each one is free to use, independently versioned, and developed
+in public at
 [github.com/Constructive-Programming](https://github.com/Constructive-Programming).
 
 {% include libraries.html %}
 
-[**cats-eo**](https://eo.constructive.dev/) is the flagship: an
+[**eo**](https://eo.constructive.dev/) is the flagship: an
 existential-optics library for Scala 3 with discipline-checked laws,
 JMH benchmarks against Monocle, and circe + avro integrations. It is
 what we reach for when a client needs the same lens to work over an
 in-memory record, a JSON byte buffer, and an Avro wire payload — and
 when they need that lens to keep its laws under change.
 
-[**scala-cardinality**](https://cardinality.constructive.dev/)
+[**cardinality**](https://cardinality.constructive.dev/)
 is the research artefact behind the *Total Program Cardinality* thesis
 — the metric that counts the inhabitants of an ADT and informs the
 *narrowing* work we do on client codebases. Now under active
@@ -36,10 +37,15 @@ algebra and droste recursion schemes; it is the proving ground for
 the recursion-scheme techniques that show up later in production
 pipelines.
 
-The home page introduces another, longer-running output:
-[**Fixed**](https://fixed.constructive.dev/) — a new functional
-language being designed around the same constructive principles. Phase 0
-of that design is in flight; the implementation will follow.
+[**rivoli**](https://rivoli.constructive.dev/) is a research
+artefact: a 744B mixture-of-experts decode engine running on a single
+128 GB APU, where every milestone is gated on a measured number.
+
+[**Fixed**](https://fixed.constructive.dev/) is the longest-running
+output: a new functional language for multi-million-line codebases,
+designed around the same constructive principles and for development
+alongside coding agents. Phase 0 — design — is in flight; the
+implementation will follow.
 
 ## Working with us
 

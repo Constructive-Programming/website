@@ -23,21 +23,21 @@ criteria:
 
 The methodology is the lens through which we read code, design APIs, and
 prepare a codebase to be co-piloted by LLMs. The
-[Libraries]({{ '/libraries/' | relative_url }}) page lists the OSS that
-puts the methodology into Scala practice, and the home page introduces
-[Fixed](https://fixed.constructive.dev/) — a new
-language being designed around the same principles.
+[Contributions]({{ '/contributions/' | relative_url }}) page lists the OSS
+that puts the methodology into Scala practice, and the home page introduces
+[Fixed](https://fixed.constructive.dev/) — a new language being designed
+around the same principles.
 
 ## The team
 
-### Rodolfo Hansen — Head of Construction
+### Rodolfo Hansen — Director
 
 Rodolfo founded Constructive Programming and currently leads the practice.
 He's been writing software professionally for more than two decades —
 across Scala, Rust, Haskell, Kotlin, JavaScript, and a number of paradigms
 — and has been a CTO, a founder, an engineering manager, and an IC at
 nearly every team scale below "100 engineers." He is currently the main
-engineer behind the [cats-eo](https://eo.constructive.dev/) library and
+engineer behind the [eo](https://eo.constructive.dev/) library and
 is designing the new research language
 [Fixed](https://fixed.constructive.dev/), based in the
 Netherlands, where he operates this consulting firm.
@@ -71,7 +71,7 @@ type system could do to make wrong programs harder to write.
 
 - **Serialization &amp; De-serialization without doing either** —
   *Scala Love*, Warsaw, 2024. A novel use of polymorphic lenses, with
-  code drawn from [cats-eo](https://github.com/Constructive-Programming/eo).
+  code drawn from [eo](https://github.com/Constructive-Programming/eo).
 - **Total Program Cardinality** — *Scala Love (online)*, 2023.
   A new code-quality metric grounded in counting the inhabitants of a
   program's types.
