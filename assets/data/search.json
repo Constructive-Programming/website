@@ -13,6 +13,16 @@
   
   
   {
+      "title"    : "Contributions",
+      "subtitle"    : "Open-source contributions from the practice",
+      "category" : "",
+      "tags"     : "libraries",
+      "url"      : "/contributions/"
+  },
+  
+  
+  
+  {
       "title"    : "Engagements",
       "subtitle"    : "How we work — three offerings, one bar for quality",
       "category" : "",
@@ -33,14 +43,6 @@
   
   
   
-  
-  {
-      "title"    : "Libraries",
-      "subtitle"    : "Open engineering output from the practice",
-      "category" : "",
-      "tags"     : "libraries",
-      "url"      : "/libraries/"
-  },
   
   
   
